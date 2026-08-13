@@ -1,0 +1,14 @@
+{
+  "software_engineering": {
+    "filename": "Candidate_SOURCE_Software_Engineering.docx",
+    "sha256": "replace-with-sha256-of-source-document",
+    "source_title": "Current Resume Headline",
+    "summary_prefix": "Opening words of the existing professional summary"
+  },
+  "consulting_architecture": {
+    "filename": "Candidate_SOURCE_Consulting_Architecture.docx",
+    "sha256": "replace-with-sha256-of-source-document",
+    "source_title": "Current Resume Headline",
+    "summary_prefix": "Opening words of the existing professional summary"
+  }
+}

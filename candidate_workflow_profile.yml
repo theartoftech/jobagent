@@ -1,0 +1,189 @@
+# Strict workflow profile for the candidate job-screening and resume gating.
+# This file is intentionally conservative. It is used after discovery/scoring
+# to decide whether a job should reach the human resume workflow.
+
+salary_floor: 150000
+
+excluded_companies:
+  - Oracle
+
+preferred_locations:
+  - Remote US
+  - Preferred State
+  - Preferred City
+  - Preferred Suburb
+  - Nearby Suburb
+  - Hybrid Preferred City
+  - Commuting distance to Preferred City office
+
+# A Senior/Lead opening at one of these companies may remain viable when its
+# technical fit is strong, even if the title is below the candidate's current level.
+strategic_companies:
+  - Block
+  - Stripe
+  - Atlassian
+  - Mastercard
+  - Intuit
+  - CVS Health
+  - Elevance Health
+  - Global Payments
+  - NCR Voyix
+  - ServiceNow
+  - Workday
+  - Apps Associates
+  - Accenture
+  - PwC
+  - Cognizant
+  - Infosys
+
+# Exact-URL approvals for an otherwise high overqualified-risk role. Keep this
+# posting-scoped so approval never transfers to a different requisition.
+seniority_approvals: {}
+
+confirmed_strengths:
+  - Java
+  - J2EE
+  - Spring Boot
+  - REST APIs
+  - Oracle CPQ
+  - quote-to-cash
+  - pricing workflows
+  - approvals workflows
+  - document generation
+  - Oracle DB
+  - SQL
+  - MySQL
+  - PostgreSQL
+  - Docker
+  - Kubernetes-deployed applications
+  - CI/CD
+  - production troubleshooting
+  - technical leadership
+  - professional services
+  - enterprise integrations
+  - Unix/Linux
+  - customer-facing technical delivery
+  - forward deployed engineering
+  - customer-facing software engineering
+  - deployment into customer environments
+
+allowed_with_care:
+  - JavaScript
+  - Oracle JET
+  - Python deployment automation
+  - AI-assisted development with Codex
+  - IBM MQ
+  - MSMQ
+  - OCI
+  - Kubernetes application support
+  - technical consulting
+  - solution architecture
+
+do_not_claim:
+  - React
+  - Angular
+  - Vue
+  - TypeScript professional experience
+  - Ruby on Rails
+  - Go
+  - Kotlin
+  - Python backend professional experience
+  - AWS
+  - Azure
+  - GCP
+  - Kafka
+  - MongoDB
+  - NoSQL
+  - Salesforce Apex
+  - LWC
+  - Flows
+  - Data Cloud
+  - Agentforce
+  - production RAG
+  - embeddings
+  - MCP servers
+  - ledgering
+  - settlement
+  - treasury
+  - double-entry accounting
+
+# Answers copied back from workflow-review prompts. Entries are scoped to the
+# exact posting URL so a resolution cannot silently apply to another opening.
+gap_resolutions: {}
+
+hard_reject_if_primary:
+  - React-heavy frontend
+  - Angular-heavy frontend
+  - Vue-heavy frontend
+  - Ruby on Rails primary stack
+  - Go primary stack
+  - Python primary backend stack
+  - Salesforce platform development
+  - AWS/Terraform/EKS infrastructure
+  - production AI/ML platform engineering
+  - DevOps-only
+  - SRE-only
+  - active clearance required
+  - West Coast office attendance required
+  - international-only location
+
+hard_screen_questions:
+  - 4+ years React
+  - 4+ years Angular
+  - production Ruby/Rails
+  - current Ruby/Rails production use
+  - AWS required
+  - GCP required
+  - Azure required
+  - active clearance required
+  - current Salesforce Apex experience
+  - current Go production experience
+  - current Python backend production experience
+  - ledgering or settlement experience required
+
+resume_templates:
+  software_engineering:
+    use_for:
+      - Java backend
+      - enterprise SaaS
+      - API/platform
+      - CI/CD
+      - production systems
+      - SQL/database-heavy application engineering
+  consulting_architecture:
+    use_for:
+      - solution architect
+      - technical consultant
+      - customer-facing technical architecture
+      - professional services
+      - implementation leadership
+      - forward deployed engineer
+      - forward deployed architect
+  cpq_implementation:
+    use_for:
+      - CPQ implementation
+      - quote-to-cash consulting
+      - pricing/configuration workflows
+      - Infor/Salesforce/Oracle CPQ adjacency
+  technical_success:
+    use_for:
+      - success architect
+      - customer architect
+      - technical account architect
+      - customer solutions architect
+
+resume_workflow_policy:
+  generate_for:
+    - STRONG APPLY
+    - APPLY
+  allow_for_moderate_stretch_only_when:
+    - gaps_are_preferred_not_required
+    - role_has_clear_java_backend_or_cpq_or_consulting_core
+    - salary_and_location_fit
+    - missing_gap_answers_false
+  never_generate_when:
+    - EXTREME STRETCH
+    - SKIP
+    - required_experience_gap_present
+    - hard_screen_question_failed
+    - missing_gap_answers_true

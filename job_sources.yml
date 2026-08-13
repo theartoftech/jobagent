@@ -1,0 +1,57 @@
+sources:
+  - name: LinkedIn Jobs
+    type: primary_browser_assisted
+    priority: 1
+    notes: >
+      Use as the primary browser-assisted source for current opportunity discovery. Review
+      the complete listing, preserve the LinkedIn URL, and verify promising jobs against the
+      employer's official company or ATS posting before recommending Apply or Maybe. Confirm
+      employer identity, application-domain ownership, recruiter credibility, freshness,
+      compensation, location, duplicate status, and suspicious application behavior. A logged-in
+      browser session is optional; unattended runs must continue through official ATS discovery
+      and generate LinkedIn search links rather than failing.
+
+  - name: Indeed
+    type: discovery
+    notes: >
+      Use for discovery and freshness hints. Reject stale indexed postings when the
+      official company page is expired, delisted, unavailable, or materially different.
+
+  - name: Google Jobs
+    type: discovery
+    notes: >
+      Use broad searches to find exact requisition titles and alternate official URLs.
+
+  - name: Glassdoor
+    type: discovery
+    notes: >
+      Use as a supplemental source for employer/job-title discovery.
+
+  - name: Dice
+    type: discovery
+    notes: >
+      Use for Java, backend, architecture, and technical consulting discovery.
+
+  - name: Built In
+    type: discovery
+    notes: >
+      Use for technology-company discovery, especially remote and Atlanta-friendly roles.
+
+  - name: RemoteOK
+    type: discovery
+    notes: >
+      Use for remote software-engineering discovery. Verify dates carefully.
+
+  - name: Wellfound
+    type: discovery
+    notes: >
+      Use for startup and SaaS discovery. Verify company pages before recommending.
+
+  - name: USAJOBS
+    type: official
+    notes: >
+      Use the official USAJOBS Search API for federal 2210 / application software
+      roles when USAJOBS_USER_AGENT and USAJOBS_AUTHORIZATION_KEY are available
+      in the local environment. Treat as official live postings, but screen
+      strictly for public eligibility, clearance requirements, seniority/pay fit,
+      location, Java/backend/application software relevance, and no-stretch rules.

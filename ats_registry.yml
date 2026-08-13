@@ -1,0 +1,179 @@
+companies:
+  OneTrust:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/onetrust
+
+  RELX:
+    ats:
+      - type: workday
+        url: https://relx.wd3.myworkdayjobs.com/relx
+
+  LexisNexis Risk Solutions:
+    ats:
+      - type: workday
+        url: https://relx.wd3.myworkdayjobs.com/RiskSolutions
+      - type: workday
+        url: https://relx.wd3.myworkdayjobs.com/LexisNexisLegal
+
+  Atlassian:
+    ats:
+      - type: atlassian
+        url: https://www.atlassian.com/company/careers
+
+  Insight Global Staffing:
+    ats:
+      - type: insightglobal
+        url: https://jobs.insightglobal.com/
+      - type: icims
+        url: https://careers-insightglobal.icims.com/jobs
+
+  Southern Company:
+    ats:
+      - type: firstparty-listing
+        url: https://southerncompany.jobs/jobs/
+
+  Georgia Power:
+    ats:
+      - type: firstparty-listing
+        url: https://southerncompany.jobs/jobs/
+
+  Stripe:
+    ats:
+      - type: firstparty-listing
+        url: https://stripe.com/jobs/search
+
+  Docker:
+    ats:
+      - type: ashby
+        url: https://jobs.ashbyhq.com/docker
+
+  Mastercard:
+    ats:
+      - type: workday
+        url: https://mastercard.wd1.myworkdayjobs.com/CorporateCareers
+
+  Intuit:
+    ats:
+      - type: intuit
+        url: https://jobs.intuit.com/search-jobs
+
+  BlackRock:
+    ats:
+      - type: firstparty-listing
+        url: https://www.blackrock.com/corporate/careers/job-search
+
+  Anomaly:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/anomaly
+
+  Block:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/block
+
+  Collibra:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/collibra
+
+  Cohere Health:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/coherehealth
+
+  ElevenLabs:
+    ats:
+      - type: ashby
+        url: https://jobs.ashbyhq.com/elevenlabs
+
+  LangChain:
+    ats:
+      - type: ashby
+        url: https://jobs.ashbyhq.com/langchain
+
+  Charlie Health:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/charliehealth
+
+  Clover Health:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/cloverhealth
+
+  DispatchHealth:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/dispatchhealth
+
+  Gifthealth:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/gifthealth
+
+  Nomi Health:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/nomihealth
+
+  Omada:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/omadahealth
+
+  Parachute Health:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/parachutehealth
+
+  Prescryptive Health:
+    ats:
+      - type: workday
+        url: https://prescryptive.wd503.myworkdayjobs.com/Prescryptive_Health_External
+
+  Northeast Georgia Health System:
+    ats:
+      - type: workday
+        url: https://nghs.wd1.myworkdayjobs.com/External
+
+  The Weather Company LLC:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/theweathercompany
+
+  Temporal Technologies:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/temporaltechnologies
+
+  Automattic:
+    ats:
+      - type: greenhouse
+        url: https://job-boards.greenhouse.io/automattic
+
+  Rivian:
+    ats:
+      - type: greenhouse
+        url: https://boards.greenhouse.io/rivian
+
+  Stord:
+    ats:
+      - type: workday
+        url: https://stord.wd503.myworkdayjobs.com/Stord_External_Career
+
+  RaceTrac:
+    ats:
+      - type: workday
+        url: https://racetrac.wd5.myworkdayjobs.com/SSC
+
+  NCR Atleos:
+    ats:
+      - type: workday
+        url: https://ncratleos.wd5.myworkdayjobs.com/EXT
+
+  Inspira Financial:
+    ats:
+      - type: adp
+        url: https://myjobs.adp.com/inspiracareers/

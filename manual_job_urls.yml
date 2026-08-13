@@ -1,0 +1,88 @@
+jobs:
+  - company: Inspira Financial
+    title: Lead Solutions Architect (Remote)
+    url: https://myjobs.adp.com/inspiracareers/cx/job-details?reqId=5001215356506
+    source_url: https://www.indeed.com/viewjob?jk=538c32ce70d87a9b
+    added_on: 2026-08-10
+    source: indeed-manual-feedback
+  - company: C3 AI
+    title: Forward Deployed Team Lead
+    url: https://c3.ai/job-description/8577794002?gh_jid=8577794002
+    source_url: https://www.linkedin.com/jobs/view/4420151486/
+    added_on: 2026-08-10
+    source: linkedin-manual-feedback
+  - company: GlobalLogic
+    title: Forward Deployed AI Architect IRC296102
+    url: https://www.linkedin.com/jobs/view/4449757371/
+    source_url: https://www.linkedin.com/jobs/view/4449757371/
+    added_on: 2026-08-10
+    source: linkedin-manual-feedback
+    verification_status: needs_official_verification
+    notes: LinkedIn Easy Apply listing; no live official GlobalLogic posting was resolved.
+  - company: FullStack
+    title: Principal Agentic Engineer
+    url: https://talent.fullstack.com/jobs/aef7ee91-020a-464e-a374-b51ac9203461
+    added_on: 2026-08-07
+    source: linkedin-manual-feedback
+  - company: Genuine Parts Company
+    title: Staff Engineer - Supply Chain Technology
+    url: https://jobs.genpt.com/job/atlanta/staff-engineer-supply-chain-technology/505/96361416240
+  - company: LexisNexis Risk Solutions
+    title: Consulting/Principal Software Engineer
+    url: https://relx.wd3.myworkdayjobs.com/en-US/LexisNexisLegal/job/Consulting-Principal-Software-Engineer_R112606
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: Waystar
+    title: Staff Software Engineer
+    url: https://careers.waystar.com/atlanta-ga/staff-software-engineer/B04A119A21D34D2495BAC1DC53164D60/job/
+    source_url: https://www.linkedin.com/jobs/view/4440804336/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: Honeywell
+    title: Principal Software Architect
+    url: https://ibqbjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/job/154498/
+    source_url: https://www.linkedin.com/jobs/view/4449403272/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: Iterable
+    title: Senior Software Engineer (Channels)
+    url: https://job-boards.greenhouse.io/iterable/jobs/7766310
+    source_url: https://www.linkedin.com/jobs/view/4394719740/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: AppFolio
+    title: Staff Software Engineer - Investor/Owner
+    url: https://jobs.jobvite.com/appfolio/job/ot7aAfw4
+    source_url: https://www.linkedin.com/jobs/view/4417409278/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: AutoStore
+    title: Principal Architect
+    url: https://autostore.wd3.myworkdayjobs.com/autostore/job/Atlanta-GA-USA/Principal-Architect_JR102626
+    source_url: https://www.linkedin.com/jobs/view/4440627408/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: Truist
+    title: Lead Software Engineer
+    url: https://careers.truist.com/us/en/job/TBJTBFUSR0117326EXTERNALENUS/Lead-Software-Engineer
+    source_url: https://www.linkedin.com/jobs/view/4448391778/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: Circle
+    title: Staff Software Engineer
+    url: https://careers.circle.com/us/en/job/CIICIRUSJR100014EGEXTERNALENUS/Staff-Software-Engineer
+    source_url: https://www.linkedin.com/jobs/view/4241271648/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: Delta Dental Insurance
+    title: Senior Software Engineer (Java back-end)
+    url: https://ejep.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/job/3388/
+    source_url: https://www.linkedin.com/jobs/view/4446337320/
+    added_on: 2026-08-08
+    source: linkedin-manual-feedback
+  - company: Indeed
+    title: Principal Software Engineer V
+    url: https://www.indeed.com/viewjob?jk=aa89b4d0151e7b12
+    source_url: https://www.indeed.com/viewjob?jk=aa89b4d0151e7b12
+    added_on: 2026-08-09
+    source: indeed-manual-feedback

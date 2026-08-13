@@ -1,0 +1,1494 @@
+companies:
+  - name: Salesforce
+    careers_url: https://careers.salesforce.com/en/jobs/
+    notes: >
+      Prioritize backend Java, enterprise SaaS, platform engineering, API, integration,
+      CPQ, quote-to-cash, and Atlanta/Georgia/remote-friendly roles. Avoid Salesforce
+      platform roles requiring Apex, LWC, Flow, Data Cloud, or Agentforce ownership
+      unless clearly secondary.
+
+  - name: MuleSoft
+    careers_url: https://careers.salesforce.com/en/jobs/
+    notes: >
+      Search as part of Salesforce. Prioritize backend API platform, integration runtime,
+      Java, REST, enterprise integration, platform engineering, solution architecture,
+      integration consulting, and technically deep advisory roles. Avoid sales-only
+      presales, active-clearance, and MuleSoft-only roles requiring deep Anypoint/DataWeave
+      experience unless they involve backend engineering, integration architecture, or
+      technical delivery ownership.
+
+  - name: Slack
+    careers_url: https://careers.salesforce.com/en/jobs/
+    notes: >
+      Search as part of Salesforce. Consider backend/platform application roles only.
+      Avoid AWS/Terraform/EKS-heavy infrastructure roles and West Coast office requirements.
+
+  - name: OneTrust
+    careers_url: https://www.onetrust.com/careers/
+    notes: >
+      Prioritize backend Java, platform engineering, enterprise SaaS, integrations,
+      APIs, data/privacy platform engineering, and Atlanta/remote roles.
+
+  - name: Fiserv
+    careers_url: https://www.careers.fiserv.com/
+    notes: >
+      Prioritize Java backend, payments platform, APIs, SQL/database, enterprise software,
+      production support, and Alpharetta/Atlanta/remote roles. Avoid .NET-first roles.
+
+  - name: Mastercard
+    careers_url: https://careers.mastercard.com/us/en/search-results?keywords=Software%20Engineer
+    ats_urls:
+      - https://mastercard.wd1.myworkdayjobs.com/CorporateCareers
+    title_aliases:
+      - Lead Software Engineer
+      - Staff Backend Software Engineer
+      - Principal Software Engineer
+      - Senior Software Engineer
+    notes: >
+      Payments and decisioning-platform target with Atlanta and Arlington opportunities.
+      Prioritize senior backend and full-stack product engineering, Java, APIs, distributed
+      systems, transaction processing, SQL/database-backed applications, testing,
+      observability, secure coding, and technical leadership. Treat AI/ML, agentic tools,
+      or decisioning-domain exposure as secondary unless the posting makes them mandatory.
+      Avoid roles that are primarily data science, infrastructure operations, or frontend-only.
+
+  - name: Intuit
+    careers_url: https://jobs.intuit.com/search-jobs
+    title_aliases:
+      - Staff Backend Software Engineer
+      - Staff Software Engineer
+      - Principal Software Engineer
+      - Senior Software Engineer
+    notes: >
+      Financial-management and small-business platform target with Atlanta opportunities.
+      Prioritize backend and full-stack application engineering, Java/Spring where applicable,
+      APIs, enterprise integrations, scalable systems, software architecture, testing,
+      production support, technical leadership, and mentoring. Treat AI integration as a
+      secondary fit signal unless the posting requires prior production AI/ML ownership.
+      Avoid stale postings and roles centered primarily on data science, infrastructure,
+      or frontend-only delivery.
+
+  - name: Inspira Financial
+    careers_url: https://myjobs.adp.com/inspiracareers/
+    official_search_domains:
+      - inspirafinancial.com
+      - myjobs.adp.com
+    title_aliases:
+      - Lead Solutions Architect
+      - Principal Solutions Architect
+      - Enterprise Architect
+      - Principal Software Engineer
+    notes: >
+      Financial-services and retirement-platform target. Prioritize solution and enterprise
+      architecture, APIs, integration patterns, distributed systems, cloud-native application
+      design, modernization, architecture governance, technical leadership, mentoring, and
+      senior stakeholder advisory. Atlanta-compatible remote roles are acceptable. Treat a
+      preferred Azure background as adjacent to OCI unless Azure is a hard production screen.
+
+  - name: Global Payments
+    careers_url: https://jobs.globalpayments.com/en/jobs/
+    notes: >
+      Prioritize Java backend, SQL/database-heavy application engineering, APIs,
+      production troubleshooting, Linux/Unix, and Alpharetta/Atlanta roles. Verify that
+      job pages are live, because stale indexed postings may return 404.
+
+  - name: Workday
+    careers_url: https://workday.wd5.myworkdayjobs.com/Workday
+    title_aliases:
+      - Software Development Engineer
+      - Software Engineer/Software Development Engineer
+      - Engineer
+    notes: >
+      Prioritize backend platform, enterprise SaaS, Java, integrations, data services,
+      and application engineering roles. Avoid roles requiring deep Workday-specific
+      configuration unless software-engineering focused.
+
+  - name: TriNet
+    careers_url: https://jobs.trinet.com/careers?domain=trinet.com
+    official_search_domains:
+      - jobs.trinet.com
+      - trinet.com
+    title_aliases:
+      - Staff Software Engineer
+      - Senior Software Engineer
+      - Software Architect
+      - Solutions Architect
+    notes: >
+      HR, payroll, benefits, and PEO SaaS target with Atlanta and remote potential.
+      Prioritize senior backend/platform engineering, Java/Spring where applicable,
+      APIs, payroll and benefits workflows, enterprise integrations, SQL/database-
+      backed applications, application modernization, solution architecture,
+      technical consulting, production reliability, and technical leadership roles.
+      Avoid sales-only, HR-operations-only, payroll-processing-only, support-only,
+      security-only, data/AI-only, infrastructure-only, or frontend-heavy roles unless
+      application/platform engineering or technical delivery ownership is central.
+
+  - name: Riskonnect
+    careers_url: https://riskonnect.com/company/careers/
+    official_search_domains:
+      - riskonnect.com
+      - workforcenow.adp.com
+    title_aliases:
+      - Senior Software Engineer
+      - Principal Software Engineer
+      - Solutions Architect
+      - Implementation Consultant
+      - Technical Consultant
+    notes: >
+      Atlanta-based integrated risk-management, GRC, claims, policy, billing, and
+      business-continuity SaaS target with remote and hybrid potential. Prioritize
+      senior backend/platform engineering, Java/Spring where applicable, APIs and
+      enterprise integrations, SQL/database-backed applications, workflow and document
+      automation, implementation consulting, solution architecture, customer-facing
+      technical delivery, production reliability, and technical leadership roles.
+      Avoid sales-only, risk-analyst-only, support-only, security-only, data/AI-only,
+      infrastructure-only, or frontend-heavy roles unless application/platform
+      engineering or technical implementation ownership is central.
+
+  - name: Collibra
+    careers_url: https://www.collibra.com/company/careers
+    official_search_domains:
+      - collibra.com
+      - job-boards.greenhouse.io
+    title_aliases:
+      - Senior Software Engineer
+      - Staff Software Engineer
+      - Senior Customer Engineer
+      - Senior Enterprise Solution Architect
+      - Technical Consultant
+    notes: >
+      Enterprise data governance, catalog, lineage, quality, privacy, and integration
+      SaaS target with remote U.S. engineering and customer-solutions potential.
+      Prioritize senior backend/platform application engineering, enterprise APIs and
+      integrations, metadata and workflow platforms, SQL/database-backed applications,
+      customer engineering, solution architecture, professional services, production
+      reliability, and technical leadership roles. Screen carefully for Go-first cloud
+      infrastructure, Terraform/Kubernetes operations, production AI/ML, deep data-
+      engineering, and product-specific certification requirements. Avoid sales-only,
+      support-only, DevOps/infrastructure-only, AI-only, or frontend-heavy roles unless
+      application/platform engineering or technical delivery ownership is central.
+
+  - name: ServiceNow
+    careers_url: https://careers.servicenow.com/jobs/
+    notes: >
+      Prioritize backend platform, enterprise SaaS, Java, distributed systems,
+      workflow automation, integrations, and remote/Atlanta-friendly roles.
+      Avoid heavy front-end or product AI roles unless backend is primary.
+
+  - name: Infor
+    careers_url: https://careers.infor.com/
+    notes: >
+      Prioritize enterprise application engineering, Java backend, ERP/CPQ-adjacent,
+      integrations, REST APIs, SQL, and cloud modernization roles.
+
+  - name: Manhattan Associates
+    careers_url: https://www.manh.com/about-us/careers
+    notes: >
+      Prioritize Java backend, enterprise SaaS, supply-chain software, integrations,
+      SQL/database, platform modernization, and Atlanta roles. Avoid Salesforce-platform,
+      front-end design, AI-only, RFID/hardware, or delivery-manager roles.
+
+  - name: SAP
+    careers_url: https://jobs.sap.com/
+    notes: >
+      Prioritize Java backend, enterprise application development, cloud platform,
+      integrations, CPQ/quote-to-cash, commerce, pricing, and SaaS roles.
+      Avoid roles requiring deep SAP functional consulting unless engineering-heavy.
+
+  - name: Boomi
+    careers_url: https://boomi.com/company/careers/
+    notes: >
+      Prioritize backend platform, API, integration, Java, enterprise connectivity,
+      runtime/platform engineering, and distributed systems roles.
+
+  - name: Red Hat
+    careers_url: https://redhat.wd5.myworkdayjobs.com/jobs/?q=Software%20Engineer&a=bc33aa3152ec42d4995f4791a106ed09&c=48e76bf7cb5510011a9542195ab40001&e=3afab13eadf301a2eaafadcc15425800
+    notes: >
+      Prioritize Java backend, platform engineering, Kubernetes-adjacent application
+      engineering, OpenShift-adjacent roles, and enterprise software. Avoid roles that
+      are primarily Linux kernel, support, DevOps, or infrastructure-only.
+
+  - name: IBM
+    careers_url: https://www.ibm.com/careers/search?field_keyword_17[0]=Remote
+    notes: >
+      Prioritize Java backend, enterprise application engineering, hybrid cloud application
+      modernization, integration, database-heavy software engineering, and consulting-engineer
+      roles. Avoid roles requiring heavy mainframe, security clearance, or AI/ML platform depth.
+
+  - name: Guidewire Software
+    careers_url: https://www.guidewire.com/about/careers/jobs?location=United+States+-+Remote&keyword=JAVA&workplaceType=Remote
+    notes: >
+      Prioritize insurance platform, Java backend, enterprise SaaS, integrations,
+      document/workflow systems, SQL/database, and remote-friendly roles. Avoid production
+      AI/ML, heavy cloud-infra, San Mateo hybrid, and front-end-heavy roles.
+
+  - name: Pegasystems
+    careers_url: https://www.pega.com/about/careers
+    notes: >
+      Prioritize backend engineering, enterprise workflow automation, platform engineering,
+      Java, REST APIs, integrations, and enterprise SaaS roles. Avoid roles requiring deep
+      Pega configuration/implementation unless engineering-heavy.
+
+  - name: CVS Health
+    careers_url: https://jobs.cvshealth.com/
+    ats_urls:
+      - https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers
+    title_aliases:
+      - Software Development Engineer
+      - Staff Software Development Engineer
+      - Senior Software Development Engineer
+    notes: >
+      Healthcare, pharmacy, PBM, and benefits platform target. Prioritize backend Java,
+      APIs, PBM modernization, claims/benefits/member workflows, SQL/database-heavy
+      application engineering, workflow automation, and platform modernization.
+      Avoid React-heavy full-stack, production AI/ML platform, and cloud-infrastructure-heavy
+      roles.
+
+  - name: Waystar
+    careers_url: https://careers.waystar.com/
+    notes: >
+      Healthcare payments and revenue-cycle technology target. Prioritize Java/backend,
+      enterprise SaaS, APIs, payment workflows, claims/revenue-cycle integrations,
+      SQL/database-heavy application engineering, workflow automation, production
+      reliability, and technical leadership. Avoid frontend-heavy or junior roles unless
+      backend/platform work is primary.
+
+  - name: Elevance Health
+    careers_url: https://careers.elevancehealth.com/
+    title_aliases:
+      - Engineer Senior
+      - Engineering Tech Lead Senior
+      - Tech Lead Senior
+    notes: >
+      Healthcare payer/platform target. Prioritize Java, Spring Boot, Kotlin/Spring,
+      backend services, distributed systems, claims/benefits/member platforms,
+      APIs, SQL/database, production troubleshooting, and senior technical leadership.
+      Avoid roles that are primarily Python/React/TypeScript, data science, or cloud
+      infrastructure unless backend engineering is primary.
+
+  - name: Kaiser Permanente
+    careers_url: https://www.kaiserpermanentejobs.org/GA-IT
+    notes: >
+      Atlanta healthcare IT target. Prioritize backend/platform software engineering,
+      Java, APIs, enterprise integrations, member/provider systems, SQL/database work,
+      production reliability, and technical leadership. Avoid Epic analyst, infrastructure,
+      support-only, or security-only roles unless software engineering is central.
+
+  - name: Northeast Georgia Health System
+    careers_url: https://www.nghs.com/careers
+    official_search_domains:
+      - nghs.com
+      - nghs.wd1.myworkdayjobs.com
+    title_aliases:
+      - Senior Software Engineer
+      - Application Developer
+      - Senior Application Developer
+      - Integration Developer
+      - Integration Architect
+      - Solutions Architect
+      - Systems Analyst
+    notes: >
+      Regional healthcare-system target covering Gainesville, Braselton, Barrow,
+      Lumpkin, Habersham, and nearby Northeast Georgia locations. Prioritize software
+      and application engineering, Java/backend services, APIs, healthcare-system
+      integrations, interface engines, SQL/database-backed applications, clinical and
+      business workflow automation, platform modernization, production reliability,
+      solution architecture, and technical leadership. Consider technically deep
+      application or integration analyst roles when development and system ownership
+      are central. Avoid clinical-care-only, Epic configuration-only, helpdesk,
+      desktop support, networking, infrastructure-only, security-only, and purely
+      administrative roles unless software/application delivery is the primary work.
+
+  - name: Children's Healthcare of Atlanta
+    careers_url: https://careers.choa.org/us/en/c/information-technology-jobs
+    notes: >
+      Local Atlanta healthcare target. Prioritize software engineering, backend services,
+      APIs, integrations, SQL/database, workflow automation, and platform modernization.
+      Avoid application analyst, Epic-only, helpdesk, infrastructure, or security-only roles.
+
+  - name: GE HealthCare
+    careers_url: https://careers.gehealthcare.com/global/en/c/digital-technology-it-jobs
+    notes: >
+      Healthcare technology target. Prioritize Java/backend, mission-critical application
+      platforms, APIs, Kubernetes/Docker-adjacent application engineering, SQL/database,
+      production reliability, and technical leadership. Avoid DevOps/cloud-infrastructure-only
+      or hardware/device-focused roles unless application engineering is primary.
+
+  - name: Greenway Health
+    careers_url: https://www.greenwayhealth.com/careers/explore-jobs
+    notes: >
+      Healthcare software and practice-management/EHR-adjacent target. Prioritize backend
+      engineering, Java, APIs, integrations, SQL/database, workflow automation, healthcare
+      business systems, and production support. Avoid implementation/support-only or .NET-heavy
+      roles unless the software engineering fit is strong.
+
+  - name: EngagedMD
+    careers_url: https://www.engagedmd.com/careers
+    notes: >
+      Healthcare workflow, patient education, and consent-automation SaaS target.
+      Prioritize backend/platform software engineering, Java or adjacent enterprise
+      backend roles, APIs, integrations, workflow automation, document/process systems,
+      SQL/database-backed application engineering, production reliability, and remote-friendly
+      U.S. roles. Avoid implementation/support-only, frontend-heavy, product-design, or
+      data/analytics-first roles unless backend application engineering is primary.
+
+  - name: Cisco
+    careers_url: https://careers.cisco.com/global/en
+    notes: >
+      Medium-priority opportunistic target. Prioritize backend/platform engineering,
+      Java, APIs, integrations, customer-experience engineering, enterprise application
+      services, SQL/database-heavy application work, and hands-on technical consulting
+      roles where software implementation remains primary. Avoid network support,
+      security-only, infrastructure-only, DevOps-only, and generic AI/platform roles
+      unless backend application engineering is clearly central.
+
+  - name: Macy's
+    careers_url: https://www.macysjobs.com/
+    notes: >
+      Prioritize Java backend, packaged software, SQL/data processing, enterprise systems,
+      cloud-friendly modernization, and Johns Creek/Atlanta hybrid roles. Avoid roles that
+      require GCP/Python/data-engineering depth as primary unless otherwise aligned.
+
+  - name: Chick-fil-A
+    careers_url: https://careers.chick-fil-a.com/corporate/jobs
+    notes: >
+      High-priority Atlanta-area target. Prioritize backend Java, Spring Boot,
+      APIs, enterprise platforms, commerce/order systems, integrations, SQL/database,
+      cloud modernization, product engineering, and technical leadership roles.
+      Avoid customer support, restaurant operations, marketing-site, mobile-first,
+      or front-end-heavy roles unless backend application engineering is primary.
+
+  - name: Delta Air Lines
+    careers_url: https://delta.avature.net/careers
+    notes: >
+      High-priority Atlanta target given office proximity. Prioritize backend services,
+      Java/Spring Boot, APIs, enterprise platforms, integrations, SQL/database-heavy
+      application work, reliability, and senior engineering roles tied to customer,
+      operations, or internal platform systems. Avoid airline operations-only,
+      data-science-only, infrastructure-only, or front-end-heavy roles unless
+      backend engineering remains the center of gravity.
+
+  - name: The Home Depot
+    careers_url: https://careers.homedepot.com/
+    notes: >
+      High-priority Atlanta/Vinings/Cumberland-area target. Prioritize Java, Spring Boot,
+      backend services, APIs, enterprise platforms, distributed systems, product/platform
+      engineering, SQL/database work, CI/CD, Kubernetes/Docker, and technical leadership.
+      Avoid React-heavy frontend roles or GCP/cloud-infrastructure roles where application
+      engineering is not primary.
+
+  - name: Cox Enterprises
+    careers_url: https://jobs.coxenterprises.com/
+    notes: >
+      High-priority Sandy Springs/Vinings-area target. Prioritize backend services,
+      Java/Spring Boot, REST APIs, enterprise platforms, data services, integrations,
+      product engineering, and technical leadership. Screen carefully for full-stack,
+      mobile, or AI-heavy roles.
+
+  - name: Cox Automotive
+    careers_url: https://jobs.coxenterprises.com/
+    notes: >
+      Search within Cox careers. Prioritize automotive commerce platforms, backend Java,
+      APIs, integrations, enterprise SaaS, data services, and production engineering.
+      Avoid frontend-heavy or cloud-infrastructure-only postings.
+
+  - name: Intercontinental Exchange
+    careers_url: https://www.ice.com/careers
+    notes: >
+      Strong downtown/Midtown Atlanta target. Prioritize Principal Engineer, Senior Java
+      Developer, backend platform, regulated financial systems, Java, SQL/database,
+      production reliability, performance tuning, and technical leadership roles.
+
+  - name: ICE
+    careers_url: https://www.ice.com/careers
+    notes: >
+      Alias for Intercontinental Exchange. Use this name in searches because postings may
+      use either ICE or Intercontinental Exchange. Prioritize Java/backend/database-heavy
+      roles in Atlanta.
+
+  - name: NCR Voyix
+    careers_url: https://www.ncrvoyix.com/careers
+    notes: >
+      Atlanta commerce/payments/retail technology target. Prioritize Java backend,
+      enterprise platforms, payments/commerce systems, APIs, integrations, SQL/database,
+      production support, and technical leadership. Screen for compensation and level.
+
+  - name: NCR Atleos
+    careers_url: https://www.ncratleos.com/careers
+    notes: >
+      Atlanta banking, ATM, payments, and financial-services technology target. Prioritize
+      senior software engineering, Java/backend services, APIs, integrations, payments
+      workflows, transaction systems, SQL/database-backed applications, production
+      reliability, technical leadership, and Atlanta/remote-friendly roles. Screen for
+      infrastructure-only, hardware-only, field-service, or support-only roles unless
+      software engineering or technical delivery ownership is central.
+
+  - name: RELX
+    careers_url: https://www.relx.com/careers
+    notes: >
+      Strong skill fit, often Alpharetta. Prioritize consulting/principal software
+      engineer, Java, SQL, database architecture, production troubleshooting, batch
+      processing, data-access layers, and advisory engineering roles.
+
+  - name: LexisNexis Risk Solutions
+    careers_url: https://risk.lexisnexis.com/careers
+    notes: >
+      Search as part of RELX/LexisNexis. Prioritize Java/backend, SQL/database-heavy
+      engineering, risk platforms, data processing, production reliability, and principal
+      technical leadership roles. Alpharetta is acceptable for strong matches.
+
+  - name: Equifax
+    careers_url: https://careers.equifax.com/
+    notes: >
+      Atlanta/Alpharetta target. Prioritize Java, Spring Boot, backend services,
+      APIs, database-heavy application engineering, regulated data platforms, production
+      troubleshooting, and technical leadership. Avoid roles where GCP/GKE/big-data
+      tooling or front-end development is the primary requirement.
+
+  - name: Smarsh
+    careers_url: https://www.smarsh.com/careers
+    notes: >
+      Regulated communications/compliance platform target. Prioritize Senior Java,
+      backend services, enterprise SaaS, APIs, SQL/database, production support,
+      regulated workflows, and technical leadership.
+
+  - name: BlackRock
+    careers_url: https://careers.blackrock.com/
+    notes: >
+      Atlanta financial technology target. Prioritize Java backend, platform engineering,
+      financial systems, data services, APIs, SQL/database, reliability, and technical
+      leadership. Avoid heavy frontend/full-stack roles unless backend is primary.
+
+  - name: Morgan Stanley
+    careers_url: https://www.morganstanley.com/careers
+    notes: >
+      Alpharetta financial services target. Prioritize Java backend, enterprise platforms,
+      SQL/database, APIs, regulated systems, production support, and senior engineering
+      roles. Consider commute only for strong matches.
+
+  - name: Corpay
+    careers_url: https://www.corpay.com/careers
+    notes: >
+      Peachtree Corners/Buckhead payments target. Prioritize Senior Java Developer,
+      backend services, payments platforms, APIs, SQL/database, production support,
+      and enterprise integrations. Screen compensation and commute carefully.
+
+  - name: Deloitte
+    careers_url: https://apply.deloitte.com/en_US/careers
+    notes: >
+      Low-priority opportunistic target. Search only for Internal Services,
+      Software Engineering, or US Delivery Center roles that are clearly centered
+      on backend Java, APIs, integrations, SQL/database-heavy application work,
+      enterprise platforms, hands-on engineering execution, solution architecture,
+      technical advisory, implementation architecture, or delivery leadership. Travel
+      up to 50% can be acceptable for strong-fit roles. Avoid Government/Public Services
+      or clearance-linked roles, client-travel-heavy postings, cloud-infrastructure-first
+      roles, data/AI-only transformation roles, non-technical business advisory, and
+      implementation work where technical ownership is not central.
+
+  - name: Capgemini
+    careers_url: https://www.capgemini.com/careers/join-capgemini/job-search/
+    notes: >
+      Services-driven employer is acceptable for the candidate given his professional-services
+      background. Prioritize hands-on Java backend, Spring Boot, APIs, SQL/database,
+      enterprise integrations, platform/application modernization, and technical
+      consulting roles in the US or remote. Travel up to 50% can be acceptable
+      for strong-fit roles. Also consider solution architecture, implementation
+      architecture, integration consulting, and delivery leadership roles. Avoid sales-only
+      presales, non-technical advisory, management consulting, high-travel client-delivery
+      roles, cloud-infrastructure-first roles, and data/AI-only transformation postings.
+
+  - name: U.S. Bank
+    careers_url: https://careers.usbank.com/
+    notes: >
+      Atlanta financial technology target. Prioritize Java/Spring Boot backend,
+      APIs, enterprise platforms, SQL/database, payments/banking systems, and
+      production reliability. Avoid React-heavy full-stack or cloud/DevOps-heavy roles.
+
+  - name: The Coca-Cola Company
+    careers_url: https://careers.coca-colacompany.com/
+    notes: >
+      Atlanta target. Prioritize backend/platform/product engineering, Java, APIs,
+      enterprise integrations, SQL/data services, workflow automation, and technical
+      leadership. Avoid director/product-only, front-end-heavy, or AI-only postings.
+
+  - name: AppFolio
+    careers_url: https://www.appfolio.com/open-roles
+    notes: >
+      Property management SaaS target. Prioritize backend Java, enterprise SaaS,
+      APIs, workflow automation, integrations, SQL/database-heavy application
+      engineering, production reliability, platform modernization, and technical
+      leadership roles. Also consider roles involving document workflows,
+      payments, accounting, leasing, customer operations, or business-process
+      automation if the primary engineering focus is backend/platform. Avoid
+      React-heavy frontend, production AI/ML-only, DevOps-only, Salesforce-platform,
+      or cloud-infrastructure-heavy roles unless backend application engineering
+      remains the center of gravity.
+
+  - name: FinQuery
+    careers_url: https://finquery.com/careers/
+    notes: >
+      Smaller Atlanta fintech / enterprise SaaS target. Prioritize Senior Software Engineer,
+      Lead Product Engineer, backend services, Java/Spring where applicable, REST APIs,
+      SQL/database-backed workflows, contract/spend/lease accounting systems, production
+      reliability, and Atlanta hybrid roles. Screen for .NET-first postings.
+
+  - name: MessageGears
+    careers_url: https://messagegears.com/company/
+    notes: >
+      Atlanta customer-engagement SaaS target. Prioritize Senior Software Engineer,
+      Java/Spring, backend services, microservices, APIs, messaging workflows,
+      integrations, platform reliability, and remote/Atlanta hybrid roles.
+
+  - name: Recruitics
+    careers_url: https://careers.recruitics.com/
+    notes: >
+      Recruitment marketing / talent-platform SaaS target. Prioritize Senior or Lead
+      Full Stack Software Engineer roles where backend is primary, especially Java/Kotlin,
+      Spring Boot, APIs, microservices, external ATS/HR integrations, data flow,
+      automation, and remote or Atlanta-friendly roles.
+
+  - name: Very Good Security
+    careers_url: https://www.verygoodsecurity.com/careers
+    notes: >
+      Payments/security infrastructure SaaS target. Prioritize Sr. Software Engineer,
+      Java, Spring Boot, Spring Security, high-scale SaaS microservices, Kafka/event-driven
+      systems, payment tokenization, APIs, Docker/Kubernetes, production reliability,
+      and remote-friendly roles.
+
+  - name: Cayuse
+    careers_url: https://www.cayuse.com/careers/
+    notes: >
+      Research administration SaaS target. Prioritize Senior Software Engineer Java,
+      Senior Full Stack Java Engineer, Java/Spring/Hibernate, Spring Boot, relational
+      databases, enterprise workflows, compliance-oriented SaaS, integrations, and
+      remote U.S. roles.
+
+  - name: Jitterbit
+    careers_url: https://www.jitterbit.com/careers/
+    notes: >
+      Integration and automation platform target. Prioritize Sr. Software Engineer,
+      Java, REST APIs, integration/iPaaS, multi-tenant SaaS, RDBMS, Docker/Kubernetes,
+      cloud architecture, enterprise automation, and remote roles.
+
+  - name: Temporal Technologies
+    careers_url: https://temporal.io/careers
+    notes: >
+      Workflow orchestration / durable execution platform target. Prioritize Senior or
+      Staff Software Engineer roles in SDK, Cloud, Compute, Open Source Server,
+      Observability, Developer Experience, Java SDK adjacency, distributed systems,
+      workflow automation, and U.S. remote roles.
+
+  - name: DealHub
+    careers_url: https://dealhub.io/careers/
+    notes: >
+      CPQ / quote-to-revenue SaaS target. Prioritize Java Software Engineer, Backend
+      Software Engineer, quote-to-cash, CPQ, pricing, approvals/workflow, REST APIs,
+      SQL, relational databases, and Java server-side roles. Treat as watch-list unless
+      U.S. remote or U.S.-based engineering roles are open.
+
+  - name: Greenlight
+    careers_url: https://greenlight.com/careers
+    notes: >
+      Atlanta fintech target. Prioritize Senior Software Engineer, Developer Experience,
+      Staff Engineer, backend/platform services, financial technology, product engineering,
+      production reliability, APIs, and Atlanta/remote-friendly roles. Screen for stack fit.
+
+  - name: Stord
+    careers_url: https://www.stord.com/careers
+    notes: >
+      Atlanta logistics / commerce software target. Prioritize Staff Software Engineer,
+      Senior Software Engineer, platform engineering, integrations, logistics workflows,
+      commerce systems, APIs, data/platform services, remote U.S. roles, and Atlanta roles.
+      Screen carefully for Elixir/front-end/AI-only roles if Java/backend is not central.
+
+  - name: Advanced Tech Placement
+    careers_url: https://advancedtechplacement.com
+    notes: >
+      Technology placement and recruiting target. Prioritize senior Java/backend,
+      Spring Boot, APIs, SQL/database-heavy application engineering, enterprise
+      integrations, payments/fintech, healthcare, SaaS, and Atlanta or remote-friendly
+      contract-to-hire/full-time roles. Screen carefully for recruiter reposts,
+      stale listings, vague client roles, and positions where the client location,
+      employment type, or stack fit is unclear.
+
+  - name: Insight Global Staffing
+    careers_url: https://jobs.insightglobal.com/
+    official_domains:
+      - insightglobal.com
+      - jobs.insightglobal.com
+    official_search_domains:
+      - jobs.insightglobal.com/find_a_job
+      - insightglobal.com/jobs/find_a_job
+    title_aliases:
+      - Forward Deployed Engineer
+      - Senior Forward Deployed Engineer
+      - Implementation Consultant
+      - Solutions Consultant
+      - Customer Engineer
+      - Technical Delivery Lead
+    notes: >
+      Staffing and recruiting target. Prioritize client roles that are clearly senior
+      Java/backend, Spring Boot, APIs, SQL/database-heavy application engineering,
+      enterprise integrations, payments/fintech, healthcare, SaaS, and Atlanta or
+      remote-friendly contract-to-hire/full-time opportunities. Screen carefully for
+      stale reposts, vague client descriptions, short contracts, low-fit stacks,
+      unclear location requirements, and roles where software engineering is not central.
+
+  - name: WorldVia
+    careers_url: https://worldvia.com
+    notes: >
+      Travel network and travel technology target. Prioritize backend/platform software
+      engineering, Java/Spring where applicable, APIs, integrations, booking/travel
+      workflows, partner/vendor systems, SQL/database-backed applications, workflow
+      automation, production reliability, and Atlanta or remote-friendly roles. Avoid
+      sales, travel advisor, marketing, or operations-only postings unless software
+      engineering is the primary focus.
+
+  - name: Epic
+    careers_url: https://careers.epic.com/
+    notes: >
+      Healthcare software/EHR target, but low-priority unless remote or non-relocation
+      senior software engineering roles are available. Prioritize backend/platform,
+      Java/Kotlin, healthcare data, integrations, APIs, clinical workflows, large-scale
+      healthcare systems, and technical leadership. Avoid implementation, analyst,
+      training, support, project management, junior/new-grad, or relocation-required
+      roles unless the candidate explicitly wants to consider Madison/Verona, WI.
+
+  - name: Southern Company
+    careers_url: https://southerncompany.jobs/
+    notes: >
+      Atlanta energy/utility technology target. Prioritize Information Technology roles
+      centered on software engineering, backend/platform systems, Java/Spring where
+      applicable, APIs, enterprise integrations, SQL/database-backed applications,
+      workflow automation, reliability, customer/billing systems, grid/energy platforms,
+      and technical leadership. Avoid utility operations, plant, line operations,
+      infrastructure-only, security-only, analyst-only, or generic project management
+      postings unless hands-on software engineering is central.
+
+  - name: Georgia Power
+    careers_url: https://southerncompany.jobs/
+    notes: >
+      Georgia Power / Southern Company operating-company target. Prioritize IT and
+      software engineering roles tied to customer systems, billing, grid/energy platforms,
+      enterprise integrations, workflow automation, APIs, SQL/database-backed applications,
+      Java/Spring where applicable, reliability, and technical leadership in Atlanta or
+      remote/hybrid Georgia-friendly roles. Avoid utility field operations, plant, line
+      operations, infrastructure-only, security-only, analyst-only, or generic project
+      management postings unless software engineering or technical delivery ownership is
+      central.
+
+  - name: AIG
+    careers_url: https://aig.wd1.myworkdayjobs.com/aig
+    notes: >
+      Insurance and risk technology target. Prioritize senior software engineering,
+      Java/Spring, backend/platform services, APIs, enterprise integrations,
+      SQL/database-backed applications, claims, underwriting, policy, billing,
+      risk-management systems, document/workflow automation, production reliability,
+      and technical leadership. Avoid actuarial, analyst-only, infrastructure-only,
+      security-only, project management, or business operations postings unless
+      hands-on software engineering is central.
+
+  - name: Tata Consultancy Services
+    careers_url: https://www.tcs.com/careers/united-states
+    notes: >
+      Large IT services and consulting target. Prioritize senior hands-on software
+      engineering roles centered on Java/Spring, backend/platform services, APIs,
+      enterprise integrations, SQL/database-heavy applications, payments, banking,
+      insurance, healthcare, energy/utilities, SaaS/platform modernization, workflow
+      automation, production reliability, technical advisory, solution architecture,
+      implementation architecture, and technical leadership. Screen carefully for client
+      location, travel, employment type, and stack fit. Avoid offshore-only, support-only,
+      infrastructure-only, testing-only, non-technical advisory, project management,
+      business analyst, or high-travel implementation roles unless technical ownership
+      is clearly central.
+
+  - name: DispatchHealth
+    careers_url: https://careers.dispatchhealth.com/
+    notes: >
+      Healthcare-at-home technology target. Prioritize Operations & Technology roles
+      centered on backend/platform software engineering, Java/Spring where applicable,
+      APIs, healthcare integrations, patient/provider workflows, scheduling/logistics,
+      SQL/database-backed applications, workflow automation, production reliability,
+      and technical leadership. Avoid clinical, paramedic, nursing, operations-only,
+      support-only, analyst-only, or project management postings unless hands-on
+      software engineering is clearly central.
+
+  - name: Slalom
+    careers_url: https://www.slalom.com/careers
+    notes: >
+      Business and technology consulting target. Prioritize senior hands-on software
+      engineering roles centered on Java/Spring, backend/platform services, APIs,
+      enterprise integrations, SQL/database-backed applications, product engineering,
+      cloud-adjacent application modernization, workflow automation, production
+      reliability, solution architecture, implementation architecture, integration
+      consulting, delivery leadership, and technical leadership. Screen carefully for
+      client location, travel, employment type, and stack fit. Avoid non-technical
+      advisory, management consulting, business analyst, project management,
+      Salesforce-only, data/AI-only, infrastructure-only, or high-travel implementation
+      roles unless technical ownership is clearly central.
+
+  - name: Indeed
+    careers_url: https://www.indeed.com/careers
+    notes: >
+      Hiring platform and HR technology target. Prioritize senior software engineering,
+      solutions engineering, integration architecture, ATS integrations, APIs, REST/JSON,
+      authentication, enterprise customer workflows, data flows, product/platform
+      engineering, technical advisory, implementation guidance, and remote-friendly roles.
+      Screen carefully for sales-only presales, account management, support-only,
+      recruiter operations, and roles where technical ownership is shallow.
+
+  - name: Thrivent
+    careers_url: https://careers.thrivent.com/
+    notes: >
+      Financial services and insurance platform target. Prioritize Staff/Senior Software
+      Engineer, Java/Spring, backend/platform services, APIs, enterprise integrations,
+      SQL/database-backed applications, financial services workflows, insurance systems,
+      advisor/client platforms, production reliability, and technical leadership. Avoid
+      financial advisor, sales, branch operations, data/AI-only, infrastructure-only,
+      or analyst-only postings unless hands-on software engineering is central.
+
+  - name: ICF
+    careers_url: https://careers.icf.com/us/en
+    notes: >
+      Digital modernization and professional-services target. Prioritize senior hands-on
+      software engineering, solution architecture, technical consulting, Java/Spring,
+      backend/platform services, APIs, enterprise integrations, SQL/database-heavy
+      applications, federal health, energy, public-sector modernization, FHIR/health data,
+      workflow automation, production reliability, and technical delivery leadership.
+      Avoid clearance-required, infrastructure-only, data/AI-only, project management,
+      or business advisory roles unless technical ownership is central.
+
+  - name: Genuine Parts Company
+    careers_url: https://jobs.genpt.com/
+    notes: >
+      Atlanta-based enterprise technology and distribution platform target. Search also
+      as GPC, NAPA, Motion, and Global Technology Center. Prioritize technology roles
+      centered on Java/Spring, backend/platform services, APIs, enterprise integrations,
+      commerce, inventory, supply chain, logistics, customer platforms, SQL/database-backed
+      applications, workflow automation, production reliability, and technical leadership.
+      Avoid store, warehouse, driver, sales, operations-only, infrastructure-only, or
+      offshore-only postings unless hands-on software engineering is central.
+
+  - name: McMaster-Carr
+    careers_url: https://www.mcmaster.com/careers
+    official_search_domains:
+      - mcmaster.com
+    title_aliases:
+      - Staff Software Engineer
+      - Senior Software Engineer
+      - Software Engineer
+    notes: >
+      Distribution and e-commerce technology target. Prioritize senior hands-on backend
+      and platform engineering, Java/Spring, APIs, enterprise integrations, SQL/database-
+      backed applications, commerce, catalog, inventory, fulfillment, warehouse and
+      logistics systems, production reliability, and technical leadership. Prefer Atlanta
+      metro, Georgia, or remote-compatible roles. Avoid warehouse operations, customer
+      service, sales, distribution operations, infrastructure-only, data/AI-only, and
+      frontend-only postings unless application-engineering ownership is central.
+
+  - name: Citi
+    careers_url: https://jobs.citi.com/
+    notes: >
+      Large banking technology target. Prioritize senior Java/Kotlin backend engineering,
+      platform services, APIs, enterprise integrations, SQL/database-heavy applications,
+      banking, payments, risk, compliance, trading, client platforms, solution architecture,
+      production reliability, and technical leadership. Screen carefully for location,
+      hybrid/onsite requirements, compensation, and stack fit. Avoid analyst-only,
+      operations-only, infrastructure-only, data/AI-only, active-clearance, or heavy
+      frontend roles unless backend application engineering is central.
+
+  - name: The Hartford
+    careers_url: https://www.jointhehartford.com/jobs/
+    notes: >
+      Insurance technology target. Prioritize Information Technology roles centered on
+      senior software engineering, Java/Spring, backend/platform services, APIs,
+      enterprise integrations, policy, claims, billing, underwriting, Duck Creek-adjacent
+      insurance systems, SQL/database-backed applications, production reliability, and
+      technical leadership. Screen for remote/hybrid requirements. Avoid actuarial,
+      underwriting-only, claims operations, infrastructure-only, data/AI-only, or
+      analyst-only roles unless hands-on software engineering is central.
+
+  - name: FedEx
+    careers_url: https://careers.fedex.com/
+    notes: >
+      Logistics and enterprise technology target. Prioritize professional/technology roles
+      centered on senior software engineering, Java/Spring, backend/platform services,
+      APIs, enterprise integrations, shipment/logistics workflows, customer platforms,
+      tracking systems, supply chain, SQL/database-backed applications, workflow automation,
+      production reliability, and technical leadership. Avoid driver, package handler,
+      warehouse, facility operations, retail, maintenance, pilot, infrastructure-only,
+      or operations-only postings unless hands-on software engineering is central.
+
+  - name: Endava
+    careers_url: https://www.endava.com/careers
+    notes: >
+      Technology services and digital transformation target. Prioritize senior hands-on
+      software engineering, Java/Spring, backend/platform services, APIs, enterprise
+      integrations, SQL/database-backed applications, solution architecture, technical
+      consulting, delivery leadership, payments, financial services, healthcare, logistics,
+      SaaS/platform modernization, workflow automation, and production reliability. Screen
+      carefully for geography, travel, employment type, and stack fit. Avoid testing-only,
+      support-only, infrastructure-only, data/AI-only, project management, or
+      non-technical advisory roles unless technical ownership is central.
+
+  - name: Rockwell Automation
+    careers_url: https://www.rockwellautomation.com/en-us/careers.html
+    notes: >
+      Industrial automation and manufacturing software target. Prioritize senior software
+      engineering, Java/Spring where applicable, backend/platform services, APIs,
+      enterprise integrations, SQL/database-backed applications, workflow automation,
+      industrial software, IoT/connected operations, manufacturing systems, technical
+      consulting, solution architecture, production reliability, and technical leadership.
+      Screen carefully for location, travel, and hands-on software ownership. Avoid plant
+      operations, hardware-only, controls-only, PLC-only, field service, infrastructure-only,
+      sales-only, or support-only roles unless application/platform software engineering
+      or technical advisory work is central.
+
+  - name: Aderant
+    careers_url: https://aderant.wd5.myworkdayjobs.com/Aderant_External_Careers
+    notes: >
+      Legal and professional-services software target. Prioritize Senior Technical
+      Consultant, Solution Architect, Implementation Architect, Integration Consultant,
+      Professional Services Engineer, enterprise application consulting, backend/platform
+      software engineering, APIs, integrations, SQL/database-heavy legal workflows,
+      document/workflow automation, billing/timekeeping/accounting systems, delivery
+      leadership, and technical advisory roles. Avoid legal operations, sales-only,
+      support-only, infrastructure-only, or project management roles unless technical
+      delivery ownership is central.
+
+  - name: DocuSign
+    careers_url: https://careers.docusign.com/
+    notes: >
+      Agreement, e-signature, CLM, and workflow automation target. Prioritize Professional
+      Services Engineer, Solution Architect, Customer Solutions Architect, Technical
+      Account Architect, Senior/Principal Technical Consultant, backend/platform software
+      engineering, APIs, integrations, document workflows, contract lifecycle management,
+      quote-to-cash adjacency, SQL/database-backed applications, implementation guidance,
+      and technical advisory roles. Avoid sales-only, account management, support-only,
+      data/AI-only, or project management roles unless technical ownership is central.
+
+  - name: Conga
+    careers_url: https://conga.com/careers
+    notes: >
+      Revenue lifecycle, CPQ, CLM, document automation, and quote-to-cash target.
+      Prioritize CPQ Consultant, CPQ Solution Architect, Solution Architect, Implementation
+      Architect, Professional Services Engineer, Integration Consultant, Java/backend
+      software engineering, APIs, enterprise integrations, Salesforce CPQ/Revenue Cloud
+      adjacency, pricing, billing, renewals, document workflows, SQL/database-backed
+      applications, delivery leadership, and technical advisory roles. Avoid sales-only,
+      support-only, data/AI-only, or project management roles unless technical delivery
+      ownership is central.
+
+  - name: Duck Creek
+    careers_url: https://www.duckcreek.com/careers/
+    notes: >
+      Insurance core systems and professional-services software target. Prioritize
+      Solution Architect, Implementation Architect, Senior/Principal Technical Consultant,
+      Professional Services Engineer, Integration Consultant, backend/platform engineering,
+      APIs, enterprise integrations, policy, billing, claims, rating, insurance workflows,
+      SQL/database-backed applications, delivery leadership, and technical advisory roles.
+      Avoid insurance operations, analyst-only, sales-only, support-only, infrastructure-only,
+      or project management roles unless technical delivery ownership is central.
+
+  - name: Appian
+    careers_url: https://appian.com/careers
+    notes: >
+      Enterprise workflow automation and low-code platform target. Prioritize Solution
+      Architect, Implementation Architect, Enterprise Application Consultant, Professional
+      Services Engineer, Integration Consultant, technical advisory, delivery architecture,
+      backend/platform services, APIs, integrations, process automation, case management,
+      document/workflow systems, SQL/database-backed applications, and technical leadership.
+      Avoid low-code-only configuration, business analyst, sales-only, support-only,
+      data/AI-only, or project management roles unless technical architecture or delivery
+      ownership is central.
+
+  - name: Stripe
+    careers_url: https://stripe.com/jobs
+    notes: >
+      Payments infrastructure and financial technology target. Prioritize senior software
+      engineering, backend/platform services, APIs, integrations, payments, billing,
+      subscription, revenue, financial infrastructure, developer platforms, technical
+      advisory, solution architecture, professional services, implementation guidance,
+      customer engineering, production reliability, and technical leadership roles.
+      Screen carefully for location, travel, and stack fit. Avoid recruiting-only,
+      sales-only, account management, support-only, data/AI-only, frontend-heavy, or
+      infrastructure-only roles unless backend/platform engineering or technical delivery
+      ownership is central.
+
+  - name: GE Aerospace
+    careers_url: https://careers.geaerospace.com
+    notes: >
+      Aerospace, aviation systems, and industrial software target. Prioritize senior
+      software engineering, backend/platform services, Java/Spring where applicable,
+      APIs, enterprise integrations, SQL/database-backed applications, fleet/engine
+      services, avionics-adjacent software, manufacturing systems, technical advisory,
+      solution architecture, production reliability, and technical leadership roles.
+      Screen carefully for location, travel, clearance, export-control, and hands-on
+      software ownership. Avoid hardware-only, manufacturing-only, field service,
+      infrastructure-only, data/AI-only, support-only, or clearance-required roles unless
+      application/platform software engineering or technical delivery ownership is central.
+
+  - name: GE Vernova
+    careers_url: https://careers.gevernova.com
+    notes: >
+      Energy technology, grid software, electrification, and industrial software target.
+      Prioritize senior software engineering, backend/platform services, Java/Spring
+      where applicable, APIs, enterprise integrations, SQL/database-backed applications,
+      grid/utility systems, Proficy/industrial software, IoT/connected operations,
+      technical advisory, solution architecture, production reliability, and technical
+      leadership roles. Screen carefully for location, travel, hardware/control-system
+      focus, and hands-on software ownership. Avoid plant operations, hardware-only,
+      controls-only, PLC-only, field service, infrastructure-only, support-only, or
+      clearance-required roles unless application/platform software engineering or
+      technical delivery ownership is central.
+
+  - name: Target
+    careers_url: https://corporate.target.com/careers
+    notes: >
+      Retail, commerce, supply-chain, and Target Tech target. Prioritize senior software
+      engineering, backend/platform services, Java/Spring where applicable, APIs,
+      enterprise integrations, ecommerce, payments, pricing, inventory, supply chain,
+      fulfillment, customer platforms, SQL/database-backed applications, product/platform
+      engineering, production reliability, and technical leadership roles. Screen carefully
+      for remote/hybrid requirements and whether the posting is corporate Target Tech
+      rather than store or warehouse operations. Avoid store, warehouse, hourly retail,
+      supply-chain operations-only, product-only, data/AI-only, infrastructure-only, or
+      support-only roles unless hands-on software engineering is central.
+
+  - name: RaceTrac
+    careers_url: https://careers.racetrac.com/
+    notes: >
+      Atlanta retail, fuel, logistics, and enterprise technology target. Prioritize
+      senior software engineering, backend/platform services, Java/Spring where
+      applicable, APIs, enterprise integrations, payments, loyalty, merchandising,
+      supply-chain, distribution, store systems, SQL/database-backed applications,
+      technical advisory, production reliability, and technical leadership roles.
+      Screen carefully for Atlanta/Georgia/remote fit and whether the posting is
+      Store Support Center or corporate technology rather than store operations,
+      maintenance, drivers, or field roles. Avoid hourly retail, store operations-only,
+      distribution operations-only, hardware-only, infrastructure-only, support-only,
+      or onsite-only roles unless application/platform software engineering or
+      technical delivery ownership is central.
+
+  - name: Lockheed Martin
+    careers_url: https://www.lockheedmartinjobs.com/
+    notes: >
+      Aerospace, defense, mission systems, and enterprise technology target. Prioritize
+      senior software engineering, backend/platform services, Java/Spring where applicable,
+      APIs, enterprise integrations, SQL/database-backed applications, mission support
+      software, manufacturing/operations platforms, solution architecture, technical
+      advisory, production reliability, and technical leadership roles. Screen carefully
+      for active clearance, citizenship, onsite requirements, travel, location, and
+      hands-on software ownership. Avoid active-clearance-required, hardware-only,
+      embedded-only, systems engineering-only, field service, infrastructure-only,
+      cyber-only, support-only, or onsite-only roles unless application/platform software
+      engineering or technical delivery ownership is central and the location is practical.
+
+  - name: Rivian
+    careers_url: https://rivian.com/careers
+    notes: >
+      Electric vehicle, connected vehicle, manufacturing systems, logistics, commerce,
+      fleet, service, and enterprise software target. Prioritize senior software
+      engineering, backend/platform services, Java/Spring where applicable, APIs,
+      integrations, SQL/database-backed applications, order/customer/service platforms,
+      supply-chain and manufacturing workflow software, technical advisory, solution
+      architecture, production reliability, and technical leadership roles. Screen
+      carefully for Atlanta/Georgia/remote fit, travel, embedded systems, hardware,
+      autonomy/AI, and manufacturing-floor requirements. Avoid vehicle embedded-only,
+      firmware-only, hardware-only, robotics-only, autonomy/AI-only, field service,
+      manufacturing operations-only, infrastructure-only, or onsite-only roles unless
+      application/platform software engineering or technical delivery ownership is central.
+
+  - name: Travelers
+    careers_url: https://careers.travelers.com/
+    notes: >
+      Insurance technology and analytics target. Prioritize senior software engineering,
+      backend/platform services, Java/Spring where applicable, APIs, enterprise
+      integrations, SQL/database-backed applications, claims, policy, billing, risk,
+      underwriting, data platforms adjacent to application engineering, technical advisory,
+      solution architecture, production reliability, and technical leadership roles.
+      Screen carefully for Hartford/St. Paul onsite requirements, data/AI-only roles,
+      infrastructure-only roles, and insurance operations roles. Avoid claims-only,
+      underwriting-only, risk-control-only, actuarial-only, data/AI-only, support-only,
+      infrastructure-only, or onsite-only roles unless hands-on application/platform
+      software engineering or technical delivery ownership is central.
+
+  - name: Globe Life
+    careers_url: https://careers.globelifeinsurance.com/
+    notes: >
+      Life insurance technology target, requested as Global Life. Prioritize senior
+      software engineering, backend/platform services, Java/Spring where applicable,
+      APIs, enterprise integrations, SQL/database-backed applications, policyholder,
+      claims, billing, customer, agent, and insurance operations platforms, technical
+      advisory, solution architecture, production reliability, and technical leadership
+      roles. Screen carefully for McKinney/Dallas onsite requirements, agent-sales roles,
+      customer service operations, data/AI-only roles, and infrastructure-only roles.
+      Avoid insurance agent, sales-only, customer-service-only, operations-only,
+      actuarial-only, data/AI-only, support-only, infrastructure-only, or onsite-only
+      roles unless hands-on application/platform software engineering or technical
+      delivery ownership is central.
+
+  - name: GlobalLogic
+    careers_url: https://www.globallogic.com/careers/
+    notes: >
+      Digital engineering and product-engineering services target. Prioritize senior
+      software engineering, lead/principal engineering, backend/platform services,
+      Java/Spring where applicable, APIs, enterprise integrations, SQL/database-backed
+      applications, modernization, client-facing technical delivery, solution architecture,
+      implementation guidance, professional services engineering, production reliability,
+      and technical leadership roles. Screen carefully for U.S. remote, Atlanta/Alpharetta,
+      Charlotte, or travel-friendly roles, and verify whether roles are hands-on software
+      delivery rather than project coordination. Avoid QA-only, Scrum Master-only,
+      technical writing-only, data collection, embedded-only, hardware-only, data/AI-only,
+      infrastructure-only, support-only, or onsite-only roles unless application/platform
+      software engineering or technical delivery ownership is central.
+
+  - name: Docker
+    careers_url: https://www.docker.com/careers/
+    notes: >
+      Developer-platform and container tooling target. Prioritize senior software
+      engineering, backend/platform services, Java-adjacent developer tooling,
+      APIs, integrations, developer experience, enterprise SaaS, product/platform
+      engineering, solution architecture, technical advisory, production reliability,
+      and technical leadership roles. Screen carefully for Go-heavy, infra-heavy,
+      DevRel-only, and security-only roles. Avoid marketing, sales-only, support-only,
+      data/AI-only, infrastructure-operations-only, or frontend-heavy roles unless
+      application/platform engineering or technical delivery ownership is central.
+
+  - name: Atlassian
+    careers_url: https://www.atlassian.com/company/careers
+    official_domains:
+      - atlassian.com
+      - careers-americas.icims.com
+    official_search_domains:
+      - atlassian.com/company/careers/details
+    title_aliases:
+      - Software Engineer
+      - Backend Software Engineer
+      - Platform Engineer
+    notes: >
+      Developer tooling, collaboration platform, and enterprise SaaS target. Prioritize
+      senior software engineering, backend/platform services, Java-adjacent product
+      engineering, APIs, enterprise integrations, developer experience, workflow
+      automation, SQL/database-backed applications, technical advisory, production
+      reliability, and technical leadership roles. Screen carefully for exact stack fit,
+      product area, and Team Anywhere location compatibility. Avoid support-only,
+      customer-success-only, sales-only, frontend-heavy, data-science-only, or
+      infrastructure-only roles unless application/platform software engineering or
+      technical delivery ownership is central.
+
+  - name: Automattic
+    careers_url: https://automattic.com/work-with-us/
+    notes: >
+      Remote-first publishing, commerce, and web-platform target. Prioritize senior
+      software engineering, backend/platform services, APIs, enterprise integrations,
+      workflow/content/commerce platforms, SQL/database-backed applications, developer
+      tooling, technical advisory, production reliability, and technical leadership roles.
+      Screen carefully for exact stack fit, travel expectations, and whether the role is
+      hands-on software engineering rather than support, community, marketing, or
+      operations. Avoid support-only, customer-success-only, content-only, frontend-heavy,
+      data-science-only, or infrastructure-only roles unless application/platform
+      software engineering or technical delivery ownership is central.
+
+  - name: Nomi Health
+    careers_url: https://www.nomihealth.com/careers
+    notes: >
+      Healthcare payments and care-delivery platform target. Prioritize senior software
+      engineering, backend/platform services, Java/Spring where applicable, APIs,
+      claims/payments workflows, enterprise integrations, SQL/database-backed applications,
+      healthcare platform modernization, technical advisory, solution architecture,
+      production reliability, and technical leadership roles. Avoid care-operations-only,
+      support-only, data/AI-only, infrastructure-only, or frontend-heavy roles unless
+      application/platform software engineering is central.
+
+  - name: Gifthealth
+    careers_url: https://www.gifthealth.com/careers
+    notes: >
+      Pharmacy and healthcare technology target. Prioritize senior software engineering,
+      backend/platform services, Java/Spring where applicable, APIs, integrations,
+      prescription/pharmacy workflows, SQL/database-backed applications, healthcare
+      business systems, technical advisory, production reliability, and technical
+      leadership roles. Avoid support-only, operations-only, implementation-only,
+      data/AI-only, infrastructure-only, or mobile/frontend-heavy roles unless
+      backend/platform software engineering is central.
+
+  - name: Instacart
+    careers_url: https://www.instacart.careers/
+    notes: >
+      Commerce, logistics, and marketplace platform target. Prioritize senior software
+      engineering, backend/platform services, APIs, enterprise integrations, order,
+      fulfillment, logistics, partner systems, SQL/database-backed applications,
+      technical advisory, production reliability, and technical leadership roles.
+      Screen carefully for mobile-only, machine-learning-only, trust/safety-only,
+      and infra-only roles. Avoid operations-only, data/AI-only, or frontend-heavy
+      roles unless backend/platform software engineering is central.
+
+  - name: Headspace
+    careers_url: https://www.headspace.com/careers
+    notes: >
+      Digital health and consumer wellness platform target. Prioritize senior software
+      engineering, backend/platform services, Java/Spring where applicable, APIs,
+      integrations, subscriptions/payments, SQL/database-backed applications, healthcare
+      platform services, technical advisory, production reliability, and technical
+      leadership roles. Avoid content, coaching, care-operations-only, mobile-only,
+      data/AI-only, or frontend-heavy roles unless backend/platform engineering is central.
+
+  - name: The Weather Company LLC
+    careers_url: https://www.weathercompany.com/careers
+    notes: >
+      Data platform, weather technology, and enterprise services target. Prioritize
+      senior software engineering, backend/platform services, APIs, data-adjacent
+      application engineering, enterprise integrations, SQL/database-backed applications,
+      product/platform engineering, technical advisory, production reliability, and
+      technical leadership roles. Avoid meteorology-only, data science-only,
+      infrastructure-only, or frontend-heavy roles unless application/platform software
+      engineering is central.
+
+  - name: Experian
+    careers_url: https://jobs.experian.com/
+    notes: >
+      Credit, data, identity, and enterprise platform target. Prioritize senior software
+      engineering, backend/platform services, Java/Spring, APIs, enterprise integrations,
+      SQL/database-backed applications, identity/fraud/customer platforms, technical
+      advisory, production reliability, and technical leadership roles. Avoid analytics-only,
+      data science-only, infrastructure-only, security-only, or frontend-heavy roles unless
+      backend/platform software engineering is central.
+
+  - name: EarthLink
+    careers_url: https://www.earthlink.net/about/careers/
+    notes: >
+      Connectivity, customer platform, and enterprise systems target. Prioritize senior
+      software engineering, backend/platform services, APIs, enterprise integrations,
+      billing/customer/account systems, SQL/database-backed applications, technical
+      advisory, production reliability, and technical leadership roles. Avoid network
+      operations-only, telecom field roles, infrastructure-only, support-only, or
+      frontend-heavy roles unless application/platform software engineering is central.
+
+  - name: Parachute Health
+    careers_url: https://www.parachutehealth.com/careers/
+    notes: >
+      Healthcare workflow and digital ordering platform target. Prioritize senior software
+      engineering, backend/platform services, Java/Spring where applicable, APIs,
+      healthcare workflow automation, enterprise integrations, SQL/database-backed
+      applications, technical advisory, production reliability, and technical leadership
+      roles. Avoid customer success, operations-only, support-only, data/AI-only, or
+      frontend-heavy roles unless backend/platform software engineering is central.
+
+  - name: Quantum Health
+    careers_url: https://quantum-health.com/careers/
+    notes: >
+      Healthcare navigation and benefits platform target. Prioritize senior software
+      engineering, backend/platform services, Java/Spring where applicable, APIs,
+      claims/benefits/member workflows, enterprise integrations, SQL/database-backed
+      applications, technical advisory, production reliability, and technical leadership
+      roles. Avoid care-coordinator, service-only, operations-only, data/AI-only,
+      infrastructure-only, or frontend-heavy roles unless application/platform software
+      engineering is central.
+
+  - name: Omada
+    careers_url: https://careers.omadahealth.com/
+    notes: >
+      Digital health platform target. Prioritize senior software engineering, backend/
+      platform services, APIs, integrations, member/workflow platforms, subscriptions/
+      billing, SQL/database-backed applications, technical advisory, production
+      reliability, and technical leadership roles. Avoid coaching, care operations,
+      mobile-only, data/AI-only, or frontend-heavy roles unless backend/platform
+      software engineering is central.
+
+  - name: Clover Health
+    careers_url: https://www.cloverhealth.com/en/about-us/careers
+    notes: >
+      Healthcare payer and care platform target. Prioritize senior software engineering,
+      backend/platform services, Java/Spring where applicable, APIs, claims/member/provider
+      workflows, enterprise integrations, SQL/database-backed applications, technical
+      advisory, production reliability, and technical leadership roles. Avoid clinical-only,
+      care-operations-only, data science-only, infrastructure-only, or frontend-heavy
+      roles unless backend/platform software engineering is central.
+
+  - name: Anomaly
+    careers_url: https://www.anomaly.com/careers
+    notes: >
+      Smaller software/platform target. Prioritize senior software engineering, backend/
+      platform services, APIs, integrations, enterprise SaaS, SQL/database-backed
+      applications, technical advisory, production reliability, and technical leadership
+      roles. Screen carefully for exact company/domain fit and for roles that are truly
+      hands-on engineering rather than operations, marketing, or creative work.
+
+  - name: Block
+    careers_url: https://block.xyz/careers
+    notes: >
+      Payments, commerce, fintech, and developer-platform target. Prioritize senior
+      software engineering, backend/platform services, APIs, payments, billing,
+      subscriptions, enterprise integrations, SQL/database-backed applications, technical
+      advisory, production reliability, and technical leadership roles. Screen carefully
+      for strong stack fit, location, and crypto/ML-only roles. Avoid frontend-heavy,
+      data/AI-only, security-only, or infrastructure-only roles unless backend/platform
+      engineering is central.
+
+  - name: Cohere Health
+    careers_url: https://coherehealth.com/careers/
+    notes: >
+      Healthcare workflow and prior-authorization platform target. Prioritize senior
+      software engineering, backend/platform services, Java/Spring where applicable,
+      APIs, healthcare workflow automation, enterprise integrations, SQL/database-backed
+      applications, technical advisory, production reliability, and technical leadership
+      roles. Avoid customer support, operations-only, data/AI-only, infrastructure-only,
+      or frontend-heavy roles unless backend/platform software engineering is central.
+
+  - name: Warner Bros. Discovery
+    careers_url: https://careers.wbd.com/
+    notes: >
+      Media, streaming, advertising, and enterprise platform target. Prioritize senior
+      software engineering, backend/platform services, APIs, enterprise integrations,
+      subscriptions, identity/account, commerce, ad-tech-adjacent application engineering,
+      SQL/database-backed applications, technical advisory, production reliability, and
+      technical leadership roles. Avoid content production, editorial, marketing-only,
+      data science-only, infrastructure-only, or frontend-heavy roles unless backend/
+      platform software engineering is central.
+
+  - name: Truist
+    careers_url: https://careers.truist.com/us/en
+    notes: >
+      Banking and enterprise platform target. Prioritize senior software engineering,
+      backend/platform services, Java/Spring where applicable, APIs, enterprise
+      integrations, payments/banking/customer/account platforms, SQL/database-backed
+      applications, technical advisory, production reliability, and technical leadership
+      roles. Avoid branch banking operations, sales-only, support-only, data/AI-only,
+      infrastructure-only, or frontend-heavy roles unless backend/platform software
+      engineering or technical delivery ownership is central.
+
+  - name: Booz Allen Hamilton
+    careers_url: https://careers.boozallen.com/
+    notes: >
+      Consulting and technical delivery target. Prioritize senior software engineering,
+      technical consulting, solution architecture, implementation guidance, professional
+      services engineering, integration strategy, enterprise application delivery,
+      backend/platform services, and technical leadership roles. Screen carefully for
+      active clearance requirements, federal onsite constraints, and non-coding advisory.
+      Avoid project/program-management-only, policy-only, support-only, or clearance-
+      required roles unless the candidate clearly qualifies and the technical fit is strong.
+
+  - name: General Motors
+    careers_url: https://search-careers.gm.com/en/jobs/
+    notes: >
+      Automotive software and enterprise technology target. Prioritize senior software
+      engineering, backend/platform services, Java-adjacent systems, APIs, enterprise
+      integrations, connected-services platforms, SQL/database-backed applications,
+      technical advisory, production reliability, and technical leadership roles. Screen
+      carefully for embedded-only, autonomy-only, manufacturing-floor-only, hardware-only,
+      and onsite-only roles. Avoid vehicle embedded-only, robotics-only, data/AI-only,
+      infrastructure-only, or plant-operations-only roles unless application/platform
+      software engineering is central.
+
+  - name: Ford
+    careers_url: https://www.careers.ford.com/
+    notes: >
+      Automotive and mobility platform target. Prioritize senior software engineering,
+      backend/platform services, APIs, enterprise integrations, connected-services and
+      customer/account platforms, SQL/database-backed applications, technical advisory,
+      production reliability, and technical leadership roles. Screen carefully for
+      embedded-only, autonomy-only, manufacturing-only, and onsite-heavy roles. Avoid
+      hardware-only, robotics-only, field-service-only, data/AI-only, infrastructure-only,
+      or frontend-heavy roles unless backend/platform software engineering is central.
+
+  - name: Tesla
+    careers_url: https://www.tesla.com/careers
+    notes: >
+      Automotive, energy, and digital platform target. Prioritize senior software
+      engineering, backend/platform services, APIs, enterprise integrations, customer/
+      billing/account platforms, SQL/database-backed applications, technical advisory,
+      production reliability, and technical leadership roles. Screen carefully for
+      onsite expectations, stack fit, embedded-only work, and hardware/device roles.
+      Avoid vehicle embedded-only, firmware-only, robotics-only, manufacturing-floor-only,
+      data/AI-only, or infrastructure-only roles unless application/platform software
+      engineering is central.
+
+  - name: Toyota
+    careers_url: https://careers.toyota.com/us/en
+    notes: >
+      Automotive finance, connected technology, and enterprise platform target.
+      Prioritize senior software engineering, backend/platform services, APIs, enterprise
+      integrations, customer/finance/mobility platforms, SQL/database-backed applications,
+      technical advisory, production reliability, and technical leadership roles. Screen
+      carefully for embedded-only, manufacturing-only, and onsite-heavy roles. Avoid
+      hardware-only, robotics-only, autonomy-only, data/AI-only, infrastructure-only,
+      or frontend-heavy roles unless backend/platform software engineering is central.
+
+  - name: Honda
+    careers_url: https://honda.wd5.myworkdayjobs.com/HondaCareers
+    notes: >
+      Automotive and enterprise technology target. Prioritize senior software engineering,
+      backend/platform services, APIs, enterprise integrations, customer/account/service
+      platforms, SQL/database-backed applications, technical advisory, production
+      reliability, and technical leadership roles. Screen carefully for embedded-only,
+      manufacturing-only, hardware-only, and onsite-heavy roles. Avoid vehicle embedded-
+      only, firmware-only, robotics-only, data/AI-only, infrastructure-only, or
+      frontend-heavy roles unless backend/platform software engineering is central.
+
+  - name: Prescryptive Health
+    careers_url: https://www.prescryptive.com/careers
+    notes: >
+      Healthcare and pharmacy technology target. Prioritize senior software engineering,
+      backend/platform services, Java/Spring where applicable, APIs, healthcare workflow
+      automation, pharmacy/payments/member systems, SQL/database-backed applications,
+      technical advisory, production reliability, and technical leadership roles. Avoid
+      operations-only, support-only, care-delivery-only, data/AI-only, infrastructure-only,
+      or frontend-heavy roles unless backend/platform software engineering is central.
+
+  - name: Zenara Health
+    careers_url: https://www.zenarahealth.com/
+    notes: >
+      Healthcare technology target. Prioritize senior software engineering, backend/
+      platform services, APIs, integrations, workflow automation, SQL/database-backed
+      applications, technical advisory, production reliability, and technical leadership
+      roles. Screen carefully for exact company and role fit. Avoid care-operations-only,
+      support-only, data/AI-only, infrastructure-only, or frontend-heavy roles unless
+      backend/platform software engineering is central.
+
+  - name: Third Eye Software
+    careers_url: https://www.thirdeyesoftware.com/
+    notes: >
+      Smaller software and consulting target. Prioritize senior software engineering,
+      backend/platform services, APIs, enterprise integrations, SQL/database-backed
+      applications, implementation guidance, technical consulting, professional services
+      engineering, and technical leadership roles. Screen carefully for exact company fit,
+      stack alignment, and travel expectations. Avoid support-only, QA-only, data/AI-only,
+      infrastructure-only, or non-technical advisory roles.
+
+  - name: Ascend Technologies
+    careers_url: https://teamascend.com/careers/
+    notes: >
+      Managed technology and consulting target. Prioritize senior software engineering,
+      backend/platform services, enterprise integrations, technical consulting,
+      implementation guidance, application modernization, solution architecture, and
+      technical leadership roles. Screen carefully for MSP/helpdesk focus, infrastructure-
+      only work, and heavy client-travel expectations. Avoid support-only, infrastructure-
+      operations-only, security-only, or non-coding project roles unless application or
+      technical consulting delivery is central.
+
+  - name: ElevenLabs
+    careers_url: https://elevenlabs.io/careers
+    notes: >
+      AI product-platform target. Prioritize senior software engineering, backend/platform
+      services, APIs, developer tooling, enterprise integrations, product/platform
+      engineering, technical advisory, production reliability, and technical leadership
+      roles. Screen carefully for stack fit, AI research-only roles, and frontend-only
+      roles. Avoid research-only, prompt-only, DevRel-only, data/AI-only, or
+      infrastructure-only roles unless backend/platform engineering is central.
+
+  - name: LangChain
+    careers_url: https://www.langchain.com/careers
+    notes: >
+      AI developer-platform target. Prioritize senior software engineering, backend/
+      platform services, APIs, developer tooling, workflow/orchestration platforms,
+      integrations, enterprise SaaS, technical advisory, production reliability, and
+      technical leadership roles. Screen carefully for stack fit and research-heavy roles.
+      Avoid research-only, data-science-only, prompt-only, DevRel-only, or frontend-heavy
+      roles unless backend/platform engineering is central.
+
+  - name: Charlie Health
+    careers_url: https://www.charliehealth.com/careers
+    notes: >
+      Digital health target covering engineering, product, and design hiring areas.
+      Prioritize senior software engineering, backend/platform services, APIs, healthcare
+      workflow/member platforms, SQL/database-backed applications, technical advisory,
+      production reliability, and technical leadership roles. Avoid clinical-only,
+      coaching-only, care-operations-only, data/AI-only, infrastructure-only, product-
+      only, or design-only roles unless software engineering is central.
+
+  - name: InductiveHealth
+    careers_url: https://www.inductivehealth.com/careers/
+    notes: >
+      Public health and healthcare software target. Prioritize senior software engineering,
+      backend/platform services, Java/Spring where applicable, APIs, integrations,
+      healthcare workflow/data platforms, SQL/database-backed applications, technical
+      advisory, production reliability, and technical leadership roles. Avoid support-only,
+      analyst-only, data-science-only, infrastructure-only, or frontend-heavy roles unless
+      backend/platform software engineering is central.
+
+  - name: Apps Associates
+    careers_url: https://appsassociates.com/careers/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=21229615
+    official_search_domains:
+      - appsassociates.com
+    title_aliases:
+      - Senior Technical Consultant
+      - Solution Architect
+      - Integration Consultant
+    notes: >
+      High-priority Oracle consulting and professional-services target. Prioritize Oracle
+      enterprise applications, CPQ, CX, integrations, APIs, implementation leadership,
+      solution architecture, technical consulting, application modernization, production
+      support, and customer-facing delivery roles. the candidate's Oracle CPQ and professional-
+      services background is directly relevant. Avoid purely functional ERP/HCM roles,
+      managed-services support-only work, and roles requiring deep module expertise the candidate
+      cannot truthfully claim.
+
+  - name: Accenture
+    careers_url: https://www.accenture.com/us-en/careers
+    oracle_partner_url: https://www.oracle.com/partner/accenture/
+    official_search_domains:
+      - accenture.com
+    title_aliases:
+      - Oracle Technical Architect
+      - Technical Delivery Lead
+      - Oracle CPQ Consultant
+    notes: >
+      High-priority Oracle and enterprise technology consulting target. Prioritize Oracle
+      application engineering, CPQ and quote-to-cash, integration architecture, Java/API
+      delivery, cloud application modernization, technical advisory, delivery leadership,
+      and client-facing implementation roles. Consulting travel is acceptable. Avoid
+      functional-only Oracle Financials/HCM/SCM roles, sales-only positions, and roles
+      requiring certifications or module ownership the candidate does not have.
+
+  - name: PwC
+    careers_url: https://jobs.us.pwc.com/oracle-jobs
+    oracle_partner_url: https://www.oracle.com/partner/pwc/
+    official_search_domains:
+      - jobs.us.pwc.com
+    title_aliases:
+      - Oracle Technical Architect
+      - Oracle Integration Architect
+      - Oracle CPQ Consultant
+    notes: >
+      Oracle consulting and enterprise transformation target. Prioritize technical Oracle
+      consulting, application and integration architecture, CPQ/quote-to-cash, APIs,
+      implementation leadership, technical delivery, design workshops, and modernization
+      roles. Treat advisory and professional-services work as a strong lane. Avoid audit,
+      tax, purely functional ERP transformation, and roles centered on Oracle modules or
+      certifications outside the candidate's demonstrated experience.
+
+  - name: Cognizant
+    careers_url: https://careers.cognizant.com/us-en/jobs/
+    oracle_partner_url: https://www.oracle.com/partner/cognizant/
+    official_search_domains:
+      - careers.cognizant.com
+    title_aliases:
+      - Principal Consultant
+      - Technical Architect
+      - Java Architect
+    notes: >
+      U.S. technology consulting and delivery target with Atlanta presence. Prioritize
+      Oracle enterprise applications, Java/backend engineering, APIs, integrations,
+      application modernization, solution architecture, implementation consulting,
+      technical delivery leadership, and client-facing advisory roles. Avoid offshore-
+      only postings, support-only assignments, frontend-heavy roles, and positions whose
+      primary stack or mandatory platform expertise does not match the candidate's background.
+
+  - name: Infosys
+    careers_url: https://www.infosys.com/careers/americas/apply.html
+    oracle_partner_url: https://www.oracle.com/partner/infosys/
+    official_search_domains:
+      - infosys.com
+    title_aliases:
+      - Principal Consultant
+      - Technical Architect
+      - Java Architect
+    notes: >
+      U.S. enterprise consulting and technology delivery target with an Atlanta presence.
+      Prioritize Oracle application consulting, Java/backend services, APIs, enterprise
+      integrations, modernization, solution architecture, implementation leadership,
+      technical advisory, and professional-services delivery. Avoid offshore-only roles,
+      functional-only ERP/HCM work, support-only assignments, and postings requiring a
+      primary stack or Oracle module specialization the candidate cannot truthfully claim.

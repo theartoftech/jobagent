@@ -1,0 +1,232 @@
+target_profile:
+  title_targets:
+    - Senior Principal Software Engineer
+    - Principal Software Engineer
+    - Staff Software Engineer
+    - Staff Java Engineer
+    - Principal Java Engineer
+    - Principal Application Engineer
+    - Consulting Principal Software Engineer
+    - Software Architect
+    - Cloud Architect
+    - Solution Architect
+    - Technical Architect
+    - Lead Architect
+    - Platform Architect
+    - CPQ Architect
+    - Technical Delivery Architect
+    - Technical Director
+    - Forward Deployed Engineer
+    - Forward Deployed Software Engineer
+    - Senior Forward Deployed Engineer
+    - Principal Forward Deployed Engineer
+    - Forward Deployed Architect
+    - Forward Deployed Solutions Architect
+    - Forward Deployed Team Lead
+    - Senior Software Engineer
+    - Lead Software Engineer
+    - Backend Software Engineer
+    - Java Software Engineer
+    - Java Architect
+    - Enterprise Application Engineer
+    - Platform Software Engineer
+    - Integration Engineer
+    - Database-focused Software Engineer
+    - Technical Consultant
+    - Senior Technical Consultant
+    - Principal Technical Consultant
+    - Technical Solutions Consultant
+    - Solutions Engineer
+    - Senior Solutions Engineer
+    - Advisory Consultant
+    - Senior Advisory Consultant
+    - Principal Consultant
+    - Professional Services Engineer
+    - Technical Delivery Lead
+    - Implementation Architect
+    - Integration Consultant
+    - Enterprise Application Consultant
+    - CPQ Consultant
+    - CPQ Solution Architect
+    - Customer Solutions Architect
+    - Delivery Architect
+    - Technical Account Architect
+    - Software Development Engineer
+    - Senior Application Engineer
+    - Solutions Consultant
+    - Implementation Consultant
+    - Technical Implementation Consultant
+    - Customer Engineer
+    - Professional Services Consultant
+    - Technical Lead
+    - Lead Consultant
+    - Implementation Lead
+    - Member of Technical Staff
+    - Senior Member of Technical Staff
+    - Enterprise Architect 
+    - Technical Product Manager
+    - Principal Technical Product Manager
+  worth_applying_title_targets:
+    - Director of Software Engineering
+    - Director, Application Development
+    - Director, Platform Engineering
+    - Director, Enterprise Applications
+    - Director, Architecture
+    - Director, Technical Delivery
+  strong_keywords:
+    - Java
+    - J2EE
+    - Spring Boot
+    - REST API
+    - SQL
+    - Oracle Database
+    - MySQL
+    - SQL Server
+    - Hibernate
+    - JPA
+    - JDBC
+    - enterprise SaaS
+    - backend services
+    - integrations
+    - quote-to-cash
+    - CPQ
+    - production troubleshooting
+    - root-cause analysis
+    - CI/CD
+    - Kubernetes
+    - Docker
+    - Linux
+    - Unix
+    - technical leadership
+    - technical consulting
+    - professional services
+    - technical advisory
+    - solution architecture
+    - solution design
+    - implementation leadership
+    - delivery leadership
+    - technical lead
+    - technical delivery lead
+    - mentoring junior developers
+    - code review
+    - technical guidance
+    - client-facing technical delivery
+    - professional-services delivery
+    - integration consulting
+    - enterprise application consulting
+    - system implementation
+    - application implementation
+    - technical workshops
+    - system learning
+    - CPQ consulting
+    - CPQ solution architecture
+    - quote-to-cash implementation
+    - Revenue Cloud
+    - delivery architecture
+    - customer solutions architecture
+    - technical account architecture
+    - forward deployed engineering
+    - customer-facing software engineering
+    - deployment into customer environments
+    - ambiguous customer problem solving
+    - production software implementation
+    - end-to-end technical ownership
+    - microservices
+    - distributed systems
+    - cloud architecture
+    - OCI
+    - enterprise platform modernization
+    - system design
+    - AI-enabled development
+
+  acceptable_secondary_keywords:
+    - AI-assisted coding
+    - AI development tools
+    - GitHub Copilot
+    - Cursor
+    - Claude Code
+    - Model Context Protocol
+    - MCP
+    - responsible AI awareness
+    - presales support
+    - technical discovery
+    - client workshops
+    - implementation handoff
+    - solution validation
+    - advisory consulting
+    - implementation guidance
+    - client implementation
+    - product learning
+    - system onboarding
+    - Salesforce CPQ partner
+    - Revenue Cloud partner
+    - ServiceNow partner
+    - legal software
+    - professional-services software
+    - contract lifecycle management
+    - document automation
+    - full stack
+    - full-stack
+    - Oracle JET
+    - UI technologies
+    - frontend collaboration
+
+  exclude_if_primary_focus:
+    - React-heavy frontend
+    - Rails-heavy frontend
+    - Salesforce Apex/LWC/Flow
+    - Agentforce/Data Cloud ownership
+    - production AI/ML engineer
+    - AWS/Terraform/EKS infrastructure
+    - DevOps-only
+    - DevSecOps-only
+    - data warehouse architect
+    - sales-only presales
+    - account management
+    - project management without technical ownership
+    - non-technical business advisory
+    - active clearance required
+    - West Coast office attendance required
+
+  locations:
+    preferred:
+      - Remote US
+      - Preferred State
+      - Preferred City
+      - Example City
+      - Nearby City
+      - Preferred Metro Area
+      - Preferred Suburb
+      - Nearby Suburb
+      - Preferred Region
+    acceptable:
+      - Hybrid Preferred City
+      - Commuting distance to Preferred City office
+      - Hybrid Preferred Suburb
+      - Hybrid Nearby Suburb
+      - Flex Preferred City with up to 50% in-office time per quarter
+      - Any role explicitly labeled Flexible or Remote, even if a city is attached
+      - Full-time onsite Preferred Suburb
+    reject:
+      - required West Coast office attendance
+      - unpaid quarterly travel to West Coast
+
+  compensation:
+    target_minimum: 150000
+    unknown_compensation_policy: Do not reject an otherwise strong match solely because compensation is unpublished
+
+  excluded_companies:
+    - Oracle
+
+  travel:
+    acceptable:
+      - Travel above 50% is acceptable for strong-fit roles when the technical fit is strong
+    reject:
+      - constant onsite presence as a primary expectation
+
+  freshness:
+    include_max_age_days: 60
+    priority_order:
+      - posted_within_7_days
+      - posted_within_21_days
+      - posted_within_60_days

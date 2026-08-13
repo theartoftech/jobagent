@@ -1,0 +1,216 @@
+selection_sources:
+  - Y Combinator Jobs
+  - Wellfound
+  - Built In
+  - Atlanta Tech Square ecosystem
+  - Enterprise SaaS and infrastructure venture portfolios
+
+selection_notes: >
+  Curated for U.S.-remote or Atlanta-compatible senior backend/platform engineering,
+  enterprise SaaS, APIs, integrations, workflow, payments, healthcare, developer
+  platforms, data infrastructure, solution architecture, and technical-delivery
+  possibilities. Inclusion authorizes discovery only; normal fit and resume gates apply.
+
+startups:
+  - name: FullStack
+    careers_url: https://talent.fullstack.com/jobs
+    sector: remote software consulting and delivery
+    promotion_rule: Promote to companies.yml after two verified matching roles on separate runs.
+  - name: Postman
+    careers_url: https://www.postman.com/company/careers/
+    sector: API platform
+  - name: CircleCI
+    careers_url: https://circleci.com/careers/
+    sector: developer platform
+  - name: Sentry
+    careers_url: https://sentry.io/careers/
+    sector: developer platform
+  - name: LaunchDarkly
+    careers_url: https://launchdarkly.com/careers/
+    sector: developer platform
+  - name: Grafana Labs
+    careers_url: https://grafana.com/careers/
+    sector: observability
+  - name: Cockroach Labs
+    careers_url: https://www.cockroachlabs.com/careers/
+    sector: database platform
+  - name: Yugabyte
+    careers_url: https://www.yugabyte.com/careers/
+    sector: database platform
+  - name: dbt Labs
+    careers_url: https://www.getdbt.com/about-us/careers
+    sector: data platform
+  - name: Vercel
+    careers_url: https://vercel.com/careers
+    sector: developer platform
+  - name: Netlify
+    careers_url: https://www.netlify.com/careers/
+    sector: developer platform
+  - name: Render
+    careers_url: https://render.com/careers
+    sector: cloud application platform
+  - name: Fly.io
+    careers_url: https://fly.io/jobs/
+    sector: cloud application platform
+  - name: Supabase
+    careers_url: https://supabase.com/careers
+    sector: database platform
+  - name: Clerk
+    careers_url: https://clerk.com/careers
+    sector: identity developer platform
+  - name: PlanetScale
+    careers_url: https://planetscale.com/careers
+    sector: database platform
+  - name: Materialize
+    careers_url: https://materialize.com/careers/
+    sector: data platform
+  - name: Airbyte
+    careers_url: https://airbyte.com/company/careers
+    sector: data integration
+  - name: Fivetran
+    careers_url: https://www.fivetran.com/careers
+    sector: data integration
+  - name: Monte Carlo
+    careers_url: https://montecarlo.ai/careers-at-monte-carlo/
+    sector: data reliability
+  - name: Hightouch
+    careers_url: https://hightouch.com/careers
+    sector: data integration
+  - name: Cribl
+    careers_url: https://cribl.io/careers/
+    sector: data infrastructure
+  - name: Chainguard
+    careers_url: https://www.chainguard.dev/careers
+    sector: software supply chain
+  - name: Snyk
+    careers_url: https://snyk.io/careers/
+    sector: developer security
+  - name: Orca Security
+    careers_url: https://orca.security/about/careers/
+    sector: cloud security
+  - name: Tailscale
+    careers_url: https://tailscale.com/careers
+    sector: networking platform
+  - name: 1Password
+    careers_url: https://1password.com/careers
+    sector: identity and security
+  - name: Drata
+    careers_url: https://drata.com/careers
+    sector: compliance SaaS
+  - name: Vanta
+    careers_url: https://www.vanta.com/company/careers
+    sector: compliance SaaS
+  - name: Plaid
+    careers_url: https://plaid.com/careers/
+    sector: financial APIs
+  - name: Brex
+    careers_url: https://www.brex.com/careers
+    sector: fintech
+  - name: Ramp
+    careers_url: https://ramp.com/careers
+    sector: fintech
+  - name: Mercury
+    careers_url: https://mercury.com/jobs
+    sector: fintech
+  - name: Highnote
+    careers_url: https://highnote.com/careers
+    sector: payments platform
+  - name: Lithic
+    careers_url: https://www.lithic.com/about/careers
+    sector: payments platform
+  - name: Modern Treasury
+    careers_url: https://www.moderntreasury.com/about#careers
+    sector: payments platform
+  - name: Alloy
+    careers_url: https://www.alloy.com/about/jobs
+    sector: fintech identity
+  - name: Rainforest
+    careers_url: https://www.rainforestpay.com/careers
+    sector: Atlanta payments platform
+  - name: PrizePicks
+    careers_url: https://www.prizepicks.com/careers
+    sector: Atlanta consumer technology
+  - name: FullStory
+    careers_url: https://www.fullstory.com/careers/
+    sector: Atlanta SaaS
+  - name: Calendly
+    careers_url: https://calendly.com/careers
+    sector: Atlanta SaaS
+  - name: Salesloft
+    careers_url: https://www.salesloft.com/company/careers
+    sector: Atlanta enterprise SaaS
+  - name: Flock Safety
+    careers_url: https://www.flocksafety.com/careers
+    sector: Atlanta public-safety technology
+  - name: Kobiton
+    careers_url: https://kobiton.com/careers
+    sector: Atlanta developer platform
+  - name: Motive
+    careers_url: https://gomotive.com/company/careers/
+    sector: operations platform
+  - name: Rippling
+    careers_url: https://www.rippling.com/careers
+    sector: HR and payroll SaaS
+  - name: Deel
+    careers_url: https://www.deel.com/careers/
+    sector: HR and payroll SaaS
+  - name: Gusto
+    careers_url: https://gusto.com/about/careers
+    sector: HR and payroll SaaS
+  - name: Carta
+    careers_url: https://carta.com/careers/
+    sector: financial SaaS
+  - name: Webflow
+    careers_url: https://webflow.com/company/careers
+    sector: application platform
+  - name: Retool
+    careers_url: https://retool.com/careers
+    sector: application platform
+  - name: Sourcegraph
+    careers_url: https://sourcegraph.com/jobs
+    sector: developer platform
+  - name: Replit
+    careers_url: https://replit.com/careers
+    sector: developer platform
+  - name: WorkOS
+    careers_url: https://workos.com/careers
+    sector: enterprise identity APIs
+  - name: Pulumi
+    careers_url: https://www.pulumi.com/careers/
+    sector: developer platform
+  - name: Kong
+    careers_url: https://konghq.com/company/careers
+    sector: API platform
+  - name: Harness
+    careers_url: https://www.harness.io/company/careers
+    sector: developer platform
+  - name: ClickHouse
+    careers_url: https://clickhouse.com/company/careers
+    sector: database platform
+  - name: Chronosphere
+    careers_url: https://chronosphere.io/careers/
+    sector: observability
+  - name: Astronomer
+    careers_url: https://www.astronomer.io/careers/
+    sector: workflow and data platform
+  - name: Honeycomb
+    careers_url: https://www.honeycomb.io/careers
+    sector: observability
+  - name: Aiven
+    careers_url: https://aiven.io/careers
+    sector: data infrastructure
+  - name: Contentful
+    careers_url: https://www.contentful.com/careers/
+    sector: enterprise content platform
+  - name: commercetools
+    careers_url: https://commercetools.com/careers
+    sector: enterprise commerce platform
+  - name: Celigo
+    careers_url: https://www.celigo.com/company/careers/
+    sector: enterprise integration
+  - name: SnapLogic
+    careers_url: https://www.snaplogic.com/company/careers
+    sector: enterprise integration
+  - name: Workato
+    careers_url: https://www.workato.com/careers/
+    sector: workflow and integration

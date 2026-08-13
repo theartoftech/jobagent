@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+outputs/
+Source Docs/
+resume_templates.json
+/*_profile.yml
+linkedin-export*.zip
+linkedin-live-verifications*.json

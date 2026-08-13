@@ -1,0 +1,80 @@
+overrides:
+  - company: NCR Voyix
+    job_id: R0157400
+    url_contains: R0157400
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed stretch: Convenience and Fuel Retail payments/loyalty role;
+      mirrored description calls for 7+ years C++ on Windows and modern C++ 11+,
+      which is outside the candidate's Java/backend SaaS target profile.
+
+  - company: U.S. Bank
+    job_id: 2026-0015060
+    url_contains: 2026-0015060
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: official Workday posting no longer exists.
+
+  - company: U.S. Bank
+    job_id: 2026-0019855
+    url_contains: 2026-0019855
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed location mismatch: Charlotte, NC role is not remote and should not
+      be treated as remote-compatible for the candidate.
+
+  - company: The Weather Company LLC
+    job_id: 5166846007
+    url_contains: 5166846007
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed extreme stretch: Consumer Weather Science role centered on Python,
+      atmospheric model data, AWS, production LLM APIs, and AI-generated consumer
+      forecast products rather than the candidate's Java/backend enterprise SaaS lane.
+
+  - company: Aderant
+    job_id: REQ_100000257
+    url_contains: REQ_100000257
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed required-stack mismatch: Senior Software Engineer posting lists
+      .NET in the qualifications/technology stack, which should be treated as
+      do-not-apply under the candidate's current Java/backend strategy.
+
+  - company: CVS Health
+    job_id: R0976382
+    url_contains: R0976382
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed mismatch: Galway role is centered on DevOps/SRE/AIOps and
+      observability-platform ownership, with SLO/SLI, OpenTelemetry, Grafana,
+      cloud, IaC, and incident-automation requirements outside the candidate's primary
+      application-engineering lane.
+
+  - company: Omada
+    job_id: 7822840
+    url_contains: 7822840
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed primary-stack mismatch: the role requires Ruby on Rails and
+      screens directly for Rails experience, with a Rails/React/AWS product
+      stack outside the candidate's Java/backend enterprise SaaS lane.
+
+  - company: Omada
+    job_id: 8051562
+    url_contains: 8051562
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed hard application-screen mismatch: Core Systems & Integrations
+      asks directly about current/recent production Ruby/Rails work and the
+      percentage of recent experience spent in Ruby/Rails. The backend and
+      integration responsibilities fit, but Ruby/Rails is a decisive primary
+      stack requirement outside the candidate's background.

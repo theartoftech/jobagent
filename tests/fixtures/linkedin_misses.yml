@@ -1,0 +1,14 @@
+ats_cases:
+  - company: OneTrust
+    source_url: https://job-boards.greenhouse.io/onetrust/jobs/8067475
+    expected_ats_url: https://job-boards.greenhouse.io/onetrust
+  - company: RELX
+    source_url: https://relx.wd3.myworkdayjobs.com/en-US/LexisNexisLegal/job/Consulting-Principal-Software-Engineer_R112606
+    expected_ats_url: https://relx.wd3.myworkdayjobs.com/relx
+  - company: LexisNexis Risk Solutions
+    source_url: https://relx.wd3.myworkdayjobs.com/en-US/LexisNexisLegal/job/Consulting-Principal-Software-Engineer_R112606
+    expected_ats_url: https://relx.wd3.myworkdayjobs.com/LexisNexisLegal
+manual_case:
+  company: FullStack
+  title: Principal Agentic Engineer
+  url: https://talent.fullstack.com/jobs/aef7ee91-020a-464e-a374-b51ac9203461
