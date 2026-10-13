@@ -187,6 +187,31 @@ class ShardPlanningTests(unittest.TestCase):
 
         self.assertEqual(selected, [company])
 
+    def test_same_day_rerun_reuses_companies_attempted_earlier_that_day(self) -> None:
+        companies = [
+            {"name": "Scheduled Co", "careers_url": "https://scheduled.example/jobs"},
+            {"name": "Earlier Overdue Co", "careers_url": "https://overdue.example/jobs"},
+        ]
+        today = discover_jobs_sharded.dt.date(2026, 9, 9)
+        scan_state = {
+            "companies": {
+                "earlier overdue co": {
+                    "last_attempted_deep_scan": today.isoformat(),
+                    "last_successful_deep_scan": today.isoformat(),
+                    "retry_next_weekday": False,
+                }
+            }
+        }
+
+        selected = discover_jobs_sharded.select_deep_scan_companies(
+            companies=companies,
+            today=today,
+            ats_registry={},
+            scan_state=scan_state,
+        )
+
+        self.assertIn(companies[1], selected)
+
 
 class AtsSentinelTests(unittest.TestCase):
     def test_sentinel_dedupes_shared_boards_and_returns_only_new_relevant_jobs(self) -> None:

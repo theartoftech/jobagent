@@ -31,9 +31,33 @@ except ModuleNotFoundError:
     yaml = None
 
 if __package__:
+    from scripts.job_override_dates import override_is_active
+    from scripts.language_requirements import required_unsupported_spoken_languages
+    from scripts.location_requirements import (
+        explicit_nonremote_location_outside_allowed_metro,
+        hybrid_location_outside_allowed_metro,
+    )
     from scripts.mark_applied_jobs import ReportJob, TrackerJob, load_tracker_jobs_snapshot, match_tracker_job
     from scripts.render_workflow_review_html import write_workflow_review_html
 else:
+    try:
+        from scripts.job_override_dates import override_is_active
+    except ModuleNotFoundError:
+        from job_override_dates import override_is_active
+    try:
+        from scripts.language_requirements import required_unsupported_spoken_languages
+    except ModuleNotFoundError:
+        from language_requirements import required_unsupported_spoken_languages
+    try:
+        from scripts.location_requirements import (
+            explicit_nonremote_location_outside_allowed_metro,
+            hybrid_location_outside_allowed_metro,
+        )
+    except ModuleNotFoundError:
+        from location_requirements import (
+            explicit_nonremote_location_outside_allowed_metro,
+            hybrid_location_outside_allowed_metro,
+        )
     from mark_applied_jobs import ReportJob, TrackerJob, load_tracker_jobs_snapshot, match_tracker_job
     from render_workflow_review_html import write_workflow_review_html
 
@@ -49,6 +73,7 @@ REQUIRED_MARKERS = (
     "hands-on",
     "proficient with",
     "proficiency with",
+    "technical expertise",
 )
 
 PRIMARY_STACK_MARKERS = (
@@ -103,6 +128,21 @@ PRINCIPAL_ARCHITECT_TITLE_MARKERS = (
     "delivery architect",
 )
 
+COMPENSATION_CONTEXT_MARKERS = (
+    "salary",
+    "compensation",
+    "base pay",
+    "pay range",
+    "annual pay",
+)
+
+COMPENSATION_AMOUNT_PATTERN = re.compile(
+    r"(?<![a-z0-9])(?:usd\s*|\$\s*)?"
+    r"(?P<amount>\d{2,3}(?:,\d{3})+(?:\.\d+)?|\d{5,6}(?:\.\d+)?|\d+(?:\.\d+)?\s*k)"
+    r"(?![a-z0-9])",
+    re.IGNORECASE,
+)
+
 REDUCED_SCOPE_INTERVIEW_NOTE = (
     "Use reduced-scope interview positioning. Emphasize hands-on contribution, team fit, "
     "production problem-solving, code quality, mentoring where useful, and willingness to "
@@ -119,6 +159,7 @@ REDUCED_SCOPE_INTERVIEW_NOTE = (
 class WorkflowReview:
     company: str
     title: str
+    job_id: str
     url: str
     location: str
     work_model: str
@@ -155,6 +196,28 @@ def load_yaml(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"Expected YAML mapping in {path}")
     return data
+
+
+def load_job_overrides(path: Path) -> list[dict[str, str]]:
+    if not path.exists():
+        return []
+    payload = load_yaml(path)
+    raw_overrides = payload.get("overrides", [])
+    if not isinstance(raw_overrides, list):
+        raise ValueError(f"Expected 'overrides' list in {path}")
+
+    overrides: list[dict[str, str]] = []
+    for item in raw_overrides:
+        if not isinstance(item, dict):
+            raise ValueError(f"Invalid job override entry in {path}: {item!r}")
+        overrides.append(
+            {
+                str(key): str(value).strip()
+                for key, value in item.items()
+                if value is not None and str(value).strip()
+            }
+        )
+    return overrides
 
 
 def load_yaml_via_ruby(path: Path) -> dict[str, Any] | list[Any]:
@@ -277,18 +340,61 @@ def merge_current_and_carry_forward_jobs(
     carry_forward_jobs: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     merged: list[dict[str, Any]] = []
-    seen: set[tuple[str, str]] = set()
+    seen_requisitions: set[tuple[str, str]] = set()
+    seen_urls: set[tuple[str, str]] = set()
+    seen_fallbacks: set[tuple[str, str]] = set()
     for job in [*current_jobs, *carry_forward_jobs]:
-        identity = job_identity(job)
-        if identity in seen:
+        company = normalize(job.get("company", ""))
+        job_id = normalize(job.get("job_id", ""))
+        url = str(job.get("url", "")).strip().casefold()
+        requisition_identity = (company, job_id) if job_id else None
+        url_identity = (company, url) if url else None
+        fallback_identity = job_identity(job) if not job_id and not url else None
+        if requisition_identity is not None and requisition_identity in seen_requisitions:
+            continue
+        if url_identity is not None and url_identity in seen_urls:
+            continue
+        if fallback_identity is not None and fallback_identity in seen_fallbacks:
             continue
         merged.append(job)
-        seen.add(identity)
+        if requisition_identity is not None:
+            seen_requisitions.add(requisition_identity)
+        if url_identity is not None:
+            seen_urls.add(url_identity)
+        if fallback_identity is not None:
+            seen_fallbacks.add(fallback_identity)
     return merged
+
+
+def dedupe_equivalent_postings(jobs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep one posting when company, role, location, model, and description match."""
+    deduped: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str, str, str]] = set()
+    for job in jobs:
+        description = normalize(job.get("description", ""))
+        if not description:
+            deduped.append(job)
+            continue
+        key = (
+            normalize(job.get("company", "")),
+            normalize(job.get("title", "")),
+            normalize(job.get("location", "")),
+            normalize(job.get("work_model", "")),
+            description,
+        )
+        if key in seen:
+            continue
+        deduped.append(job)
+        seen.add(key)
+    return deduped
 
 
 def normalize(value: object) -> str:
     return re.sub(r"\s+", " ", str(value or "").strip().casefold())
+
+
+def normalize_title_marker(value: object) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", str(value).casefold())).strip()
 
 
 def is_excluded_company(job: dict[str, Any], workflow_profile: dict[str, Any]) -> bool:
@@ -297,6 +403,50 @@ def is_excluded_company(job: dict[str, Any], workflow_profile: dict[str, Any]) -
         return False
     company = normalize(job.get("company", ""))
     return company in {normalize(item) for item in excluded if normalize(item)}
+
+
+def is_excluded_role_title(job: dict[str, Any], workflow_profile: dict[str, Any]) -> bool:
+    title = normalize_title_marker(job.get("title", ""))
+    for configured_marker in workflow_profile.get("excluded_role_title_markers", []) or []:
+        marker = normalize_title_marker(configured_marker)
+        if not marker:
+            raise ValueError("Excluded role title markers must be non-empty strings")
+        if re.search(rf"(?<![a-z0-9]){re.escape(marker)}(?![a-z0-9])", title):
+            return True
+    return False
+
+
+def is_skipped_by_job_override(
+    job: dict[str, Any],
+    overrides: list[dict[str, str]],
+    *,
+    as_of: dt.date | None = None,
+) -> bool:
+    effective_date = as_of or dt.date.today()
+    job_company = normalize(job.get("company", ""))
+    job_title = normalize_title_marker(job.get("title", ""))
+    job_url = str(job.get("url", ""))
+    job_id = str(job.get("job_id", ""))
+    for override in overrides:
+        if not override_is_active(override, as_of=effective_date):
+            continue
+        if normalize(override.get("decision", "")) != "skip":
+            continue
+        company = normalize(override.get("company", ""))
+        title_contains = normalize_title_marker(override.get("title_contains", ""))
+        url_contains = override.get("url_contains", "")
+        override_job_id = override.get("job_id", "")
+        if company and company != job_company:
+            continue
+        if title_contains and title_contains not in job_title:
+            continue
+        if url_contains and url_contains not in job_url:
+            continue
+        if override_job_id and override_job_id != job_id and override_job_id not in job_url:
+            continue
+        if company or title_contains or url_contains or override_job_id:
+            return True
+    return False
 
 
 def contains_term(text: str, token: str) -> bool:
@@ -355,6 +505,7 @@ def skill_variants(skill: str) -> list[str]:
     lowered = normalize(skill)
     variants = {lowered}
     mapping = {
+        "rest apis": ["rest api", "restful api", "restful apis"],
         "typescript professional experience": ["typescript"],
         "python backend professional experience": ["python"],
         "ruby on rails": ["ruby on rails", "rails"],
@@ -381,29 +532,72 @@ def collect_matches(text: str, values: list[str]) -> list[str]:
     return dedupe(hits)
 
 
-def detect_required_gaps(text: str, do_not_claim: list[str]) -> list[str]:
+def required_skill_has_confirmed_disjunctive_alternative(
+    text: str,
+    required_skill: str,
+    confirmed_strengths: list[str],
+) -> bool:
+    normalized_text = normalize(text)
+    for clause in re.split(r"(?<=[.;])\s+", normalized_text):
+        if not contains_term(clause, required_skill) or not contains_term(clause, "or"):
+            continue
+        for strength in confirmed_strengths:
+            for variant in skill_variants(strength):
+                if normalize(variant) == normalize(required_skill):
+                    continue
+                if contains_term(clause, variant):
+                    return True
+    return False
+
+
+def detect_required_gaps(
+    text: str,
+    do_not_claim: list[str],
+    confirmed_strengths: list[str] | None = None,
+) -> list[str]:
     required_text = re.split(
         r"\b(?:preferred qualifications|preferred experience|nice to have|bonus qualifications)\b",
         text,
         maxsplit=1,
     )[0]
+    confirmed = confirmed_strengths or []
     gaps: list[str] = []
     for skill in do_not_claim:
-        for variant in skill_variants(skill):
-            if contains_required_context(required_text, variant):
-                gaps.append(skill)
-                break
+        required_variants = [
+            variant
+            for variant in skill_variants(skill)
+            if contains_required_context(required_text, variant)
+        ]
+        if required_variants and not any(
+            required_skill_has_confirmed_disjunctive_alternative(
+                required_text,
+                variant,
+                confirmed,
+            )
+            for variant in required_variants
+        ):
+            gaps.append(skill)
     return dedupe(gaps)
 
 
-def detect_preferred_gaps(text: str, do_not_claim: list[str], required_gaps: list[str]) -> list[str]:
+def detect_preferred_gaps(
+    text: str,
+    do_not_claim: list[str],
+    required_gaps: list[str],
+    confirmed_strengths: list[str] | None = None,
+) -> list[str]:
     required_set = {normalize(item) for item in required_gaps}
+    confirmed = confirmed_strengths or []
     gaps: list[str] = []
     for skill in do_not_claim:
         if normalize(skill) in required_set:
             continue
         for variant in skill_variants(skill):
-            if contains_term(text, variant):
+            if contains_term(text, variant) and not required_skill_has_confirmed_disjunctive_alternative(
+                text,
+                variant,
+                confirmed,
+            ):
                 gaps.append(skill)
                 break
     return dedupe(gaps)
@@ -421,6 +615,10 @@ def gap_resolution_status(answer: str) -> str:
 def resolve_gap_answers(
     *, job: dict[str, Any], workflow_profile: dict[str, Any], detected_gaps: list[str]
 ) -> dict[str, str]:
+    candidate_answers = workflow_profile.get("candidate_gap_resolutions", {}) or {}
+    if not isinstance(candidate_answers, dict):
+        raise ValueError("workflow_profile candidate_gap_resolutions must be a skill-to-answer mapping")
+
     configured = workflow_profile.get("gap_resolutions", {}) or {}
     if not isinstance(configured, dict):
         raise ValueError("workflow_profile gap_resolutions must be a URL-to-answers mapping")
@@ -430,12 +628,26 @@ def resolve_gap_answers(
         raise ValueError(f"Gap resolutions for {job_url!r} must be a skill-to-answer mapping")
 
     normalized_answers: dict[str, str] = {}
+    for skill, raw_answer in candidate_answers.items():
+        if not isinstance(skill, str) or not isinstance(raw_answer, str) or not raw_answer.strip():
+            raise ValueError(
+                "Candidate gap resolutions require non-empty string skills and answers"
+            )
+        key = normalize(skill)
+        if key in normalized_answers:
+            raise ValueError(f"Duplicate candidate gap resolution for {skill!r}")
+        answer = raw_answer.strip()
+        status = gap_resolution_status(answer)
+        if status == "posting_false_positive":
+            raise ValueError(
+                f"Candidate gap resolution for {skill!r} cannot use posting_false_positive"
+            )
+        normalized_answers[key] = answer
+
     for skill, raw_answer in raw_answers.items():
         if not isinstance(skill, str) or not isinstance(raw_answer, str) or not raw_answer.strip():
             raise ValueError(f"Gap resolutions for {job_url!r} require non-empty string skills and answers")
         key = normalize(skill)
-        if key in normalized_answers:
-            raise ValueError(f"Duplicate gap resolution for {skill!r} at {job_url!r}")
         answer = raw_answer.strip()
         gap_resolution_status(answer)
         normalized_answers[key] = answer
@@ -447,14 +659,100 @@ def resolve_gap_answers(
     }
 
 
+def configured_salary_floor(workflow_profile: dict[str, Any]) -> float | None:
+    raw_floor = workflow_profile.get("salary_floor")
+    if raw_floor is None or raw_floor == "":
+        return None
+    if isinstance(raw_floor, bool) or not isinstance(raw_floor, (int, float, str)):
+        raise ValueError("workflow_profile salary_floor must be a positive number")
+    try:
+        floor = float(str(raw_floor).replace(",", "").strip())
+    except ValueError as exc:
+        raise ValueError("workflow_profile salary_floor must be a positive number") from exc
+    if floor <= 0:
+        raise ValueError("workflow_profile salary_floor must be a positive number")
+    return floor
+
+
+def published_annual_compensation_maximum(text: str) -> float | None:
+    normalized_text = normalize(text)
+    amounts: list[float] = []
+    for marker in COMPENSATION_CONTEXT_MARKERS:
+        for marker_match in re.finditer(re.escape(marker), normalized_text):
+            window_start = max(0, marker_match.start() - 80)
+            window_end = min(len(normalized_text), marker_match.end() + 260)
+            window = normalized_text[window_start:window_end]
+            for amount_match in COMPENSATION_AMOUNT_PATTERN.finditer(window):
+                nearby_start = max(0, amount_match.start() - 50)
+                nearby_end = min(len(window), amount_match.end() + 50)
+                nearby = window[nearby_start:nearby_end]
+                if "per hour" in nearby or "hourly" in nearby:
+                    continue
+                token = amount_match.group("amount").replace(",", "").replace(" ", "")
+                multiplier = 1000.0 if token.casefold().endswith("k") else 1.0
+                numeric_token = token[:-1] if multiplier > 1 else token
+                value = float(numeric_token) * multiplier
+                if value >= 10000:
+                    amounts.append(value)
+    return max(amounts) if amounts else None
+
+
 def detect_hard_blockers(
     text: str,
     job: dict[str, Any],
     workflow_profile: dict[str, Any],
     required_gaps: list[str],
+    confirmed_strengths: list[str] | None = None,
 ) -> list[str]:
     blockers: list[str] = []
     risk_flags = [normalize(flag) for flag in job.get("risk_flags", []) or []]
+
+    salary_floor = configured_salary_floor(workflow_profile)
+    published_maximum = published_annual_compensation_maximum(text)
+    if (
+        salary_floor is not None
+        and published_maximum is not None
+        and published_maximum <= salary_floor
+    ):
+        blockers.append(
+            "published compensation maximum "
+            f"${published_maximum:,.0f} does not exceed ${salary_floor:,.0f} floor"
+        )
+
+    normalized_title = normalize_title_marker(job.get("title", ""))
+    for configured_marker in workflow_profile.get("excluded_role_title_markers", []) or []:
+        marker = normalize_title_marker(configured_marker)
+        if not marker:
+            raise ValueError("Excluded role title markers must be non-empty strings")
+        if re.search(rf"(?<![a-z0-9]){re.escape(marker)}(?![a-z0-9])", normalized_title):
+            blockers.append(f"excluded role type: {str(configured_marker).casefold()}")
+
+    unsupported_languages = required_unsupported_spoken_languages(
+        f"{job.get('title', '')} {text}",
+        [str(item) for item in workflow_profile.get("unsupported_required_languages", [])],
+    )
+    blockers.extend(
+        f"required spoken language unsupported: {language}"
+        for language in unsupported_languages
+    )
+
+    if hybrid_location_outside_allowed_metro(
+        location=str(job.get("location", "")),
+        work_model=str(job.get("work_model", "")),
+        allowed_metro_tokens=[
+            str(item) for item in workflow_profile.get("hybrid_allowed_metro_tokens", [])
+        ],
+    ):
+        blockers.append("hybrid/flex location outside Atlanta metro")
+
+    if explicit_nonremote_location_outside_allowed_metro(
+        location=str(job.get("location", "")),
+        work_model=str(job.get("work_model", "")),
+        allowed_metro_tokens=[
+            str(item) for item in workflow_profile.get("hybrid_allowed_metro_tokens", [])
+        ],
+    ):
+        blockers.append("physical location outside Atlanta metro without remote status")
 
     for configured in workflow_profile.get("hard_reject_if_primary", []) or []:
         configured_text = normalize(configured)
@@ -466,7 +764,15 @@ def detect_hard_blockers(
             blockers.append(str(configured))
         elif "ruby" in configured_text and (contains_term(text, "ruby on rails") or contains_primary_context(text, "rails")):
             blockers.append(str(configured))
-        elif configured_text.startswith("go ") and contains_required_context(text, "go"):
+        elif (
+            configured_text.startswith("go ")
+            and contains_required_context(text, "go")
+            and not required_skill_has_confirmed_disjunctive_alternative(
+                text,
+                "go",
+                confirmed_strengths or [],
+            )
+        ):
             blockers.append(str(configured))
         elif "python primary" in configured_text and contains_primary_context(text, "python"):
             blockers.append(str(configured))
@@ -598,8 +904,8 @@ def classify_review(
     do_not_claim = [str(item) for item in workflow_profile.get("do_not_claim", []) or []]
     confirmed = [str(item) for item in workflow_profile.get("confirmed_strengths", []) or []]
 
-    required_gaps = detect_required_gaps(text, do_not_claim)
-    preferred_gaps = detect_preferred_gaps(text, do_not_claim, required_gaps)
+    required_gaps = detect_required_gaps(text, do_not_claim, confirmed)
+    preferred_gaps = detect_preferred_gaps(text, do_not_claim, required_gaps, confirmed)
     resolved_gaps = resolve_gap_answers(
         job=job,
         workflow_profile=workflow_profile,
@@ -611,14 +917,24 @@ def classify_review(
         if gap not in resolved_gaps
         or gap_resolution_status(resolved_gaps[gap]) not in {"professional_evidence", "posting_false_positive"}
     ]
-    blockers = detect_hard_blockers(text, job, workflow_profile, effective_required_gaps)
+    blockers = detect_hard_blockers(
+        text,
+        job,
+        workflow_profile,
+        effective_required_gaps,
+        confirmed,
+    )
     overqualified_risk, resume_positioning, seniority_scope_risks, interview_positioning_note = (
         classify_seniority_fit(job=job, text=text, workflow_profile=workflow_profile)
     )
     if is_director_title(str(job.get("title", ""))) and not technical_scope_hits(text):
         blockers.append("director role lacks clear technical ownership")
         blockers = dedupe(blockers)
-    direct_matches = collect_matches(text, confirmed)
+    source_fit_reasons = job.get("fit_reasons", []) or []
+    if not isinstance(source_fit_reasons, list):
+        raise ValueError("Job fit_reasons must be a list")
+    direct_match_text = f"{text} {' '.join(str(reason) for reason in source_fit_reasons)}"
+    direct_matches = collect_matches(direct_match_text, confirmed)
     tracker_match = match_tracker_job(
         ReportJob(
             company=str(job.get("company", "")),
@@ -710,6 +1026,7 @@ def classify_review(
     return WorkflowReview(
         company=str(job.get("company", "")),
         title=str(job.get("title", "")),
+        job_id=str(job.get("job_id", "")),
         url=str(job.get("url", "")),
         location=str(job.get("location", "")),
         work_model=str(job.get("work_model", "")),
@@ -884,6 +1201,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Strict workflow reviewer for discovered jobs.")
     parser.add_argument("--discovered-jobs", required=True, type=Path)
     parser.add_argument("--workflow-profile", default="candidate_workflow_profile.yml", type=Path)
+    parser.add_argument("--job-overrides", default="job_overrides.yml", type=Path)
     parser.add_argument("--applied-jobs", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
     parser.add_argument("--date", default=dt.date.today().isoformat())
@@ -891,7 +1209,9 @@ def main() -> None:
     args = parser.parse_args()
 
     args.out.mkdir(parents=True, exist_ok=True)
+    run_date = dt.date.fromisoformat(args.date)
     workflow_profile = load_yaml(args.workflow_profile)
+    job_overrides = load_job_overrides(args.job_overrides)
     tracker_jobs = load_tracker_jobs_snapshot(args.applied_jobs, expected_date=args.date)
     jobs = load_jobs(args.discovered_jobs)
     allowed_source_decisions = {normalize(item) for item in args.include_source_decisions.split(",") if item.strip()}
@@ -901,14 +1221,20 @@ def main() -> None:
         for job in jobs
         if normalize(job.get("decision", "")) in allowed_source_decisions
         and not is_excluded_company(job, workflow_profile)
+        and not is_excluded_role_title(job, workflow_profile)
+        and not is_skipped_by_job_override(job, job_overrides, as_of=run_date)
     ]
     carry_forward_jobs = [
         job
         for job in load_carry_forward_jobs(out_dir=args.out, run_date=args.date)
         if normalize(job.get("decision", "")) in allowed_source_decisions
         and not is_excluded_company(job, workflow_profile)
+        and not is_excluded_role_title(job, workflow_profile)
+        and not is_skipped_by_job_override(job, job_overrides, as_of=run_date)
     ]
-    reviewed_jobs = merge_current_and_carry_forward_jobs(current_reviewed_jobs, carry_forward_jobs)
+    reviewed_jobs = dedupe_equivalent_postings(
+        merge_current_and_carry_forward_jobs(current_reviewed_jobs, carry_forward_jobs)
+    )
     reviews = [
         classify_review(job=job, workflow_profile=workflow_profile, tracker_jobs=tracker_jobs)
         for job in reviewed_jobs

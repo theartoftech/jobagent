@@ -251,11 +251,13 @@ def select_deep_scan_companies(
         if not isinstance(company_state, dict):
             company_state = {}
         last_success = parse_state_date(company_state.get("last_successful_deep_scan"))
+        last_attempt = parse_state_date(company_state.get("last_attempted_deep_scan"))
         overdue = last_success is not None and (today - last_success).days >= DEEP_SCAN_OVERDUE_DAYS
         forced = bool(company_state.get("retry_next_weekday"))
         daily = bool(company.get("daily_scan"))
         scheduled = bucket_map[company_rotation_key(company, ats_registry)] == today.weekday()
-        if scheduled or overdue or forced or daily:
+        same_day_rerun = last_attempt == today
+        if scheduled or overdue or forced or daily or same_day_rerun:
             selected.append(company)
     return selected
 
@@ -909,7 +911,9 @@ def main() -> None:
     parser.add_argument("--deep-scan-state")
     args = parser.parse_args()
 
+    today = dt.date.today()
     profile = discover_jobs.profile_doc_to_profile(discover_jobs.load_yaml(Path(args.profile)))
+    job_overrides = discover_jobs.load_job_overrides(Path(args.job_overrides))
     base_companies = [
         company
         for company in discover_jobs.normalize_company_entries(discover_jobs.load_yaml(Path(args.companies)))
@@ -920,9 +924,13 @@ def main() -> None:
         for company in load_startup_watchlist(Path(args.startup_watchlist))
         if not discover_jobs.is_excluded_company(str(company.get("name", "")), profile)
     ]
+    base_companies = discover_jobs.filter_companies_by_overrides(
+        base_companies, job_overrides, as_of=today
+    )
+    startup_watchlist = discover_jobs.filter_companies_by_overrides(
+        startup_watchlist, job_overrides, as_of=today
+    )
     ats_registry = discover_jobs.load_ats_registry(Path(args.ats_registry))
-    job_overrides = discover_jobs.load_job_overrides(Path(args.job_overrides))
-    today = dt.date.today()
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     sentinel_state_path = Path(args.sentinel_state) if args.sentinel_state else out_dir / "ats-sentinel-state.json"
@@ -1011,7 +1019,7 @@ def main() -> None:
         job for job in merged["jobs"]
         if not discover_jobs.is_excluded_company(job.company, profile)
     ]
-    discover_jobs.apply_job_overrides(merged["jobs"], job_overrides)
+    discover_jobs.apply_job_overrides(merged["jobs"], job_overrides, as_of=today)
     deep_scan_state = update_deep_scan_state(
         previous_state=previous_deep_scan_state,
         base_companies=base_companies,

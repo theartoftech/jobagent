@@ -12,6 +12,7 @@ from scripts.publish_skill_gap_analytics import (
     build_import_payload,
     build_posting,
     canonical_skill_key,
+    map_work_model,
     publish_payload,
     publish_payload_via_ssh,
     write_import_payload,
@@ -34,6 +35,9 @@ class _Response:
 
 
 class PublishSkillGapAnalyticsTests(unittest.TestCase):
+    def test_map_work_model_treats_uncommitted_office_flex_as_unspecified(self) -> None:
+        self.assertEqual("unspecified", map_work_model("Atlanta office/flex not stated"))
+
     def test_build_payload_maps_all_reviews_and_resolution_states(self) -> None:
         source_bytes = b'{"fixture": true}\n'
         review = {
@@ -153,6 +157,73 @@ class PublishSkillGapAnalyticsTests(unittest.TestCase):
         self.assertEqual("98200474400", traffic["requisition_id"])
         self.assertEqual("96922204080", trust_and_safety["requisition_id"])
         self.assertNotEqual(traffic["posting_key"], trust_and_safety["posting_key"])
+
+    def test_build_posting_bounds_long_multi_location_values_for_jobtracker(self) -> None:
+        posting = build_posting(
+            {
+                "company": "Example Company",
+                "title": "Principal Software Engineer",
+                "url": "https://example.com/jobs/123",
+                "location": "; ".join(f"Work At Home-State-{index}" for index in range(40)),
+                "work_model": "Remote",
+                "source_decision": "Apply",
+                "source_fit_score": 90,
+                "workflow_decision": "APPLY",
+                "already_applied": False,
+                "required_gaps": [],
+                "preferred_gaps": [],
+                "resolved_gaps": {},
+                "hard_blockers": [],
+                "risk_flags": [],
+            }
+        )
+
+        self.assertLessEqual(len(posting["location"]), 300)
+        self.assertTrue(posting["location"].endswith("..."))
+
+    def test_build_payload_keeps_current_review_over_duplicate_carry_forward(self) -> None:
+        common = {
+            "company": "Example Bank",
+            "title": "Principal Software Engineer",
+            "url": "https://example.wd1.myworkdayjobs.com/Careers/job/Principal-Software-Engineer_REQ-123",
+            "source_decision": "Apply",
+            "source_fit_score": 90,
+            "already_applied": False,
+            "required_gaps": [],
+            "preferred_gaps": [],
+            "resolved_gaps": {},
+            "hard_blockers": [],
+            "risk_flags": [],
+        }
+        review = {
+            "generated_on": "2026-09-01",
+            "reviews": [
+                {
+                    **common,
+                    "location": "Atlanta, Georgia",
+                    "work_model": "On-site",
+                    "workflow_decision": "STRONG APPLY",
+                },
+                {
+                    **common,
+                    "location": "",
+                    "work_model": "Unknown",
+                    "workflow_decision": "APPLY",
+                },
+            ],
+        }
+
+        payload = build_import_payload(
+            review=review,
+            source_artifact_name="2026-09-01-workflow-review.json",
+            source_bytes=b"{}",
+            workflow_profile_bytes=b"profile",
+            expected_date="2026-09-01",
+        )
+
+        self.assertEqual(1, len(payload["postings"]))
+        self.assertEqual("Atlanta, Georgia", payload["postings"][0]["location"])
+        self.assertEqual("strong_apply", payload["postings"][0]["strict_workflow_decision"])
 
     def test_build_payload_rejects_unknown_decision_and_invalid_date(self) -> None:
         base_review = {

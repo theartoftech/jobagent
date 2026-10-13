@@ -4,8 +4,34 @@
 
 salary_floor: 150000
 
+unsupported_required_languages:
+  - German
+
+hybrid_allowed_metro_tokens:
+  - Atlanta
+  - Alpharetta
+  - Sandy Springs
+  - Dunwoody
+  - Roswell
+  - Marietta
+  - Smyrna
+  - Decatur
+  - Brookhaven
+  - Norcross
+  - Peachtree Corners
+  - Duluth
+  - Johns Creek
+  - Kennesaw
+  - Douglasville
+  - Lithia Springs
+
 excluded_companies:
-  - Oracle
+  - Temporal Technologies
+
+excluded_role_title_markers:
+  - pre-sales
+  - presales
+  - associate technical consultant
 
 preferred_locations:
   - Remote US
@@ -106,10 +132,54 @@ do_not_claim:
   - settlement
   - treasury
   - double-entry accounting
+  - Market Management Systems
+  - Unit Commitment
+  - Economic Dispatch
 
-# Answers copied back from workflow-review prompts. Entries are scoped to the
-# exact posting URL so a resolution cannot silently apply to another opening.
-gap_resolutions: {}
+# Candidate-wide facts are answered once and reused for every posting. These
+# answers suppress duplicate questions but do not erase a required skill gap.
+candidate_gap_resolutions:
+  React: do_not_claim
+  Angular: do_not_claim
+  Vue: do_not_claim
+  TypeScript professional experience: do_not_claim
+  Ruby on Rails: do_not_claim
+  Go: do_not_claim
+  Kotlin: do_not_claim
+  Python backend professional experience: do_not_claim
+  AWS: "limited_exposure: completed AWS workshops and BeSA training; no professional production deployment experience"
+  Azure: do_not_claim
+  GCP: "limited_exposure: completed GCP training through the Georgia public-library technology program; no professional production GCP experience"
+  Kafka: do_not_claim
+  MongoDB: do_not_claim
+  NoSQL: do_not_claim
+  Salesforce Apex: do_not_claim
+  LWC: do_not_claim
+  Flows: do_not_claim
+  Data Cloud: do_not_claim
+  Agentforce: "limited_exposure: completed BeSA training; no professional production Agentforce experience"
+  production RAG: do_not_claim
+  embeddings: do_not_claim
+  MCP servers: do_not_claim
+  ledgering: do_not_claim
+  settlement: do_not_claim
+  treasury: do_not_claim
+  double-entry accounting: do_not_claim
+  Market Management Systems: do_not_claim
+  Unit Commitment: do_not_claim
+  Economic Dispatch: do_not_claim
+
+# Posting-specific answers override candidate-wide facts only for the exact URL.
+# Use these for posting interpretation, including false-positive skill matches.
+gap_resolutions:
+  "https://mtb.wd5.myworkdayjobs.com/MTB/job/Remote-USA/Principal-Software-Engineer_R89645":
+    JavaScript: "professional_evidence: advanced professional-level JavaScript knowledge through professional Oracle JET application development"
+  "https://jobs.jobvite.com/ninjaone/job/o6cIAfwk":
+    Kotlin: "posting_false_positive: the official role is explicitly centered on Java; Kotlin is part of the broader team stack and is not listed as a minimum qualification"
+  "https://www.github.careers/early-in-profession/jobs/5481?lang=en-us":
+    Azure: "posting_false_positive: Azure and AKS appear under Preferred Qualifications, not Required Qualifications"
+  "https://ncr.wd1.myworkdayjobs.com/ext_us/job/ATLANTA-GA-USA/Senior-Software-Engineer--Multi-Cloud-_R0158101":
+    GCP: "limited_exposure: completed GCP training through the Georgia public-library technology program; no professional production GCP experience"
 
 hard_reject_if_primary:
   - React-heavy frontend

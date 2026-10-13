@@ -18,6 +18,62 @@ SPEC.loader.exec_module(search_jobs)
 
 
 class SearchPlanCompactionTests(unittest.TestCase):
+    def test_salesforce_family_has_distinct_shared_board_searches(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        registry = search_jobs.load_yaml(root / "ats_registry.yml")["companies"]
+        companies = search_jobs.normalize_company_entries(search_jobs.load_yaml(root / "companies.yml"))
+        by_name = {company["name"]: company for company in companies}
+
+        for company_name, search_term in (
+            ("Salesforce", "Principal%20Software%20Engineer"),
+            ("MuleSoft", "MuleSoft"),
+            ("Slack", "Slack"),
+        ):
+            registry_url = registry[company_name]["ats"][0]["url"]
+            self.assertIn("salesforce.com/company/careers/jobs/", registry_url)
+            self.assertIn(f"search={search_term}", registry_url)
+            self.assertEqual(by_name[company_name]["human_search_url"], registry_url + "#results")
+
+    def test_cognizant_has_first_party_registry_mapping(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        registry = search_jobs.load_yaml(root / "ats_registry.yml")["companies"]
+
+        self.assertEqual(
+            registry["Cognizant"]["ats"][0]["url"],
+            "https://careers.cognizant.com/us-en/jobs/",
+        )
+
+    def test_ibm_uses_canonical_avature_search_and_preserves_manual_regression(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        registry = search_jobs.load_yaml(root / "ats_registry.yml")["companies"]
+        manual = search_jobs.load_yaml(root / "manual_job_urls.yml")["jobs"]
+
+        self.assertEqual(
+            registry["IBM"]["ats"][0]["url"],
+            "https://careers.ibm.com/en_US/careers/SearchJobs",
+        )
+        ibm_jobs = [entry for entry in manual if entry.get("company") == "IBM"]
+        self.assertTrue(any(str(entry.get("job_id")) == "119683" for entry in ibm_jobs))
+
+    def test_oracle_is_a_direct_target_and_linkedin_findings_are_preserved(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        companies = search_jobs.normalize_company_entries(search_jobs.load_yaml(root / "companies.yml"))
+        by_name = {company["name"]: company for company in companies}
+        manual = search_jobs.load_yaml(root / "manual_job_urls.yml")["jobs"]
+        oracle_jobs = {str(entry.get("job_id")): entry for entry in manual if entry.get("company") == "Oracle"}
+
+        self.assertEqual(
+            "https://careers.oracle.com/jobs/",
+            by_name["Oracle"]["careers_url"],
+        )
+        self.assertIn("OCI", by_name["Oracle"]["notes"])
+        self.assertEqual({"341620", "338426", "338454"}, set(oracle_jobs))
+        for entry in oracle_jobs.values():
+            self.assertTrue(str(entry["url"]).startswith("https://eeho.fa.us2.oraclecloud.com/"))
+            self.assertTrue(str(entry["source_url"]).startswith("https://www.linkedin.com/jobs/view/"))
+            self.assertEqual("linkedin-manual-feedback", entry["source"])
+            self.assertEqual("official_live", entry["verification_status"])
+
     def test_linkedin_feedback_targets_use_registry_manual_and_watchlist_lanes(self) -> None:
         root = Path(__file__).resolve().parents[1]
         registry = search_jobs.load_yaml(root / "ats_registry.yml")["companies"]
@@ -135,7 +191,8 @@ class SearchPlanCompactionTests(unittest.TestCase):
             "Technical Product Manager",
         ):
             self.assertIn(title, profile["title_targets"])
-        self.assertIn("Oracle", profile["excluded_companies"])
+        self.assertNotIn("Oracle", profile["excluded_companies"])
+        self.assertNotIn("Oracle", workflow["excluded_companies"])
         self.assertIn("Example City", profile["locations"]["preferred"])
         self.assertIn("Nearby City", profile["locations"]["preferred"])
         self.assertEqual(150000, profile["compensation"]["target_minimum"])
@@ -150,6 +207,26 @@ class SearchPlanCompactionTests(unittest.TestCase):
             self.assertIn(action, rules)
         self.assertIn("generic email", rules.casefold())
         self.assertIn("third-party recruiter", rules.casefold())
+
+    def test_daily_cover_letter_instructions_require_approved_writing_voice(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        daily_prompt = (root / "daily_job_search_prompt.md").read_text(encoding="utf-8")
+        readme = (root / "README.md").read_text(encoding="utf-8")
+
+        self.assertIn("$jhaynes-writing-voice", daily_prompt)
+        self.assertIn("jhaynes-writing-voice", readme)
+
+    def test_ai_apply_is_read_only_verified_discovery_input(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        daily_prompt = (root / "daily_job_search_prompt.md").read_text(encoding="utf-8")
+        rules = (root / "search_rules.md").read_text(encoding="utf-8")
+
+        for text in (daily_prompt, rules):
+            self.assertIn("AI Apply MCP", text)
+            self.assertIn("official company or ATS posting", text)
+            self.assertIn("queue_job_for_review", text)
+            self.assertIn("submit_application", text)
+            self.assertIn("AI Apply internal job ID", text)
 
     def test_friend_recommended_companies_are_configured(self) -> None:
         root = Path(__file__).resolve().parents[1]
@@ -182,6 +259,104 @@ class SearchPlanCompactionTests(unittest.TestCase):
             "https://nghs.wd1.myworkdayjobs.com/External",
             registry["companies"]["Northeast Georgia Health System"]["ats"][0]["url"],
         )
+
+    def test_oracle_cpq_customer_targets_are_configured(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        companies = search_jobs.normalize_company_entries(search_jobs.load_yaml(root / "companies.yml"))
+        by_name = {company["name"]: company for company in companies}
+        registry = search_jobs.load_yaml(root / "ats_registry.yml")["companies"]
+        expected = {
+            "Vertiv": (
+                "https://www.vertiv.com/en-us/about/career-center/",
+                "https://www.oracle.com/customers/vertiv/",
+                "https://egup.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/requisitions/",
+            ),
+            "DNV": (
+                "https://jobs.dnv.com/",
+                "https://www.oracle.com/customers/dnv-cpq/",
+                "https://jobs.dnv.com/",
+            ),
+            "Aon": (
+                "https://jobs.aon.com/jobs",
+                "https://www.oracle.com/customers/aon-cx/",
+                "https://jobs.aon.com/jobs",
+            ),
+            "Cloud Software Group": (
+                "https://careers.cloud.com/jobs/search",
+                "https://www.oracle.com/customers/cloud-software-group/",
+                "https://careers.cloud.com/jobs/search",
+            ),
+        }
+
+        for company_name, (careers_url, oracle_story_url, registry_url) in expected.items():
+            self.assertIn(company_name, by_name)
+            self.assertEqual(careers_url, by_name[company_name]["careers_url"])
+            self.assertEqual(oracle_story_url, by_name[company_name]["oracle_customer_url"])
+            self.assertIn("CPQ", by_name[company_name]["notes"])
+            self.assertEqual(registry_url, registry[company_name]["ats"][0]["url"])
+
+    def test_oracle_cpq_consulting_targets_are_configured(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        companies = search_jobs.normalize_company_entries(search_jobs.load_yaml(root / "companies.yml"))
+        by_name = {company["name"]: company for company in companies}
+        registry = search_jobs.load_yaml(root / "ats_registry.yml")["companies"]
+        expected = {
+            "KPMG": "https://www.kpmguscareers.com/job-search/",
+            "Huron": "https://huron.wd1.myworkdayjobs.com/huroncareers",
+            "PwC": "https://jobs.us.pwc.com/oracle-jobs",
+            "Accenture": "https://www.accenture.com/us-en/careers",
+            "HCLTech": "https://careers.hcltech.com/go/United-States-Experienced/9557855/",
+            "Infosys": "https://www.infosys.com/careers/americas/apply.html",
+            "Deloitte": "https://apply.deloitte.com/en_US/careers",
+            "LTM Limited": "https://careers.ltm.com/viewalljobs/",
+            "Capgemini": "https://www.capgemini.com/careers/join-capgemini/job-search/",
+            "Mythics": "https://external-mythics.icims.com/jobs/search?hashed=-435768531&ss=1",
+            "Logicom": "https://www.logicom.net/careers/head-office/vacancies-list/",
+            "Ataway": "https://atawayglobal.catsone.com/careers/97420/",
+        }
+
+        for company_name, registry_url in expected.items():
+            self.assertIn(company_name, by_name)
+            self.assertIn("Oracle", by_name[company_name]["notes"])
+            self.assertEqual(registry_url, registry[company_name]["ats"][0]["url"])
+
+        self.assertNotIn("oracle_partner_url", by_name["Ataway"])
+        self.assertEqual(
+            "https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=4340253&filterValueStore=search_CPQ",
+            by_name["LTM Limited"]["oracle_partner_url"],
+        )
+
+    def test_strategic_us_oracle_cpq_partners_are_configured(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        companies = search_jobs.normalize_company_entries(search_jobs.load_yaml(root / "companies.yml"))
+        by_name = {company["name"]: company for company in companies}
+        registry = search_jobs.load_yaml(root / "ats_registry.yml")["companies"]
+        expected = {
+            "Tech Mahindra": ("https://careers.techmahindra.com/currentopportunity.aspx", "4133966"),
+            "Wipro": ("https://careers.wipro.com/viewalljobs/?locale=en_US", "4134618"),
+            "DXC Technology": ("https://careers.dxc.com/", "4-502001180139"),
+            "Trinamix": ("https://www.trinamix.com/careers/", "51389615"),
+            "Birlasoft": ("https://jobs.birlasoft.com/go/US/684844/", "12706842"),
+            "Centroid Systems": ("https://centroid.applytojob.com/apply", "47391449"),
+            "Inoapps": ("https://www.inoapps.com/join-inoapps/", "39309961"),
+            "Argano": ("https://argano.com/careers/open-positions.html", "4-150622211257"),
+            "Infovity": ("https://infovity.com/careers/", "50701523"),
+            "Vigilant Technologies": ("https://vigilant-inc.com/careers/", "29059469"),
+            "Zensar Technologies": ("https://www.zensar.com/careers", "PS203787-IN"),
+            "NexInfo": ("https://nexinfo.com/careers/", "20587838"),
+            "Jade Global": ("https://www.jadeglobal.com/careers", "10622368"),
+            "CherryRoad Technologies": ("https://cherryroad.com/who-we-are/careers/", "22205066"),
+            "Terillium": ("https://terillium.com/careers/", "30963307"),
+            "Speridian Technologies": ("https://speridiantechnologies.applytojob.com/apply", "41821299"),
+        }
+
+        for company_name, (careers_url, partner_number) in expected.items():
+            with self.subTest(company=company_name):
+                self.assertIn(company_name, by_name)
+                self.assertEqual(careers_url, by_name[company_name]["careers_url"])
+                self.assertIn(f"CompanyNumber={partner_number}", by_name[company_name]["oracle_partner_url"])
+                self.assertIn("CPQ", by_name[company_name]["notes"])
+                self.assertEqual(careers_url, registry[company_name]["ats"][0]["url"])
 
     def test_write_search_plan_caps_detailed_company_sections(self) -> None:
         companies = [

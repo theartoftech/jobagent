@@ -18,6 +18,7 @@ class RenderWorkflowReviewHtmlTests(unittest.TestCase):
                 {
                     "company": "ReadyCo",
                     "title": "Senior Java Engineer",
+                    "job_id": "REQ-12345",
                     "url": "https://example.com/ready",
                     "location": "Remote US",
                     "work_model": "Remote",
@@ -120,6 +121,34 @@ class RenderWorkflowReviewHtmlTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            (root / "2026-07-22-networking-matches.md").write_text(
+                "\n".join(
+                    [
+                        "# Networking Matches - 2026-07-22",
+                        "",
+                        "## LinkedIn Recruiter Add Notes",
+                        "",
+                        "### ReadyCo",
+                        "",
+                        "A company-level note.",
+                        "",
+                        "## People to Contact",
+                        "",
+                        "### ReadyCo",
+                        "",
+                        "Relevant jobs:",
+                        "- Apply: Senior Java Engineer; 2026-07-22; Remote; fit 86; https://example.com/ready",
+                        "",
+                        "| Priority | Name | Current Company | Current Role | LinkedIn | Connected On | Match Source | Why Reach Out |",
+                        "|---:|---|---|---|---|---|---|---|",
+                        "| 1 | Riley Recruiter | ReadyCo | Senior Technical Recruiter | [Profile](https://www.linkedin.com/in/riley-recruiter) | 12 Jun 2026 | export-confirmed | hiring-channel contact |",
+                        "",
+                        "## Introduction Messages",
+                        "",
+                    ]
+                ),
+                encoding="utf-8",
+            )
             resume_dir = root / "resumes"
             resume_dir.mkdir()
             resume_name = "2026-07-22-ReadyCo-Senior-Java-Engineer-Candidate-Name.docx"
@@ -174,6 +203,7 @@ class RenderWorkflowReviewHtmlTests(unittest.TestCase):
         self.assertNotIn("Interview positioning", ready_section)
         self.assertNotIn("Open generated resume", ready_section)
         self.assertIn("senior_lead_execution_forward", detail_rendered)
+        self.assertIn("<dt>Job ID</dt><dd>REQ-12345</dd>", detail_rendered)
         self.assertIn("Why it fits", detail_rendered)
         self.assertIn("Technical gaps", detail_rendered)
         self.assertIn("Seniority / scope risks", detail_rendered)
@@ -191,6 +221,16 @@ class RenderWorkflowReviewHtmlTests(unittest.TestCase):
         self.assertIn("Open generated resume", detail_rendered)
         self.assertIn("Open cover letter", detail_rendered)
         self.assertIn(f'href="../cover_letters/{cover_letter_name}"', detail_rendered)
+        self.assertIn("LinkedIn outreach", detail_rendered)
+        self.assertIn("Riley Recruiter", detail_rendered)
+        self.assertIn("Senior Technical Recruiter", detail_rendered)
+        self.assertIn("https://www.linkedin.com/in/riley-recruiter", detail_rendered)
+        self.assertIn("export-confirmed", detail_rendered)
+        self.assertIn("Hi Riley,", detail_rendered)
+        self.assertIn("Senior Java Engineer role at ReadyCo", detail_rendered)
+        self.assertRegex(detail_rendered, r"\d+ / 299 characters")
+        self.assertIn("Copy message", detail_rendered)
+        self.assertIn("navigator.clipboard.writeText", detail_rendered)
         self.assertIn('href="../2026-07-22-workflow-review.html"', detail_rendered)
         self.assertIn("jobagent-resume-ready:2026-07-22", rendered)
         self.assertIn("resumeReadyCheckboxes", rendered)
@@ -217,7 +257,10 @@ class RenderWorkflowReviewHtmlTests(unittest.TestCase):
         self.assertIn("do_not_claim", batch_prompt)
         self.assertIn("posting_false_positive", batch_prompt)
         self.assertIn("candidate_workflow_profile.yml", batch_prompt)
-        self.assertIn("keyed by each exact posting URL", batch_prompt)
+        self.assertIn("candidate_gap_resolutions", batch_prompt)
+        self.assertIn("answers each factual experience question once", batch_prompt)
+        self.assertIn("keyed by the exact posting URL", batch_prompt)
+        self.assertIn("Never store posting_false_positive as a candidate-wide answer", batch_prompt)
         self.assertIn("scripts/review_job_fit.py", batch_prompt)
         self.assertIn("2026-07-22-resume-ready-jobs.md", batch_prompt)
         self.assertIn("moved to Resume Ready", batch_prompt)
@@ -264,9 +307,18 @@ class RenderWorkflowReviewHtmlTests(unittest.TestCase):
             detail_rendered = detail_path.read_text(encoding="utf-8")
 
         self.assertNotIn("Generated resume", rendered)
-        self.assertIn('<span class="resume-missing">Not generated</span>', detail_rendered)
+        self.assertIn('<span class="resume-missing">Resume not generated</span>', detail_rendered)
+        self.assertIn(
+            '<span class="resume-missing">Cover letter not generated</span>',
+            detail_rendered,
+        )
         self.assertNotIn("Open generated resume", detail_rendered)
+        self.assertIn("<dt>Job ID</dt><dd>Not provided</dd>", detail_rendered)
         self.assertNotIn("Copy All Gap Questions", rendered)
+        self.assertIn("LinkedIn outreach", detail_rendered)
+        self.assertIn("No matching current-company LinkedIn contacts", detail_rendered)
+        self.assertIn("Principal Engineer role at MissingCo", detail_rendered)
+        self.assertIn("Copy message", detail_rendered)
 
     def test_write_html_escapes_external_job_text(self) -> None:
         payload = {

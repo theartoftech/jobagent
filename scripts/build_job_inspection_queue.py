@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import re
 from dataclasses import dataclass
@@ -15,12 +16,14 @@ try:
         NEEDS_FRESHNESS_VERIFICATION_DECISION,
         load_job_overrides,
     )
+    from scripts.job_override_dates import override_is_active
 except ModuleNotFoundError:
     from discover_jobs import (
         MIN_APPLY_FIT_SCORE,
         NEEDS_FRESHNESS_VERIFICATION_DECISION,
         load_job_overrides,
     )
+    from job_override_dates import override_is_active
 
 
 MAX_APPLY_ROWS_PER_COMPANY = 5
@@ -57,6 +60,10 @@ class JobBuckets:
 
 def normalize_text(value: str) -> str:
     return re.sub(r"\s+", " ", (value or "").strip().casefold())
+
+
+def normalize_match_text(value: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", (value or "").casefold())).strip()
 
 
 def load_jobs(path: Path) -> list[InspectionJob]:
@@ -290,23 +297,37 @@ def is_freshness_verification_candidate(job: InspectionJob) -> bool:
 
 
 def override_matches_job(job: InspectionJob, override: dict[str, str]) -> bool:
+    company = override.get("company", "")
+    title_contains = override.get("title_contains", "")
     url_contains = override.get("url_contains", "")
     job_id = override.get("job_id", "")
+    if company and normalize_text(company) != normalize_text(job.company):
+        return False
+    if title_contains and normalize_match_text(title_contains) not in normalize_match_text(job.title):
+        return False
     if url_contains and url_contains not in job.url:
         return False
     if job_id and job_id != job.job_id and job_id not in job.url:
         return False
-    return bool(url_contains or job_id)
+    return bool(company or title_contains or url_contains or job_id)
 
 
-def filter_overridden_jobs(jobs: list[InspectionJob], overrides: list[dict[str, str]]) -> list[InspectionJob]:
+def filter_overridden_jobs(
+    jobs: list[InspectionJob],
+    overrides: list[dict[str, str]],
+    *,
+    as_of: dt.date | None = None,
+) -> list[InspectionJob]:
     if not overrides:
         return jobs
+    effective_date = as_of or dt.date.today()
     return [
         job
         for job in jobs
         if not any(
-            str(override.get("decision", "")).casefold() == "skip" and override_matches_job(job, override)
+            override_is_active(override, as_of=effective_date)
+            and str(override.get("decision", "")).casefold() == "skip"
+            and override_matches_job(job, override)
             for override in overrides
         )
     ]
@@ -453,7 +474,7 @@ def write_inspection_queue(
         load_carry_forward_jobs(out_dir, run_date),
     )
     overrides = load_job_overrides(job_overrides_path) if job_overrides_path else []
-    jobs = filter_overridden_jobs(jobs, overrides)
+    jobs = filter_overridden_jobs(jobs, overrides, as_of=dt.date.fromisoformat(run_date))
     buckets = select_job_buckets(jobs)
     output_path = out_dir / f"{run_date}-job-inspection-queue.md"
 
@@ -666,7 +687,9 @@ def main() -> None:
             load_carry_forward_jobs(args.out, args.date),
         )
         overrides = load_job_overrides(args.job_overrides)
-        buckets = select_job_buckets(filter_overridden_jobs(jobs, overrides))
+        buckets = select_job_buckets(
+            filter_overridden_jobs(jobs, overrides, as_of=dt.date.fromisoformat(args.date))
+        )
         if args.workflow_review is not None:
             buckets = filter_buckets_by_strict_review(
                 buckets,

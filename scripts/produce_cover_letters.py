@@ -32,10 +32,20 @@ from docx.text.paragraph import Paragraph
 from docx.text.run import Run
 
 if __package__:
+    from scripts.docx_compatibility import (
+        WORD_SETTINGS_PATH,
+        modernize_docx_compatibility,
+        require_modern_word_compatibility,
+    )
     from scripts.mark_applied_jobs import ReportJob, load_tracker_jobs_snapshot, match_tracker_job
     from scripts.produce_resumes import REQUIRED_DOCX_PARTS, render_docx, validate_rendered_pages
     from scripts.resume_artifacts import ResumeReadyJob, artifact_slug, parse_resume_ready_jobs, run_date_from_ready_path
 else:
+    from docx_compatibility import (
+        WORD_SETTINGS_PATH,
+        modernize_docx_compatibility,
+        require_modern_word_compatibility,
+    )
     from mark_applied_jobs import ReportJob, load_tracker_jobs_snapshot, match_tracker_job
     from produce_resumes import REQUIRED_DOCX_PARTS, render_docx, validate_rendered_pages
     from resume_artifacts import ResumeReadyJob, artifact_slug, parse_resume_ready_jobs, run_date_from_ready_path
@@ -46,6 +56,7 @@ LINKEDIN_URL_ENV = "JOBAGENT_LINKEDIN_URL"
 PORTFOLIO_URL_ENV = "JOBAGENT_PORTFOLIO_URL"
 SOURCE_RESUME_GLOB_ENV = "JOBAGENT_SOURCE_RESUME_GLOB"
 SIGNATURE_TEXT_COLOR = RGBColor(89, 89, 89)
+WRITING_VOICE = "jhaynes-writing-voice"
 
 
 @dataclass(frozen=True)
@@ -67,6 +78,7 @@ class CoverLetterProductionRecord:
     validation_status: str
     page_count: int
     artifact_sha256: str
+    writing_voice: str
 
 
 @dataclass(frozen=True)
@@ -197,14 +209,28 @@ def load_sender(source_dir: Path) -> Sender:
 def role_alignment(job: ResumeReadyJob) -> str:
     if job.template == "technical_success":
         return (
-            "The role’s combination of stakeholder discovery, solution design, API and integration strategy, "
-            "implementation planning, and technical leadership closely matches the way I have partnered with "
-            "product, services, support, and engineering teams throughout my career."
+            "I have spent much of my career working directly with customers and internal teams to turn complex "
+            "requirements into practical technical plans. That work has included solution design, API and "
+            "integration strategy, implementation planning, troubleshooting, and technical leadership."
         )
     return (
-        "The opportunity to own reliable backend systems, make thoughtful architecture decisions, improve "
-        "engineering practices, and collaborate across product and operational teams aligns closely with my "
-        "background in enterprise SaaS platform modernization."
+        "My background aligns well with the role's focus on reliable backend systems, architecture decisions, "
+        "engineering practices, and cross-functional delivery. I have done that work while modernizing enterprise "
+        "SaaS platforms and supporting production systems."
+    )
+
+
+def approved_voice_markers(job: ResumeReadyJob) -> tuple[str, str]:
+    return (
+        f"I am applying for the {job.title} position at {job.company}.",
+        f"I would welcome a conversation about how that experience could support {job.company}.",
+    )
+
+
+def cover_letter_uses_approved_voice(path: Path, job: ResumeReadyJob) -> bool:
+    text = "\n".join(paragraph.text for paragraph in Document(path).paragraphs)
+    return all(marker in text for marker in approved_voice_markers(job)) and (
+        "I would welcome the opportunity to discuss" not in text
     )
 
 
@@ -305,11 +331,12 @@ def build_cover_letter(*, destination_path: Path, sender: Sender, job: ResumeRea
     add_paragraph(document, "Hiring Team")
     add_paragraph(document, job.company)
     add_paragraph(document, "Dear Hiring Team,")
+    purpose_marker, closing_marker = approved_voice_markers(job)
     add_paragraph(
         document,
-        f"I am applying for the {job.title} position at {job.company}. With more than 25 years of enterprise "
-        "software experience, I bring hands-on leadership in Java/J2EE backend development, Spring Boot, REST APIs, "
-        "enterprise integrations, Oracle Database/SQL, and production support for complex SaaS platforms.",
+        f"{purpose_marker} I bring more than 25 years of enterprise software experience, with hands-on leadership "
+        "in Java/J2EE backend development, Spring Boot, REST APIs, enterprise integrations, Oracle Database/SQL, "
+        "and production support for complex SaaS platforms.",
     )
     add_paragraph(
         document,
@@ -321,12 +348,12 @@ def build_cover_letter(*, destination_path: Path, sender: Sender, job: ResumeRea
     add_paragraph(document, role_alignment(job))
     add_paragraph(
         document,
-        f"I would welcome the opportunity to discuss how my enterprise platform experience and collaborative technical "
-        f"leadership could support {job.company}. Thank you for your consideration.",
+        f"{closing_marker} Thank you for your consideration.",
     )
     add_sender_signature(document, sender)
     destination_path.parent.mkdir(parents=True, exist_ok=True)
     document.save(destination_path)
+    modernize_docx_compatibility(destination_path)
 
 
 def validate_cover_letter(*, path: Path, job: ResumeReadyJob, generated_on: str) -> None:
@@ -338,6 +365,10 @@ def validate_cover_letter(*, path: Path, job: ResumeReadyJob, generated_on: str)
         missing_parts = REQUIRED_DOCX_PARTS.difference(archive.namelist())
         if missing_parts:
             raise ValueError(f"Cover-letter artifact is missing DOCX parts: {sorted(missing_parts)}")
+        require_modern_word_compatibility(
+            archive.read(WORD_SETTINGS_PATH),
+            document_path=path,
+        )
     text = "\n".join(paragraph.text for paragraph in Document(path).paragraphs)
     for expected in (job.company, job.title, "Oracle Fusion CPQ Cloud", human_date(generated_on)):
         if expected not in text:
@@ -354,6 +385,7 @@ def write_manifest(
     payload = {
         "authorization_run_date": authorization_run_date,
         "generated_on": generated_on,
+        "writing_voice": WRITING_VOICE,
         "records": [asdict(record) for record in records],
     }
     temporary_path = path.with_suffix(".json.tmp")
@@ -396,7 +428,7 @@ def produce_cover_letters(
         for job in jobs:
             artifact_name = artifact_names[job]
             final_path = output_dir / artifact_name
-            if final_path.exists():
+            if final_path.exists() and cover_letter_uses_approved_voice(final_path, job):
                 candidate_path = final_path
                 status = "existing"
             else:
@@ -425,6 +457,7 @@ def produce_cover_letters(
                     validation_status="validated",
                     page_count=len(page_paths),
                     artifact_sha256=sha256_path(candidate_path),
+                    writing_voice=WRITING_VOICE,
                 )
             )
         output_dir.mkdir(parents=True, exist_ok=True)

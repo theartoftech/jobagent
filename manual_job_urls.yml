@@ -1,4 +1,359 @@
 jobs:
+  - company: Sonatype
+    title: Staff Software Engineer - Agentic First
+    url: https://jobs.lever.co/sonatype/ffebffdc-776a-4c8f-8106-7a8e8331c02d
+    source_url: https://www.linkedin.com/jobs/search-results/?keywords=Senior%20Principal%20Software%20Engineer&origin=QUALIFICATION_LANDING&geoId=90000052
+    added_on: 2026-09-04
+    source: linkedin-browser-review
+    verification_status: official_live
+    verified_on: 2026-09-04
+    location: United States / Remote
+    work_model: Remote
+    description: >
+      Staff-level role leading architecture and delivery of agentic-first capabilities in
+      Nexus Repository Manager. The work includes Java, cloud platforms, large-scale
+      distributed systems, performance, reliability, production operability, architecture,
+      multi-team technical direction and mentoring. The role also expects substantial
+      hands-on use of long-running multi-agent workflows, MCP tooling, evaluation harnesses,
+      and software-supply-chain security concepts such as SBOM, SCA and provenance.
+    notes: >
+      Resolved from the signed-in LinkedIn board to Sonatype's live official Lever posting.
+      Java, distributed systems, enterprise platform ownership, technical leadership and
+      agent-assisted engineering align. Strict review must treat production multi-agent
+      orchestration at depth and software-supply-chain security as central requirements,
+      not infer them from general AI-assisted development experience.
+  - company: Camunda
+    title: Senior Software Engineer, Backend - Distributed Systems
+    url: https://jobs.ashbyhq.com/camunda/92ef5a95-5d25-44e6-aa5b-58e8549f8520
+    source_url: https://www.linkedin.com/jobs/search-results/?keywords=Senior%20Principal%20Software%20Engineer&origin=QUALIFICATION_LANDING&start=50&geoId=90000052
+    added_on: 2026-09-04
+    source: linkedin-browser-review
+    verification_status: official_live
+    verified_on: 2026-09-04
+    location: United States East / Remote
+    work_model: Remote
+    description: >
+      Senior backend role building Camunda's durable, highly available distributed streaming
+      platform. Responsibilities include Java/JVM systems, concurrency, network and disk I/O,
+      multi-region and multi-tenant resilience, backup and restore APIs, production tooling,
+      observability, incident investigation, technical design, delivery leadership and
+      cross-functional work with Product, Support and SRE. The U.S. compensation range is
+      $143,800-$231,900.
+    notes: >
+      Resolved from the signed-in LinkedIn board to Camunda's live official Ashby posting.
+      Java, distributed systems, APIs, production reliability, technical ownership and
+      enterprise-platform experience align. Strict review must evaluate the title against
+      Jeff's seniority rules and treat deep low-level concurrent I/O and consensus-protocol
+      experience as meaningful specialization gaps rather than assumed evidence.
+  - company: Fresh Consulting
+    title: Staff Software Engineer (Distributed Systems and Orchestration)
+    url: https://freshconsulting.applytojob.com/apply/g37oMsmjZ3/Staff-Software-Engineer-Distributed-Systems-And-Orchestration
+    source_url: https://www.ziprecruiter.com/jobs-search?search=Principal+Software+Engineer+Java&location=United+States&refine_by_location_type=only_remote&days=30&lk=SpErBAzt4Gv_r07KiIbVsQ
+    added_on: 2026-09-03
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-09-03
+    posted_on: 2026-08-18
+    location: Houston, Texas / Remote with Houston travel every other week
+    work_model: Remote with required onsite work in Houston every other week
+    description: >
+      Staff Software Engineer position explicitly described as Principal level, leading
+      scheduling and orchestration for a distributed orbital-compute platform. The role
+      owns an MVP through production scale, distributed computing, Kubernetes or similar
+      resource-management systems, reliability, fault tolerance, CI/CD, technical
+      leadership, mentoring, and delivery in an ambiguous customer-focused environment.
+      It requires 15 years of software-development experience and accepts Java as one of
+      the primary systems languages. The published compensation range is $180,000-$245,000.
+    notes: >
+      Resolved from the signed-in ZipRecruiter board to Fresh Consulting's live official
+      applicant-tracking page. The Java, distributed-systems, Kubernetes, production
+      ownership, consulting, and technical-leadership requirements align strongly. Strict
+      review must account for the specialized orbital-compute and autonomous scheduling
+      domain, U.S.-person ITAR requirement, and required Houston attendance every other
+      week. Treat the location as recurring travel, not fully remote.
+  - company: GitHub
+    title: Principal Software Engineer, Enterprise AI Platform
+    url: https://www.github.careers/early-in-profession/jobs/5481?lang=en-us
+    source_url: https://www.github.careers/early-in-profession/jobs/5481?lang=en-us
+    added_on: 2026-08-31
+    source: github-careers-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-31
+    location: Remote, United States
+    work_model: Remote
+    job_id: "5481"
+    description: >
+      Principal individual-contributor role defining and building GitHub's Enterprise AI
+      Platform. Responsibilities include architecture for an enterprise AI control plane;
+      policy engines, governance SDKs, APIs and enforcement frameworks; reliable distributed
+      systems for identity, permissions, spend, auditability and observability; platform
+      strategy; cross-organizational technical leadership; and mentoring senior engineers.
+      Required qualifications are principal-level software engineering experience and
+      production coding in a language including Java. Deep distributed-systems, platform and
+      systems-design expertise are preferred, as are AI or developer-platform experience and
+      cloud-native systems such as Azure, Kubernetes and AKS. AI/LLM and agentic-platform
+      experience is listed as preferred rather than a mandatory years-of-experience screen.
+      The role is fully remote in the United States with a published base range of
+      $160,200-$425,000.
+    notes: >
+      The official GitHub page is live and labels this as an Experienced Professional role;
+      the early-in-profession URL path is not the role's actual seniority. Strong alignment
+      includes principal ownership, Java, enterprise platforms, distributed systems, APIs,
+      governance, Kubernetes, architecture, cross-team influence and mentoring. Strict review
+      should evaluate the lack of confirmed production AI/LLM or agent-platform delivery as a
+      meaningful positioning gap, but not convert a preferred qualification into a hard
+      rejection. The official page exposes no posting date, so the configured no-date rule
+      treats the verified live role as current on 2026-08-31.
+  - company: Spoonflower
+    title: Senior Principal Software Engineer
+    url: https://shutterflycareers.ttcportals.com/jobs/18043977-senior-principal-software-engineer
+    source_url: https://remote.co/job-details/senior-principal-software-engineer-7eaab69b-338b-44b7-a206-069fe81e83ee
+    added_on: 2026-08-31
+    source: remote-co-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-26
+    location: Remote, United States
+    work_model: Remote
+    job_id: 2026-1239
+    description: >
+      Senior Principal backend and platform engineering role for Spoonflower, part of the
+      Shutterfly family of brands. The role owns commerce backend services, APIs, service
+      boundaries, production reliability, distributed-system troubleshooting, architecture,
+      mentoring and technical standards. Required experience includes deep GraphQL design
+      and implementation with federated or supergraph architectures, Shopify or similar
+      e-commerce platforms, and strong Node.js and TypeScript. Preferred experience includes
+      Apollo Federation, headless commerce, AWS SNS or SQS, OpenSearch, Kubernetes, Terraform
+      and Next.js or React. The role is remote in eligible U.S. states and publishes regional
+      salary ranges from $150,000 to $225,500.
+    notes: >
+      Resolved from Remote.co to the live official Shutterfly careers posting. Seniority,
+      remote eligibility, backend APIs, distributed systems, integrations, production
+      ownership and technical leadership align. Strict review must treat deep GraphQL
+      federation, Shopify and strong professional Node.js/TypeScript as central required
+      gaps. This should not become Apply or Resume Ready based on title and generic backend
+      matches alone.
+  - company: Cox Automotive
+    title: Principal Software Engineer, AWS Quick, AI Artifact Hub
+    url: https://cox.wd1.myworkdayjobs.com/Cox_External_Career_Site_1/job/Atlanta-GA/Principal-Software-Engineer_R202681760
+    source_url: https://simplify.jobs/p/29dcbd4b-756f-4c5b-8032-8ab1bcab079f/Principal-Software-Engineer
+    added_on: 2026-08-31
+    source: simplify-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-27
+    location: Atlanta, Georgia; Austin, Texas; Carmel, Indiana
+    work_model: Hybrid / three office days per week
+    job_id: R202681760
+    description: >
+      Director-level Principal Software Engineer role owning architecture and technical
+      direction for Cox Automotive's AWS Quick customization platform and internal AI
+      Artifact Hub. Responsibilities include AWS-native architecture, connectors, agent
+      orchestration, knowledge ingestion, RAG, MCP servers, Python implementation,
+      infrastructure as code, AI evaluation, observability, resilient distributed systems,
+      incident leadership, enterprise integrations and cross-team technical leadership.
+      Required experience includes strong delivery of cloud-native platforms on AWS,
+      production AI or machine-learning systems, working proficiency in Python, evaluation
+      methods for non-deterministic systems, enterprise integration and three office days
+      per week. Compensation is $163,400-$272,300 with possible incentive compensation.
+    notes: >
+      Resolved from Simplify to the live official Cox Workday posting. Principal seniority,
+      Atlanta location, enterprise integration, architecture, distributed-system reliability
+      and technical leadership align well. Strict review must treat production AWS platform
+      delivery, hands-on Python and production AI/ML engineering as central required gaps,
+      not preferred skills. This should not become Apply or Resume Ready based on title alone.
+  - company: OneTrust
+    title: Principal Software Engineer - Enterprise Customer
+    url: https://job-boards.greenhouse.io/onetrust/jobs/8067479
+    source_url: https://www.dice.com/job-detail/4e4a3684-7fba-45cb-93c5-77a6f8fb1163
+    added_on: 2026-08-31
+    source: dice-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-03
+    location: Atlanta, Georgia
+    work_model: Hybrid / office-first three days per week
+    job_id: "8067479"
+    description: >
+      Principal-level, customer-facing engineering role supporting OneTrust's largest
+      enterprise customers. Responsibilities include diagnosing production issues across
+      distributed systems, data pipelines, APIs and integrations; leading customer technical
+      sessions; translating customer problems into product requirements; incident response
+      and postmortems; scalability and reliability guidance; technical assets; and mentoring
+      support and customer-success teams. Requires 12 or more years of hands-on engineering
+      and three or more years in a customer-facing technical role. The required experience
+      also includes distributed datastores or warehouses, large-scale processing or streaming
+      frameworks such as Spark, Flink or Kafka, and hands-on AWS, Azure or GCP. Java is an
+      accepted programming language. Published salary range is $196,500-$294,750.
+    notes: >
+      Resolved from a Dice listing to the live official OneTrust Greenhouse posting. Strong
+      alignment includes principal seniority, enterprise customer delivery, Java, APIs,
+      integrations, production troubleshooting, architecture, SaaS and technical leadership.
+      Strict review must account for material required gaps in distributed data platforms,
+      Spark/Flink/Kafka streaming, and hands-on AWS/Azure/GCP. Atlanta office-first attendance
+      is locally practical but should be treated as hybrid rather than remote.
+  - company: Infosys
+    title: Senior Principal - AI and Data CRL, Infosys Consulting
+    url: https://digitalcareers.infosys.com/global-careers-spanish/company-job/description/reqid/152696BR
+    source_url: https://www.indeed.com/viewjob?jk=f424ca80426ae450
+    added_on: 2026-08-28
+    source: indeed-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-28
+    posted_on: 2026-08-28
+    location: Anywhere in the US and/or Remote
+    work_model: Remote
+    job_id: "152696BR"
+    description: >
+      Senior Principal consulting role leading executive advisory, business development,
+      and large-scale transformation programs for consumer products, retail, and logistics
+      clients. Strategic lanes include enterprise AI and data transformation, intelligent
+      automation, pricing and revenue growth management, order-to-cash modernization,
+      customer experience, ERP and enterprise-platform transformation involving Oracle,
+      and business-value realization. Responsibilities include shaping transformation
+      roadmaps and business cases, advising C-suite stakeholders, leading delivery,
+      developing client relationships, mentoring consultants, and owning opportunities
+      from identification through contract close. Requires 15 or more years of consulting,
+      advisory, or transformation leadership in the target industries and deep expertise
+      in at least one listed area, which may be ERP or enterprise transformation rather
+      than AI/data. Compensation is $210,000-$256,667 and travel is required as client
+      engagements demand.
+    notes: >
+      Indeed marked this listing New on 2026-08-28. The official Infosys posting is live
+      but does not expose a publication date, so the configured no-date rule treats it as
+      current. Review AI/data business-development depth and CRL industry experience as
+      the main fit risks; Oracle enterprise transformation, order-to-cash, pricing, and
+      professional-services leadership are the strongest adjacent matches.
+  - company: Synchrony
+    title: AVP, Cloud Technical Product Owner
+    url: https://www.synchronycareers.com/job/alpharetta/avp-cloud-technical-product-owner/49398/99374010592
+    source_url: https://www.indeed.com/viewjob?jk=45598b604f8d1384
+    added_on: 2026-08-28
+    source: indeed-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-28
+    posted_on: 2026-08-17
+    location: Alpharetta, Georgia
+    work_model: Hybrid / work from home near Synchrony hub
+    job_id: "2602402"
+    description: >
+      Hands-on technical product owner role leading strategic software-engineering and
+      cloud-migration initiatives for a 24/7 enterprise platform. Responsibilities include
+      technical discovery; architecture, REST API and enterprise integration tradeoffs;
+      cloud and container concepts; product roadmaps and engineering backlogs; and
+      non-functional requirements covering availability, performance, security,
+      operability, resiliency, observability, incident learning, and production support.
+      The role aligns engineering, architecture, security, operations, business teams,
+      and vendors while driving delivery, technical demos, design decisions, and senior
+      stakeholder communication. It also calls for AI-assisted prototypes, scripts, test
+      cases, API examples, automation and documentation. Requires six or more years of IT
+      experience, including four or more years of technical product or project management.
+      Preferred Qualifications: software solution architecture, AWS cloud services, event
+      streaming, caching, CI/CD pipelines, infrastructure as code, and Terraform. Official
+      salary range is $115,000-$200,000 plus annual bonus.
+    notes: >
+      Verified from an Indeed recommendation against Synchrony's official careers page.
+      Local Alpharetta hub and posted within the current freshness window. Evaluate as a
+      technical product/delivery leadership role; OCI and enterprise SaaS experience are
+      adjacent to the preferred AWS background.
+  - company: Oracle
+    title: Principal Platform Software Engineer
+    url: https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/jobsearch/job/341620
+    source_url: https://www.linkedin.com/jobs/view/4450456199/
+    added_on: 2026-08-27
+    source: linkedin-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-27
+    posted_on: 2026-08-13
+    location: United States
+    work_model: Remote
+    job_id: "341620"
+    description: >
+      Principal platform software engineering role leading cross-team middleware and
+      runtime evolution for interoperability and multi-tenant scale. Responsibilities
+      include API lifecycle and integration, observability standards, SLOs and error
+      budgets, resilience, capacity planning, migration guidance, performance optimization,
+      secure coding, production troubleshooting, technical coaching, and coordination of
+      moderately complex delivery. Career level IC4 with a U.S. salary range of
+      $104,500-$234,600.
+    notes: LinkedIn reported the posting as two weeks old on 2026-08-27 and marked Jeff as a top applicant.
+  - company: Oracle
+    title: Lead Principal Platform Software Engineer
+    url: https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/jobsearch/job/338426
+    source_url: https://www.linkedin.com/jobs/view/4431550474/
+    added_on: 2026-08-27
+    source: linkedin-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-27
+    posted_on: 2026-08-13
+    location: United States
+    work_model: Remote
+    job_id: "338426"
+    description: >
+      Lead Principal OCI engineering role designing and operating a region-build
+      automation service. Requires 10+ years of software development, strong Java or a
+      comparable object-oriented language, large-scale distributed services, architecture,
+      mission-critical operations, hands-on technical leadership, and mentoring. Preferred
+      experience includes OCI or another public cloud, Kubernetes, Terraform, SQL and
+      NoSQL databases, Linux, networking, containers, and Docker. Career level IC5 with a
+      U.S. salary range of $96,800-$306,400.
+    notes: LinkedIn reported the posting as two weeks old on 2026-08-27.
+  - company: Oracle
+    title: Principal Application Software Engineer
+    url: https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/jobsearch/job/338454
+    source_url: https://www.linkedin.com/jobs/view/4430657304/
+    added_on: 2026-08-27
+    source: linkedin-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-27
+    posted_on: 2026-08-13
+    location: United States
+    work_model: Remote
+    job_id: "338454"
+    description: >
+      Principal application engineering role spanning enterprise applications, cloud
+      platforms, distributed systems, APIs, integrations, OCI, Kubernetes, containers,
+      microservices, CI/CD, observability, modernization, customer-focused delivery, and
+      technical mentoring. Requires 7+ years of software engineering and experience with
+      enterprise software or cloud platforms; healthcare technology and interoperability
+      are preferred rather than required. Career level IC4 with a U.S. salary range of
+      $99,600-$209,500.
+    notes: LinkedIn reported the posting as two weeks old on 2026-08-27 and marked Jeff as a top applicant.
+  - company: IBM
+    title: Senior Java Software Engineer - Legacy Modernization
+    url: https://careers.ibm.com/en_US/careers/JobDetail/Senior-Java-Software-Engineer-Legacy-Modernization/119683
+    source_url: https://careers.ibm.com/en_US/careers/JobDetail?jobId=119683&source=WEB_Search_NA
+    added_on: 2026-08-27
+    source: ibm-careers-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-27
+    posted_on: 2026-08-04
+    location: No City; Georgia listed among eligible states; United States
+    work_model: Hybrid
+    job_id: "119683"
+    description: >
+      Senior Java software engineering role in IBM Consulting's Cloud Transformation
+      Unit, designing Java solutions that modernize legacy COBOL applications. Requires
+      7+ years of Java, Spring Framework, dependency injection, JPA, SQL and relational
+      databases, test-driven development, code review, CI/CD, Git, Maven or Gradle,
+      Docker, Jenkins, Jira, technical problem solving, and hands-on coding. Preferred
+      experience includes Kubernetes, cloud platforms, performance tuning, compilation
+      technologies such as ANTLR or XText, and MVS, COBOL, or JCL. Hybrid multi-state
+      United States posting with Georgia included; salary range $117,000-$219,000.
+    notes: Hybrid multi-state US posting dated 2026-08-04; salary range $117,000-$219,000.
+  - company: OneTrust
+    title: Staff Software Engineer - AI Governance Integrations
+    url: https://job-boards.greenhouse.io/onetrust/jobs/8067475
+    source_url: https://www.linkedin.com/jobs/view/4446507255/
+    added_on: 2026-08-17
+    source: linkedin-manual-feedback
+  - company: Capgemini
+    title: Java Architect - Practicing Solution Architect
+    url: https://www.capgemini.com/jobs/526407-en_US_SAPBTP/Java-Architect---Practicing-Solution-Architect
+    source_url: https://www.linkedin.com/jobs/view/4448467053/
+    added_on: 2026-08-17
+    source: linkedin-manual-feedback
   - company: Inspira Financial
     title: Lead Solutions Architect (Remote)
     url: https://myjobs.adp.com/inspiracareers/cx/job-details?reqId=5001215356506
@@ -86,3 +441,873 @@ jobs:
     source_url: https://www.indeed.com/viewjob?jk=aa89b4d0151e7b12
     added_on: 2026-08-09
     source: indeed-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-31
+    location: United States
+    work_model: Remote
+    job_id: "47198"
+    description: >
+      Principal-level technical leadership role owning shared platforms, frameworks,
+      services and cross-cutting architecture across multiple teams. Responsibilities
+      include distributed systems, service-oriented architecture, APIs at scale,
+      reliability, security, performance, developer productivity, mentoring and aligning
+      technical strategy with product and business goals. Requires 12 years of related
+      experience with a bachelor's degree or equivalent graduate-degree paths, production
+      distributed systems and APIs, SQL and NoSQL data-access patterns, emerging technology
+      adoption, influence without direct authority and strong technical communication.
+      Published Tier 2 U.S. compensation is $183,000-$275,000.
+    notes: >
+      Verified directly on Indeed's own employer posting. The official page does not expose
+      a posting date, so the agent should use the configured freshest-bucket rule. Strong
+      alignment includes principal scope, distributed systems, APIs, SQL, enterprise
+      platforms, operational excellence and cross-team technical leadership. NoSQL is a
+      meaningful unresolved gap and must not be claimed without candidate evidence.
+  - company: LexisNexis Risk Solutions
+    title: Software Engineering Lead
+    url: https://relx.wd3.myworkdayjobs.com/RiskSolutions/job/Alpharetta-GA/Software-Engineering-Lead_R115266
+    source_url: https://www.linkedin.com/jobs/view/4453239622/
+    added_on: 2026-08-31
+    source: linkedin-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-19
+    location: Alpharetta, GA
+    work_model: Hybrid
+    job_id: "R115266"
+    description: >
+      Hands-on software engineering lead and subject-matter-expert role for the U.S.
+      RiskNarrative squad, a B2B risk-orchestration platform supporting onboarding,
+      transaction monitoring, fraud prevention and financial-crime compliance workflows.
+      The role writes code on complex systems, leads project plans and methodologies,
+      resolves escalated development issues, designs complex data models, mentors and
+      manages engineers, provides technical direction for large-scale software solutions,
+      oversees production deployments and platform maintenance, and leads internal and
+      external technical resources. Requirements
+      include Java/J2EE, JavaScript, JSP, data manipulation and optimization, normalized and
+      dimensional data modeling, TDD, development best practices, technical leadership,
+      project planning, change management and communication with customers and executives.
+      Published U.S. base pay is $115,400-$192,300 plus annual incentive eligibility.
+    notes: >
+      LinkedIn surfaced this as a recent Alpharetta hybrid role, and the official RELX
+      RiskSolutions Workday API confirms requisition R115266 is live and was posted 12 days
+      before verification. This was already found by ATS discovery but scored only 45 because
+      the stored Workday description was abbreviated before the strongest Java, data,
+      leadership and TDD requirements. Treat it as a full-description manual verification so
+      strict review can evaluate the actual role.
+  - company: Stable Kernel
+    title: Contract Principal Software Engineer (Java Spring)
+    url: https://job-boards.greenhouse.io/stablekernel/jobs/7854406003
+    source_url: https://www.linkedin.com/jobs/view/4454309969/
+    added_on: 2026-08-31
+    source: linkedin-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-13
+    location: Atlanta, GA
+    work_model: Hybrid/Remote Flex
+    job_id: "7854406003"
+    description: >
+      Principal-level contract role delivering enterprise loyalty and rewards services in
+      modern Java 17+, Spring Boot, Spring MVC, Spring Security and Spring Data. The work
+      includes REST APIs, domain-driven design, enterprise integrations, event-driven and
+      message-oriented systems, SQL, Docker, Kubernetes, CI/CD, observability, production
+      reliability, stakeholder consulting, technical leadership and mentoring. Requires
+      10+ years of primarily backend development and trusted-consultant experience. Cloud
+      platform experience is requested; NoSQL, loyalty, POS and Salesforce experience are
+      optional. Published compensation is $105 per hour with minimal travel.
+    notes: >
+      Verified on Stable Kernel's official Greenhouse board after LinkedIn surfaced the role.
+      This is unusually close to Jeff's Java, Spring, enterprise integration, consulting and
+      principal-level delivery background.
+  - company: Mercedes-Benz USA
+    title: Principal, IT Application Architect
+    url: https://jobs.mercedes-benz.com/en/principal-it-application-architect-225782-mer00043y7
+    source_url: https://www.linkedin.com/jobs/view/4433503537/
+    added_on: 2026-08-31
+    source: linkedin-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-25
+    location: Atlanta, GA
+    work_model: Atlanta office/flex not stated
+    job_id: "MER00043Y7"
+    description: >
+      Principal application architecture role owning end-to-end Digital Customer Experience
+      architecture across frontend, backend services, APIs, integrations, data, cloud,
+      security and observability. Responsibilities include architecture governance, platform
+      roadmaps, application modernization, technical leadership, coaching, vendor management,
+      production troubleshooting, CI/CD and cross-functional delivery. Requirements include
+      10+ years in business applications, enterprise architecture, Spring, Hibernate, JPA,
+      REST, SQL databases, Docker, Kubernetes and Jenkins. AWS and AEM are part of the
+      environment and must be positioned truthfully as gaps or adjacent experience.
+    notes: >
+      Verified on the official Mercedes-Benz careers site. LinkedIn listed the Atlanta role
+      as reposted six days before verification.
+  - company: Stripe
+    title: Staff Software Engineer, Startup Products
+    url: https://stripe.com/careers/listing/staff-software-engineer-startup-products/8146271?gh_jid=8146271
+    source_url: https://www.linkedin.com/jobs/view/4457566508/
+    added_on: 2026-08-31
+    source: linkedin-browser-review
+    verification_status: official_unavailable
+    verified_on: 2026-08-31
+    unavailable_on: 2026-08-31
+    posted_on: 2026-08-24
+    location: Atlanta, GA or Remote United States
+    work_model: Remote/Office Flex
+    job_id: "8146271"
+    description: >
+      Staff-level role defining technical strategy and leading ambiguous zero-to-one products
+      from architecture through implementation, launch and operation. Work spans backend
+      services, APIs, data models, enterprise integrations and polished user experiences,
+      with substantial cross-team influence, mentoring and customer problem solving. Requires
+      10+ years of engineering and strong full-stack ownership. Ruby and TypeScript are
+      preferred rather than required. Published U.S. base compensation is $224,000-$336,000.
+    notes: >
+      Delisted. Stripe's official URL returned an explicit Page not found response when
+      rechecked on 2026-08-31. Do not carry this role into active reports.
+  - company: Slalom
+    title: Integration Architect
+    url: https://www.linkedin.com/jobs/view/4454293220/
+    source_url: https://www.linkedin.com/jobs/view/4454293220/
+    added_on: 2026-08-31
+    source: linkedin-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-08-31
+    posted_on: 2026-08-17
+    location: Atlanta, GA
+    work_model: On-site
+    job_id: "4454293220"
+    description: >
+      Client-facing integration architecture role requiring 10+ years of integration design
+      and development plus direct consulting experience. Responsibilities include discovery
+      workshops, architecture, API design, cloud integration, delivery leadership and client
+      presentations. Java or Python is accepted. Relevant technologies include REST, API
+      gateways, middleware, microservices, Docker and Kubernetes. The role requests exposure
+      to at least one major cloud and lists integration products such as Boomi, Workato,
+      MuleSoft, Informatica and Apache Camel. LinkedIn lists $190,000-$232,000 base pay.
+    notes: >
+      Strong responsibility-level match, but the official Slalom posting URL was not resolved
+      during the bounded browser pass. Keep in verification rather than Apply/Maybe.
+  - company: SageSure
+    title: Staff Software Engineer
+    url: https://www.indeed.com/viewjob?jk=dae881a3e3cda465
+    source_url: https://www.indeed.com/viewjob?jk=dae881a3e3cda465
+    added_on: 2026-08-31
+    source: indeed-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-08-31
+    posted_on: 2026-08-30
+    location: United States
+    work_model: Remote
+    job_id: "dae881a3e3cda465"
+    description: >
+      Staff-level remote engineering role leading architecture and implementation for APIs,
+      services, distributed systems and high-volume business applications. The posting accepts
+      strong proficiency in any modern language and lists Java, Spring Boot, microservices,
+      AWS, Docker, Kubernetes and AI-assisted development as preferred environment experience.
+      It includes technical direction, mentoring, reliability, automated delivery and up to
+      15 percent travel.
+    notes: >
+      Indeed-hosted application and corroborating current public listings were found, but an
+      official SageSure careers URL was not resolved. Keep in verification.
+  - company: CNO Financial Group
+    title: Sr Solution Architect (MuleSoft)
+    url: https://www.indeed.com/viewjob?jk=279a11643bbbd4f1
+    source_url: https://www.indeed.com/viewjob?jk=279a11643bbbd4f1
+    added_on: 2026-08-31
+    source: indeed-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-08-31
+    posted_on: 2026-08-28
+    location: United States, EST or CST
+    work_model: Remote
+    job_id: "279a11643bbbd4f1"
+    description: >
+      Senior solution architecture role translating business requirements into scalable
+      application, API integration and cloud/hybrid architectures. The role provides technical
+      oversight, reviews engineering designs, coordinates delivery teams, prototypes emerging
+      technology and creates architecture documentation. MuleSoft is preferred rather than a
+      minimum requirement. Published public-board compensation is $118,600-$178,000.
+    notes: >
+      Current Indeed listing is credible and corroborated by other recent job indexes, but the
+      official CNO careers URL was not resolved. Keep in verification.
+  - company: Shoals Technologies
+    title: Principal Solutions Architect
+    url: https://www.indeed.com/viewjob?jk=93cb3644171a49d2
+    source_url: https://www.indeed.com/viewjob?jk=93cb3644171a49d2
+    added_on: 2026-08-31
+    source: indeed-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-08-31
+    posted_on: 2026-08-31
+    location: United States
+    work_model: Remote
+    job_id: "93cb3644171a49d2"
+    description: >
+      Principal architecture role for enterprise data, integrations, workflow automation and
+      AI-enabled business platforms. Responsibilities include architecture governance, ERP and
+      business-system integration, APIs, data modeling, technical leadership and stakeholder
+      delivery. Palantir Foundry/AIP experience is listed as nice to have, with comparable data
+      platforms accepted; Java is one of several accepted programming languages. The center of
+      gravity is enterprise data architecture, so strict review should assess that distinction.
+    notes: >
+      Current public-board posting appears credible, but an official Shoals careers URL was not
+      resolved. Keep in verification rather than promoting it directly.
+  - company: Initiate Government Solutions
+    title: Senior Java Engineer
+    url: https://recruiting.paylocity.com/recruiting/jobs/Details/4424331/Initiate-Government-Solutions/Senior-Java-Developer
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChZHcTRkYWhaQ3lCSnJ4b0dibGIyVnlnEiQwMWEwNTkxMC0xNWZiLTc0NjEtYjIxNS05MjRkMTk5NzIxNzMaS0FBRVRLMHNkRTBlUXlpc1BZbERlRmhtTUdpcXA5V2FkbmFmRDJtT25tVVpfME5QSjNydFJ2X2FkM3ZaVW5RQXVCSWlhTTB5b3N0NCCo2AIQARjWrQU%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-19
+    location: Remote, United States
+    work_model: Remote
+    job_id: "4424331"
+    description: >
+      Hands-on technical-lead role modernizing legacy monoliths into Java and Spring Boot
+      microservices and REST APIs. Responsibilities include Java production coding, API and
+      data-layer design, SQL performance tuning, Docker, Kubernetes, Helm, secure development,
+      production reliability, integrations, mentoring and federal-customer delivery. AWS
+      workload operation is part of the work. U.S. citizenship is required because of the
+      clearance requirement; an active VA Public Trust is preferred rather than required.
+    notes: >
+      ZipRecruiter surfaced the role during the bounded remote search and the official
+      Paylocity posting is live. The responsibilities closely match Java modernization,
+      enterprise integration, production troubleshooting and technical leadership. Strict
+      review must ask for truthful confirmation of the U.S.-citizenship requirement and
+      position AWS experience accurately.
+  - company: Cencora
+    title: Principal Engineer, Software Engineering - eCommerce Applications
+    url: https://myhrabc.wd5.myworkdayjobs.com/global/job/conshohocken-pa/principal-engineer--software-engineering---ecommerce-applications_r2613213
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChY3YkhOVFdnTFBSLUJIM3B2ZmE0REx3EiQwMWEwNTkwZi1mN2YxLTdjNjUtYmFjMC1kOTIyMjhhMTVhNGYaS0FBSFMwdUFxMVZJRzdlZHVZRk5jLUExcXJJR0lvY2xPWjVwT3BHOXNnR1VLbEIzX3prMHlHNTdlS0JZVHJ0c291R3hNT3VVeEpIQSCo2AIQARjWrQU%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-21
+    location: Remote, United States
+    work_model: Remote
+    job_id: R2613213
+    description: >
+      Principal technical-lead role driving architecture, implementation and modernization
+      for enterprise eCommerce and portal applications. Work includes Java or another modern
+      language, REST APIs, microservices, distributed and event-driven systems, ERP and CRM
+      integrations, payment and order-management workflows, CI/CD, reliability, production
+      support, mentoring and architecture governance. One major cloud platform and modern
+      frontend architecture are required; specific commerce platforms are preferred.
+      Published national compensation is $110,500-$220,990.
+    notes: >
+      Verified against Cencora's live Workday posting. Strong matches include principal
+      seniority, enterprise application modernization, APIs, integrations, SQL-backed business
+      workflows, production ownership and mentoring. Strict review should evaluate the cloud,
+      frontend and eCommerce-platform requirements without assuming C# is mandatory because
+      Java is explicitly accepted.
+  - company: CareFirst
+    title: Lead Software Engineer - Java, Microservices, MuleSoft & API Development (Remote)
+    url: https://carefirstcareers.ttcportals.com/jobs/18117714-lead-software-engineer-java-microservices-mulesoft-and-api-development-remote
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChY4RVBSb0ZwVWZMLXZRMjVFMzcwTDhBEiQwMWEwNTkwZi1kNDUxLTcwY2QtYjljZi1lM2FiNTA0ZjBkY2EaS0FBR090cEV1RlpMb25tMjRvNTE2R0tJQlo3b2tQMXpabTl4YjluNk44MzVNLUxFekNIUHVPNWhXUXNwTWhjV0hDYkpjUFkxV0RGcyCo2AIQARjWrQU%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-19
+    location: Remote, United States
+    work_model: Remote
+    job_id: "22431"
+    description: >
+      Hands-on lead role owning architecture and delivery for enterprise Java applications,
+      Spring Boot microservices, REST and SOAP APIs, integration platforms, cloud adoption,
+      DevSecOps, reliability and modernization. It includes technical direction across teams,
+      mentoring, production support, architecture documentation and stakeholder delivery.
+      MuleSoft, cloud platforms, Kafka, NoSQL and several tooling specifics are preferred
+      qualifications. Published compensation is $115,128-$228,657.
+    notes: >
+      Verified on CareFirst's official careers site. The core required experience is software
+      design, development and technical leadership; the detailed Java, MuleSoft, cloud and
+      data-stack list is labeled preferred. Strict review must preserve that distinction while
+      positioning only Jeff's truthful Java, API, integration, SQL, OCI and leadership evidence.
+  - company: Fresche Solutions
+    title: Java Performance Architect - Remote - FS450
+    url: https://freschesolutions.bamboohr.com/careers/802
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChY1dWdTeWxOR1BsZUVkMzFzVkt4Vml3EiQwMWEwNTkxYy03YzNhLTc3ZWUtYmIwZC0xYWMyYzA5MzIxZTIaS0FBR2FkOGhONDZvOHBwdThWR3JMTG9qUjlRUFZfTGdxWUNYVTViX245ZExPMDg3bV9haVBBNUpSR3d5UmRtcTQyeWxBMWNESENMbyCo2AIQARjWrQU%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-17
+    location: Remote, North America
+    work_model: Remote
+    job_id: "802"
+    description: >
+      Client-facing Java architecture role diagnosing and improving JVM and enterprise
+      application performance across application code, middleware, databases, operating
+      systems and infrastructure. Requires deep hands-on JVM performance optimization,
+      profiling, garbage collection, threading, heap and thread analysis, observability and
+      production root-cause analysis. Spring, WebLogic, WebSphere, Java application servers,
+      SQL performance, architecture workshops and consulting delivery are central.
+    notes: >
+      The official BambooHR posting is live. Consulting, Java, enterprise platforms,
+      production troubleshooting, databases and customer-facing architecture align, but the
+      deep JVM profiling and tuning requirement must be treated as a material evidence question
+      rather than inferred from general Java experience.
+  - company: Tenable
+    title: Senior Software Engineer - Java/Microservices
+    url: https://boards.greenhouse.io/tenableinc/jobs/5387057008
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChY4MTIwOG53X013V2NVUmhzTDdQODJ3EiQwMWEwNTkxYy03YzNhLTc3YWItODY4Yi02MDU5NWYwYjFhZTQaS0FBRnpyMFhaeFlMeXFNMnloSTJHQ25wSzczMW5hWEgzYjQ3M1VmT2U4WE9QY2JMOUFnX1Ztd0dhUkRpSGg5Yk9JbTFLbWJ0X1NpRSCo2AIQARjWrQU%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-13
+    location: Remote, eligible United States locations
+    work_model: Remote
+    job_id: "5387057008"
+    description: >
+      Backend product-engineering role building scalable cloud-native search services and
+      microservices in Java. Work includes architecture, implementation, testing, reliability,
+      production operation and collaboration across a cybersecurity SaaS platform. Published
+      compensation reaches the existing target range in some locations.
+    notes: >
+      Verified against Tenable's live Greenhouse posting. The Java and microservices work is
+      relevant, but strict review should evaluate compensation by location and the title's
+      seniority/overqualified risk before promoting it to Apply.
+  - company: NinjaOne
+    title: Senior Software Engineer, Java | Patching
+    url: https://jobs.jobvite.com/ninjaone/job/o6cIAfwk
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co4BChZtbEQzRUJhbjg0M0ZwNndaZTNYWnVBEiQwMWEwNTkxYy0xODJlLTdlNWItOTFkOC1kNmQ1ZTZkZGEyMzgaSkFBRlNpckUzT3plV1g3aHlBc1lWbndtRlVld3hlTEwyVFQ4NkZkdmRpZTNfejR2MENGcHpHeWhRdHV4eTQtRWlPeFJ3cmx4ZjZ3IKjYAhABGNatBQ%3D%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-26
+    location: Remote, Georgia and other eligible U.S. states
+    work_model: Remote
+    job_id: o6cIAfwk
+    description: >
+      Backend-focused Java role building and scaling patch-management services for millions
+      of endpoints. Requires 10 or more years of Java product development, scalable systems,
+      API and REST design with Spring, relational databases, caching, testing, architecture,
+      technical initiative ownership and mentoring. Kotlin is used by the team but the role
+      explicitly centers Java. Published location-dependent ranges include $160,000-$240,000.
+    notes: >
+      Verified on NinjaOne's official Jobvite site and eligible for Georgia remote work.
+      Technical alignment is strong; strict review should still account for the Senior title
+      and overqualified risk rather than discarding an otherwise principal-scope workload.
+  - company: U.S. Bank
+    title: Software Engineering Manager 3 (Java + GenAI - Healthcare Payments)
+    url: https://usbank.wd1.myworkdayjobs.com/US_Bank_Careers/job/Software-Engineering-Manager-3--Java---GenAI---Healthcare-Payments-_2026-0025620
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChZ2UnVPTmdCcjNfMEcweHBkLTBmQWFBEiQwMWEwNTkxOC0yY2VhLTc5MzctYjk2Ni1kMmVjMWE0Y2QwZDUaS0FBSFNMdE1NSmM3ZWVoVkxuOXRGMUhYM001eGNiVmNvTDhDbjBEVmNPdUtwQXdKalREVXFWZDZxcGh6bzF0ajJJblZ4MzFtX0JfWSCo2AIQARjWrQU%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-22
+    location: Atlanta, Georgia
+    work_model: On-site
+    job_id: 2026-0025620
+    description: >
+      Engineering-management role leading engineers, technical leads and architects delivering
+      healthcare payment platforms. The stack and responsibilities include Java, Spring Boot,
+      microservices, REST APIs, event-driven architecture, Kubernetes, containers, CI/CD,
+      cloud modernization, AI-assisted development, production reliability, observability,
+      incident management and technical governance. Requires five or more years leading a
+      software engineering team.
+    notes: >
+      Verified against U.S. Bank's official Workday posting after ZipRecruiter surfaced the
+      Atlanta role. The local on-site requirement is practical under the current Atlanta rule.
+      Strict review should determine whether Jeff's leadership history satisfies the explicit
+      five-year engineering-team management requirement without converting technical leadership
+      into people-management experience.
+  - company: OneTrust
+    title: Staff Software Engineer - Developer Experience
+    url: https://job-boards.greenhouse.io/onetrust/jobs/8107189
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChZ2bTdETjAtUFlJb2RnNmpnTUVDenRnEiQwMWEwNTkxOC03YzljLTc3YzItYmVmZC1mYTMwODg2ZTk0MjYaS0FBR3RWM1ZKYkc0R01NaFZ1TjJoc2ZhM2pEOUZwTWtZTU4xMzE4WEZYX1dSbVlwaVJheExLUzhpdDFnNzNiaUF6RTFoUGFxQVpERSCo2AIQAhin2AIiTmh0dHBzOi8vam9iLWJvYXJkcy5ncmVlbmhvdXNlLmlvL29uZXRydXN0L2pvYnMvODEwNzE4OT91dG1fc291cmNlPXppcHJlY3J1aXRlcg%3D%3D
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-12
+    location: Atlanta, Georgia
+    work_model: On-site
+    job_id: "8107189"
+    description: >
+      Staff-level role leading architecture and implementation for internal developer
+      platforms, service catalogs, self-service workflows, CI/CD and observability integrations,
+      AI-assisted engineering resources and developer enablement. It includes ambiguous
+      cross-team technical leadership, mentoring, platform adoption, documentation, training,
+      responsible AI standards and direct work with engineering teams as internal customers.
+    notes: >
+      The official OneTrust Greenhouse posting is live. Staff seniority, platform architecture,
+      developer enablement, technical leadership, mentoring, CI/CD and AI-assisted development
+      align. Strict review must inspect the complete required technology list and preserve the
+      Atlanta on-site classification.
+  - company: First Citizens Bank
+    title: Lead Software Engineer - Java (Remote)
+    url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChZPQzQwOF9CU0IxQnRXTlBiY2JEeHZBEiQwMWEwNTkwZi1mN2YxLTdjZTctOTdhYS1mMjZjYzk4YjQ5ZTIaS0FBR3Y2X2IzZVBYdkdEa2x5RTVGdTBQTjNmQXlhVjB6Zm83dFlwTDZrVnF1NENYUFJuUURJblIxNDlGM0NHaW84ZXV2dkIzVyCo2AIQARjWrQU%3D&tsid=100000404
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=Co8BChZPQzQwOF9CU0IxQnRXTlBiY2JEeHZBEiQwMWEwNTkwZi1mN2YxLTdjZTctOTdhYS1mMjZjYzk4YjQ5ZTIaS0FBR3Y2X2IzZVBYdkdEa2x5RTVGdTBQTjNmQXlhVjB6Zm83dFlwTDZrVnF1NENYUFJuUURJblIxNDlGM0NHaW84ZXV2dkIzVyCo2AIQARjWrQU%3D&tsid=100000404
+    added_on: 2026-08-31
+    source: ziprecruiter-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-08-31
+    posted_on: 2026-08-29
+    location: Remote, United States
+    work_model: Remote
+    job_id: "35120_1"
+    description: >
+      Hands-on lead role for corporate credit-card and merchant-services systems. Work includes
+      enterprise architecture, leading multiple technical leads, Java 11+, Spring Boot,
+      microservices, REST APIs, SQL-backed integrations, Docker, Kubernetes, automated testing,
+      production reliability and mentoring. React is preferred rather than central. Published
+      public-board compensation is $145,000-$175,000.
+    notes: >
+      ZipRecruiter and other current public indexes corroborate the role, but the official First
+      Citizens posting URL was not reliably resolved during this bounded pass. Keep it in
+      official-verification status instead of promoting directly to Apply or Resume Ready.
+  - company: GHX
+    title: Principal Software Engineer - Integration & Data Architecture
+    url: https://job-boards.greenhouse.io/globalhealthcareexchangeinc/jobs/4722878005
+    source_url: https://www.ziprecruiter.com/job-redirect/share?match_token=CpQBChZYakFPaUkzaHlITk5DVGxiZ0xyalZBEiQwMWEwNWIzNi0zODMxLTdmMTctYTJiMi01MTJmNTRhZWVhZjYaUEFBRkFEWUpIam5feUhhdWxveTlpdGJ5TGF6N2x1REVZQlAwZHo0bElaUHUtRHNCalMxRk8tUi1Fc1VXaElCSlJ1OUVmYUlTVGRRTUdtbDZiIKjYAhABGNatBQ%3D%3D&tsid=100000404
+    added_on: 2026-09-01
+    source: ziprecruiter-browser-review
+    verification_status: official_live
+    verified_on: 2026-09-01
+    location: Remote, United States
+    work_model: Remote
+    job_id: "4722878005"
+    description: >
+      Principal-level hands-on architecture role guiding a monolith-to-services transformation,
+      REST API governance, service boundaries, data ownership, enterprise integrations,
+      relational and document data models, workshops, design reviews and technical mentoring.
+      The required qualifications also call for deep event-driven architecture, Kafka or
+      equivalent messaging, hands-on AWS integration and data services, and NoSQL access-pattern
+      design. Published compensation is $150,000-$214,000 plus bonus.
+    notes: >
+      Resolved from the bounded ZipRecruiter pass to GHX's live official Greenhouse posting.
+      The seniority, enterprise integration, API, SQL, modernization and architecture-leadership
+      responsibilities align, but strict review must treat the required AWS, event-driven
+      messaging and NoSQL depth as material evidence gaps rather than preferred technologies.
+  - company: M&T Bank
+    title: Principal Software Engineer
+    url: https://mtb.wd5.myworkdayjobs.com/MTB/job/Remote-USA/Principal-Software-Engineer_R89645
+    source_url: https://www.remotesource.com/jobs/Gl5YMToIyojd7WYnztyo7-principal-software-engineer-at-mt-bank
+    added_on: 2026-09-07
+    source: remotesource-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-09-07
+    posted_on: 2026-09-03
+    location: Remote, United States
+    work_model: Remote
+    job_id: R89645
+    description: >
+      Principal-level individual-contributor role combining expert hands-on software
+      development with enterprise architecture, modernization and platform transformation,
+      API-based integrations, distributed systems, data synchronization, resiliency,
+      observability, production readiness, cross-team technical direction and mentoring.
+      Required qualifications include expert proficiency in one relevant programming language
+      and advanced proficiency in a second. The published national compensation range is
+      $139,700-$232,900.
+    notes: >
+      Resolved from RemoteSource to M&T Bank's live official Workday requisition. The official
+      record identifies the role as Remote Eligible, USA even though the description also
+      carries a Clanton, Alabama location label. Principal seniority, enterprise modernization,
+      Java, architecture, APIs, distributed systems, production reliability and technical
+      leadership align strongly. Strict review must ask which second programming language can
+      truthfully support the required advanced-proficiency claim; do not infer that evidence
+      from Java expertise or limited JavaScript exposure. Banking and regulated-industry
+      experience are preferred rather than required.
+  - company: Resource Innovations
+    title: Principal Software Engineer (Java)
+    url: https://apply.workable.com/resource-innovations/j/20D7C7F9E5/
+    source_url: https://himalayas.app/companies/resource-innovations/jobs/principal-software-engineer-java
+    added_on: 2026-09-07
+    source: himalayas-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-09-07
+    posted_on: 2026-09-01
+    location: Remote, United States
+    work_model: Remote
+    job_id: 20D7C7F9E5
+    description: >
+      Principal-level hands-on architecture role for modernizing a mature, business-critical
+      enterprise SaaS platform. The work includes Java and Spring Boot development, distributed
+      systems, microservices, APIs, integration patterns, event-driven design, CI/CD,
+      containers, Kubernetes, production readiness, cross-team technical direction and
+      mentoring. The published base-salary range is $140,000-$195,000 plus a discretionary
+      annual bonus.
+    notes: >
+      Resolved from Himalayas to Resource Innovations' live official Workable requisition.
+      Principal seniority, Java, Spring Boot, enterprise SaaS modernization, integrations,
+      containers, Kubernetes, reliability and technical leadership align strongly. Strict
+      review must treat strong production AWS experience, working Python, NoSQL, data pipelines
+      and search-platform experience as required evidence gaps. Messaging experience may be
+      supported by Jeff's enterprise messaging background, but Kafka must not be inferred. The
+      posting identifies the role as remote within the United States and says occasional office
+      meetings apply to candidates residing in specified metro areas; confirm that Atlanta-area
+      residency is eligible before application.
+  - company: Instructure
+    title: Platform Architect
+    url: https://jobs.ashbyhq.com/instructure/1083555c-29d8-4f33-9610-82db92ebe80e
+    source_url: https://www.linkedin.com/jobs/search-results/?keywords=full-time%20Senior%20Principal%20Software%20Engineer%2C%20on-site%20or%20hybrid%20or%20remote&geoId=90000052
+    added_on: 2026-09-09
+    source: linkedin-browser-review
+    verification_status: official_live
+    verified_on: 2026-09-09
+    posted_on: 2026-08-28
+    location: United States / Remote
+    work_model: Remote
+    job_id: 1083555c-29d8-4f33-9610-82db92ebe80e
+    description: >
+      Platform architecture role leading the design and hands-on delivery of Instructure's
+      developer portal and Platform as a Service products. The work includes distributed
+      systems, cloud platforms, Docker and Kubernetes, reliability, performance, technical
+      leadership, mentoring, code review, production troubleshooting and delivery across
+      multiple engineering teams. The published compensation range is $200,000-$230,000.
+    notes: >
+      Resolved from the signed-in LinkedIn board to Instructure's live official Ashby posting.
+      Principal-level platform architecture, distributed systems, container platforms,
+      production ownership and technical leadership align strongly. Strict review must treat
+      deep public-cloud experience and NoSQL as evidence gaps and must not infer Ruby, Python,
+      Go, AWS, Azure or GCP production experience.
+  - company: Toast
+    title: Principal Software Engineer, Configuration Platform
+    url: https://careers.toasttab.com/jobs/principal-software-engineer-configuration-platform-remote-united-states
+    source_url: https://www.linkedin.com/jobs/search-results/?keywords=full-time%20Senior%20Principal%20Software%20Engineer%2C%20on-site%20or%20hybrid%20or%20remote&geoId=90000052
+    added_on: 2026-09-09
+    source: linkedin-browser-review
+    verification_status: official_live
+    verified_on: 2026-09-09
+    location: United States / Remote
+    work_model: Remote
+    job_id: R14895
+    description: >
+      Principal engineering role owning architecture and delivery for Toast's high-concurrency
+      configuration platform. Responsibilities include resilient distributed services,
+      performance optimization, end-to-end production ownership, technical roadmaps,
+      cross-organization architecture, engineering productivity and mentoring Staff and Senior
+      Staff engineers. The backend stack includes Kotlin and Java microservices, AWS, Postgres,
+      Pulsar and RabbitMQ. The published base salary range is $180,000-$368,000 by zone.
+    notes: >
+      Resolved from the signed-in LinkedIn board to Toast's live employer careers posting.
+      Java, configuration-platform experience, distributed architecture, enterprise SaaS,
+      performance, reliability and principal-level leadership align strongly. Strict review
+      must treat Kotlin and production AWS as evidence gaps and must not infer Pulsar or
+      DynamoDB experience from adjacent enterprise messaging and relational database work.
+  - company: NexusOne
+    title: Forward Deployed Engineer
+    url: https://jobs.ashbyhq.com/nexus-cognitive/8e4e2aca-2e8d-4f55-8adb-bffd7d79a84d
+    source_url: https://www.linkedin.com/jobs/view/forward-deployed-engineer-at-nexusone-4471117262
+    added_on: 2026-09-24
+    source: blitzapi-linkedin-review
+    verification_status: official_live
+    verified_on: 2026-09-24
+    posted_on: 2026-09-23
+    location: Atlanta, Georgia / Remote
+    work_model: Remote with customer travel
+    job_id: 8e4e2aca-2e8d-4f55-8adb-bffd7d79a84d
+    description: >
+      Hands-on post-sales engineering role owning enterprise customer delivery from discovery
+      through production rollout and operational handoff. The work includes Java or another
+      backend language, enterprise integrations, Kubernetes, containers, hybrid-cloud
+      modernization, production troubleshooting, architecture reviews, workshops, technical
+      leadership and converting field work into reusable product capabilities. Required
+      experience includes modern data infrastructure such as Spark, Trino or Presto, Iceberg,
+      Kafka, Airflow, dbt or data lakes; a major public cloud such as AWS, Azure or GCP; and
+      infrastructure as code with Terraform or an equivalent tool.
+    notes: >
+      Resolved from BlitzAPI's LinkedIn-derived result to NexusOne's live official Ashby
+      posting. Jeff's Java, enterprise integration, customer delivery, Kubernetes,
+      modernization and technical-leadership experience align strongly. Strict review must
+      treat modern data-platform depth, infrastructure as code and hands-on AWS, Azure or GCP
+      as required evidence gaps; do not infer those from OCI experience or cloud training.
+  - company: Ascensus
+    title: Director, Software Engineering & Development
+    url: https://careers.ascensus.com/jobs/director-software-engineering-development-philadelphia-pennsylvania-united-states-49698c66-f409-498f-a3c3-e7a39b580907
+    source_url: https://www.linkedin.com/jobs/view/director-software-engineering-development-at-ascensus-4471137445
+    added_on: 2026-09-24
+    source: blitzapi-linkedin-review
+    verification_status: official_live
+    verified_on: 2026-09-24
+    posted_on: 2026-09-23
+    location: United States / Remote
+    work_model: Remote
+    description: >
+      Hands-on software engineering management role building and operating an Enterprise AI
+      Platform. Responsibilities include leading a cross-functional engineering team,
+      improving development, testing, CI/CD, production support and reliability practices,
+      coaching engineers, partnering with product and architecture leaders, and contributing
+      directly to debugging, automation, technical spikes or code reviews when needed. The
+      published national base range is $170,000-$220,000.
+    notes: >
+      Resolved from BlitzAPI's LinkedIn-derived results to Ascensus's live official careers
+      posting. Engineering leadership, enterprise platforms, production support, CI/CD,
+      mentoring, Playwright and cross-functional delivery align. Production AI platform and
+      Azure experience are preferred rather than required; strict review must not turn
+      AI-assisted development or OCI experience into production AI or Azure claims.
+  - company: Cinchapi
+    title: Founding Forward Deployed Engineer
+    url: https://cinchapi.com/careers/founding-forward-deployed-engineer
+    source_url: https://www.indeed.com/viewjob?jk=17e6148ef64b4219
+    added_on: 2026-09-25
+    source: indeed-browser-review
+    verification_status: official_live
+    verified_on: 2026-09-25
+    location: Atlanta, Georgia
+    work_model: Hybrid / in person with up to 25% travel
+    description: >
+      Founding hands-on engineering role taking customer deployments from technical discovery
+      through production and ongoing improvement. The work includes backend services, APIs,
+      data modeling, authentication, enterprise integrations, production troubleshooting,
+      technical scoping, customer training, reusable implementation patterns and mentoring
+      future forward-deployed engineers. The official posting lists a $150,000-$180,000 base
+      range plus equity and requires Atlanta presence with up to 25% customer travel.
+    notes: >
+      Resolved from the signed-in Indeed listing to Cinchapi's live official careers page.
+      Jeff's customer-facing professional-services history, enterprise integrations, backend
+      engineering, production delivery, troubleshooting and principal-level ownership align.
+      Strict review must treat hands-on production LLM or agentic-system delivery beyond a
+      basic demo as a required evidence gap and must not infer it from AI-assisted development.
+  - company: Salesforce
+    title: Senior Technical Architect / Technical Architect Director - Data Foundation Delivery
+    url: https://www.linkedin.com/jobs/view/4471828192
+    source_url: https://www.linkedin.com/jobs/view/4471828192
+    added_on: 2026-09-25
+    source: blitzapi-linkedin-review
+    verification_status: needs_official_verification
+    verified_on: 2026-09-25
+    posted_on: 2026-09-25
+    location: Atlanta, Georgia
+    work_model: Unconfirmed
+    description: >
+      Customer-billable architecture and delivery role leading enterprise Data Foundation
+      engagements from discovery and technical vision through governed production capability.
+      The public listing emphasizes executive advisory, architecture, delivery leadership,
+      reusable practice assets, AI-augmented delivery and work across Salesforce Data 360,
+      Informatica IDMC and MuleSoft.
+    notes: >
+      BlitzAPI returned a current Atlanta LinkedIn listing and current public indexes confirm
+      the role family, but an exact live Salesforce careers URL was not reliably resolved in
+      this bounded pass. Keep this item in official-verification status. If verified, strict
+      review must treat deep Salesforce Data 360, Informatica IDMC or MuleSoft delivery
+      experience and the role's data-platform depth as central requirements.
+  - company: Elastic
+    title: Director of Software Engineering - Distributed Systems, Serverless - Elasticsearch
+    url: https://jobs.elastic.co/jobs/engineering/united-states/director-of-software-engineering-distributed-systems-serverless-elasticsearch/8237959?gh_jid=8237959
+    source_url: https://www.linkedin.com/jobs/view/4473556431
+    added_on: 2026-10-01
+    source: blitzapi-linkedin-review
+    verification_status: official_live
+    verified_on: 2026-10-01
+    posted_on: 2026-09-29
+    location: United States
+    work_model: Remote / distributed
+    description: >
+      Director-level engineering leadership for Elasticsearch distributed systems and
+      serverless architecture. The role leads roughly 40 engineers and managers, owns
+      strategy for scalability, resilience, replication, recovery and performance, and
+      requires prior hands-on distributed-systems depth. The published base range is
+      $199,700-$315,900 outside designated premium locations.
+    notes: >
+      Resolved from BlitzAPI's LinkedIn-derived listing to Elastic's live official careers
+      posting. The scale of people management is materially larger than Jeff's documented
+      7-10 engineer leadership scope, so strict review must evaluate that requirement
+      without inflating management experience.
+  - company: Upstart
+    title: Senior Director of Data Platform Engineering
+    url: https://careers.upstart.com/jobs/senior-director-of-data-platform-engineering
+    source_url: https://www.linkedin.com/jobs/view/4472636375
+    added_on: 2026-10-01
+    source: blitzapi-linkedin-review
+    verification_status: official_live
+    verified_on: 2026-10-01
+    posted_on: 2026-09-30
+    location: United States
+    work_model: Remote
+    description: >
+      Senior director role leading a 35-person data platform organization and four managers,
+      with possible expansion to roughly 50 people. The work owns data-infrastructure
+      strategy, shared platforms, operational data architecture modernization, reliability,
+      governance and technical-debt reduction. The published base range is
+      $261,000-$357,200.
+    notes: >
+      Resolved from BlitzAPI's LinkedIn-derived listing to Upstart's live official careers
+      posting. Strict review must treat direct management of managers and a large data
+      engineering organization as required experience rather than inferring it from
+      principal-level product engineering leadership.
+  - company: FormFactor Inc.
+    title: Technical Director, Enterprise Architecture
+    url: https://www.linkedin.com/jobs/view/4470323726
+    source_url: https://www.linkedin.com/jobs/view/4470323726
+    added_on: 2026-10-01
+    source: blitzapi-linkedin-review
+    verification_status: needs_official_verification
+    verified_on: 2026-10-01
+    posted_on: 2026-09-25
+    location: United States
+    work_model: Unconfirmed
+    description: >
+      LinkedIn-derived enterprise architecture leadership listing emphasizing integration
+      standards, modernization roadmaps and technical direction.
+    notes: >
+      The bounded verification pass did not resolve an exact live FormFactor careers or ATS
+      page. Keep this listing out of Apply and Maybe until the official posting and work
+      arrangement are confirmed.
+  - company: BSN SPORTS
+    title: Director, Software Engineering - Team Art Locker Platform
+    url: https://www.linkedin.com/jobs/view/4473511425
+    source_url: https://www.linkedin.com/jobs/view/4473511425
+    added_on: 2026-10-01
+    source: blitzapi-linkedin-review
+    verification_status: needs_official_verification
+    verified_on: 2026-10-01
+    posted_on: 2026-09-29
+    location: United States
+    work_model: Unconfirmed
+    description: >
+      LinkedIn-derived director listing for backend and platform engineering leadership,
+      platform services and system migration work supporting the Team Art Locker platform.
+    notes: >
+      The bounded verification pass did not resolve an exact live BSN SPORTS or Varsity
+      Brands careers page. Keep this listing out of Apply and Maybe until the official
+      posting, compensation and work arrangement are confirmed.
+  - company: J.P. Morgan
+    title: Principal Software Engineer (Asset & Wealth Management)
+    url: https://www.ziprecruiter.com/co/J.P.-Morgan/Jobs/-in-Atlanta,GA?uuid=w1oV%2BuRkxDsyq4NN7s9EhdIj1Bo%3D&radius=50
+    source_url: https://www.ziprecruiter.com/co/J.P.-Morgan/Jobs/-in-Atlanta,GA?uuid=w1oV%2BuRkxDsyq4NN7s9EhdIj1Bo%3D&radius=50
+    added_on: 2026-10-01
+    source: ziprecruiter-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-10-01
+    location: Atlanta, Georgia
+    work_model: Unconfirmed
+    description: >
+      ZipRecruiter surfaced a principal software engineering role in Asset and Wealth
+      Management with an estimated $129,000-$174,000 range.
+    notes: >
+      The bounded browser pass did not resolve an exact live J.P. Morgan careers posting or
+      employer requisition. Keep this role out of Apply and Maybe until the official page,
+      technology requirements, compensation and work arrangement are confirmed.
+  - company: UKG
+    title: Senior Principal Software Engineer/Architect
+    url: https://www.ziprecruiter.com/co/UKG/Jobs/-in-Atlanta,GA?uuid=1DDl7rtE0wO3EuN9VLfl4tp1mIg%3D&radius=50
+    source_url: https://www.ziprecruiter.com/co/UKG/Jobs/-in-Atlanta,GA?uuid=1DDl7rtE0wO3EuN9VLfl4tp1mIg%3D&radius=50
+    added_on: 2026-10-01
+    source: ziprecruiter-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-10-01
+    location: Atlanta, Georgia
+    work_model: Unconfirmed
+    description: >
+      ZipRecruiter surfaced a senior-principal software engineer and architect role in
+      Atlanta, but did not expose a complete technology description in the result card.
+    notes: >
+      The bounded browser pass did not resolve an exact live UKG careers posting or employer
+      requisition. Keep this role out of Apply and Maybe until the official page, technology
+      requirements, compensation and work arrangement are confirmed.
+  - company: Candescent
+    title: Principal Engineer - Consumer Platform
+    url: https://www.ziprecruiter.com/co/Candescent/Jobs/-in-Atlanta,GA?uuid=&radius=50
+    source_url: https://www.ziprecruiter.com/co/Candescent/Jobs/-in-Atlanta,GA?uuid=&radius=50
+    added_on: 2026-10-01
+    source: ziprecruiter-browser-review
+    verification_status: needs_official_verification
+    verified_on: 2026-10-01
+    location: Atlanta, Georgia
+    work_model: Unconfirmed
+    description: >
+      ZipRecruiter surfaced a principal engineer role for a consumer platform in Atlanta,
+      but the result card did not expose a complete technology description or compensation.
+    notes: >
+      The bounded browser pass did not resolve an exact live Candescent careers posting or
+      employer requisition. Keep this role out of Apply and Maybe until the official page,
+      technology requirements, compensation and work arrangement are confirmed.
+  - company: Norfolk Southern
+    title: Senior Director, Enterprise Architecture
+    url: https://jobs.nscorp.com/job/Atlanta-Senior-Director%2C-Enterprise-Architecture-GA-30308/1435669400/
+    source_url: https://www.linkedin.com/jobs/view/senior-director-enterprise-architecture-at-norfolk-southern-4472557486
+    added_on: 2026-10-06
+    source: blitzapi-linkedin-review
+    verification_status: official_live
+    verified_on: 2026-10-06
+    posted_on: 2026-10-01
+    location: Atlanta, Georgia
+    work_model: On-site
+    job_id: "40281"
+    description: >
+      Enterprise architecture leadership role defining target-state architecture,
+      modernization roadmaps, architecture governance and technology standards across
+      applications, data, AI, cloud, infrastructure and security. The role partners with
+      engineering, operations and executive leaders to simplify platforms and improve
+      reliability, security and measurable business outcomes.
+    notes: >
+      Resolved from the BlitzAPI LinkedIn signal to Norfolk Southern's live official careers
+      posting. Atlanta location, enterprise modernization, architecture governance and
+      cross-functional technical leadership align, but strict review must evaluate the
+      Senior Director scope without inferring unverified executive-management experience.
+  - company: Crawford & Company
+    title: Senior Director, Oracle Cloud Delivery and Architecture
+    url: https://www.linkedin.com/jobs/view/senior-director-oracle-cloud-delivery-and-architecture-at-crawford-company-4471139143
+    source_url: https://www.linkedin.com/jobs/view/senior-director-oracle-cloud-delivery-and-architecture-at-crawford-company-4471139143
+    added_on: 2026-10-06
+    source: blitzapi-linkedin-review
+    verification_status: needs_official_verification
+    verified_on: 2026-10-06
+    posted_on: 2026-09-23
+    location: Peachtree Corners, Georgia
+    work_model: Hybrid
+    description: >
+      LinkedIn-derived senior director role leading Oracle Cloud ERP Finance architecture,
+      implementation, migration and optimization with global Finance, HR, IT and systems
+      integration partners.
+    notes: >
+      The bounded verification pass found matching current public listings but did not
+      resolve an exact live Crawford careers or ATS page. Keep this role out of Apply and
+      Maybe until the official requisition is confirmed and strict review verifies the
+      required Oracle Fusion ERP Finance depth rather than treating CPQ experience as equal.
+  - company: IHG Hotels & Resorts
+    title: Sr. Solutions Architect
+    url: https://www.linkedin.com/jobs/view/sr-solutions-architect-at-ihg-hotels-resorts-4472986383
+    source_url: https://www.linkedin.com/jobs/view/sr-solutions-architect-at-ihg-hotels-resorts-4472986383
+    added_on: 2026-10-06
+    source: blitzapi-linkedin-review
+    verification_status: needs_official_verification
+    verified_on: 2026-10-06
+    posted_on: 2026-10-01
+    location: Atlanta, Georgia
+    work_model: Unconfirmed
+    description: >
+      LinkedIn-derived senior solutions architecture role defining enterprise architecture,
+      technology roadmaps and governance while guiding secure and maintainable solutions
+      from strategy through delivery.
+    notes: >
+      The bounded verification pass did not resolve an exact live IHG careers or ATS page.
+      Keep this role out of Apply and Maybe until the official posting confirms that the
+      work is implementation and architecture focused rather than pre-sales, and confirms
+      compensation and the Atlanta work arrangement.
+  - company: Fiserv
+    title: Lead Engineer
+    url: https://careers.fiserv.com/us/en/job/R-10404240/Lead-Engineer
+    source_url: https://careers.fiserv.com/us/en/job/R-10404240/Lead-Engineer
+    added_on: 2026-10-09
+    source: fiserv-careers-manual-feedback
+    verification_status: official_live
+    verified_on: 2026-10-09
+    posted_on: 2026-10-08
+    location: Alpharetta, Georgia; Berkeley Heights, New Jersey; Columbus, Ohio; Coral Springs, Florida
+    work_model: On-site
+    job_id: R-10404240
+    description: >
+      Lead software engineering role designing, developing, testing and maintaining business
+      applications while translating requirements, leading peer reviews and mentoring junior
+      developers. Required experience includes six or more years of software development,
+      three or more years with Java or a similar language, SQL databases, AWS, Azure or GCP
+      services, CI/CD and DevOps practices, and Agile delivery. The published $109,000-$182,400
+      range applies to New Jersey and New York; compensation for Georgia may differ.
+    notes: >
+      Manually verified on Fiserv's live official careers site. Alpharetta is an eligible
+      onsite location. Java, SQL, CI/CD, application architecture, delivery leadership and
+      mentoring align. Treat professional OCI cloud architecture plus AWS and GCP training as
+      transferable cloud evidence; do not claim professional AWS, Azure or GCP production
+      experience. Georgia compensation remains unconfirmed.

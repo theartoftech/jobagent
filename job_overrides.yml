@@ -1,4 +1,201 @@
 overrides:
+  - company: Block
+    decision: Skip
+    fit_score: 0
+    expires_on: 2026-10-28
+    reason: >
+      temporary company pause: the candidate has already applied to Block three times and
+      does not want additional Block roles searched or carried forward during the next month.
+
+  - company: Grafana Labs
+    job_id: "6208004004"
+    url_contains: /jobs/6208004004
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: the official Grafana Labs Greenhouse posting no longer exists.
+
+  - company: CVS Health
+    job_id: R0993777
+    url_contains: R0993777
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: the official CVS Health Workday posting no longer exists.
+
+  - company: CVS Health
+    job_id: R1036689
+    url_contains: R1036689
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: the official CVS Health Workday posting no longer exists.
+
+  - company: Target
+    job_id: R0000452902
+    url_contains: R0000452902
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: the official Target Workday posting no longer exists.
+
+  - company: Aderant
+    job_id: REQ_100000391
+    url_contains: REQ_100000391
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed junior-scope and required-stack mismatch: Associate Technical
+      Consultant is below the candidate's target seniority and asks for C# knowledge.
+
+  - company: Block
+    job_id: "4684349008"
+    url_contains: 4684349008
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed stale and excluded role type: the official page dates this role 2025-06-12,
+      well outside the 60-day freshness window, and the work is sales engineering centered
+      on partnering with Sales and Account Management, co-selling, demos, POCs and adoption.
+
+  - company: Yugabyte
+    job_id: "4682542006"
+    url_contains: /jobs/4682542006
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed excluded role type: the posting explicitly identifies the position as a
+      Sales Engineer on the global sales team, partnering with Account Executives to qualify
+      opportunities, deliver demos and POCs, drive technical sales, and own sales wins.
+
+  - company: Red Hat
+    job_id: R-058387-2
+    url_contains: R-058387-2
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed excluded role type: this Account Solution Architect position is primarily
+      sales-oriented account support rather than hands-on software engineering, implementation,
+      or technical delivery ownership.
+
+  - company: Red Hat
+    job_id: R-058621
+    url_contains: R-058621
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed excluded role type: this Specialist Solution Architect, Cloud Services
+      position is primarily sales-oriented solution architecture rather than hands-on
+      software engineering, implementation, or technical delivery ownership.
+
+  - company: Mastercard
+    job_id: R-290175
+    url_contains: R-290175
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed location mismatch: the official posting is tied to New York City and does
+      not establish a U.S.-remote or Atlanta-compatible work arrangement.
+
+  - company: Webflow
+    job_id: "7788111"
+    url_contains: /jobs/7788111
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed primary-stack mismatch: the Assets role centers backend delivery on Python
+      and productionizing AI/ML capabilities, which are outside the candidate's confirmed
+      professional production experience.
+
+  - company: Block
+    job_id: "5369947008"
+    url_contains: 5369947008
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed scope mismatch: the posting describes well-scoped feature ownership with
+      scope expected to grow over time, which is materially below the candidate's target
+      Staff, Principal, architecture, and technical-lead ownership level.
+
+  - company: GitHub
+    job_id: "5481"
+    url_contains: /jobs/5481
+    decision: Maybe
+    fit_score: 82
+    reason: >
+      reviewed broad-scoring false negative: the required qualifications accept Java and
+      principal-level production software engineering. AI/LLM, agent-platform and Azure/AKS
+      experience are presented as preferred qualifications, so they must remain strict-review
+      positioning gaps rather than source-stage hard rejections.
+
+  - company: Spoonflower
+    job_id: 2026-1239
+    url_contains: 18043977-senior-principal-software-engineer
+    decision: Skip
+    fit_score: 40
+    reason: >
+      reviewed required-stack mismatch: this commerce-platform role requires deep GraphQL
+      federation, Shopify or comparable e-commerce platform experience, and strong
+      professional Node.js/TypeScript. Those are central qualifications not supported by
+      the candidate's current professional evidence.
+
+  - company: Cox Automotive
+    job_id: R202681760
+    url_contains: R202681760
+    decision: Skip
+    fit_score: 37
+    reason: >
+      reviewed required-stack mismatch: this principal AI-platform role requires strong
+      production AWS platform delivery, working proficiency in Python, and experience
+      building or operating production AI/ML systems. The candidate has AWS training and
+      AI-assisted development experience, but not the required professional production
+      evidence in those areas.
+
+  - title_contains: pre-sales
+    decision: Skip
+    fit_score: 0
+    reason: "reviewed excluded role type: pre-sales"
+
+  - title_contains: presales
+    decision: Skip
+    fit_score: 0
+    reason: "reviewed excluded role type: presales"
+
+  - title_contains: Account Solution Architect
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed excluded role type: account solution architecture is a sales-oriented
+      customer-account function rather than hands-on software engineering or delivery.
+
+  - title_contains: Global Specialist Solution Architect - Lightwell
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed excluded role type: the posting identifies the role as Technology Sales
+      and deep technical sales support for go-to-market execution.
+
+  - title_contains: Android Software Engineer
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed primary-stack mismatch: Android mobile application engineering is outside
+      the candidate's Java backend, enterprise platform, integration, and architecture lane.
+
+  - title_contains: iOS Software Engineer
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed primary-stack mismatch: iOS mobile application engineering is outside the
+      candidate's Java backend, enterprise platform, integration, and architecture lane.
+
+  - company: Temporal Technologies
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed company mismatch: the company's current roles do not fit the
+      candidate's target profile, so all Temporal Technologies postings are excluded.
+
   - company: NCR Voyix
     job_id: R0157400
     url_contains: R0157400
@@ -8,6 +205,70 @@ overrides:
       reviewed stretch: Convenience and Fuel Retail payments/loyalty role;
       mirrored description calls for 7+ years C++ on Windows and modern C++ 11+,
       which is outside the candidate's Java/backend SaaS target profile.
+
+  - company: NCR Voyix
+    job_id: R0158101
+    url_contains: R0158101
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: official Workday posting no longer exists.
+
+  - company: Truist
+    job_id: R0117326
+    url_contains: TBJTBFUSR0117326EXTERNALENUS
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: official Truist posting no longer exists.
+
+  - company: Workday
+    job_id: JR-0109130
+    url_contains: JR-0109130
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed location mismatch: this is a Flex role based in Reston, Virginia,
+      not a remote role or an Atlanta-metro hybrid opportunity.
+
+  - company: Workday
+    job_id: JR-0110149
+    url_contains: JR-0110149
+    decision: Skip
+    fit_score: 35
+    reason: >
+      reviewed required-platform mismatch: despite an Atlanta Flex location and strong
+      principal-level Java alignment, the basic qualifications require six or more years
+      building and operating Redis, Kafka, RabbitMQ or NoSQL platforms, production-level
+      work in at least two listed languages, and expertise with Chef, Helm and ArgoCD. The
+      role also operates these platforms across AWS and GCP. Those are central requirements,
+      not optional technologies, and are not supported by the candidate's confirmed evidence.
+
+  - company: GE Vernova
+    job_id: R5044307
+    url_contains: R5044307
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed required-domain mismatch: Technical Expertise requires Market
+      Management Systems, Unit Commitment, and Economic Dispatch experience,
+      which the candidate does not have.
+
+  - company: Elevance Health
+    job_id: JR194680
+    url_contains: JR194680
+    decision: Skip
+    fit_score: 0
+    reason: >
+      duplicate-equivalent posting: apply only to retained requisition JR194684.
+
+  - company: Elevance Health
+    job_id: JR194687
+    url_contains: JR194687
+    decision: Skip
+    fit_score: 0
+    reason: >
+      duplicate-equivalent posting: apply only to retained requisition JR194684.
 
   - company: U.S. Bank
     job_id: 2026-0015060
@@ -78,3 +339,220 @@ overrides:
       percentage of recent experience spent in Ruby/Rails. The backend and
       integration responsibilities fit, but Ruby/Rails is a decisive primary
       stack requirement outside the candidate's background.
+
+  - company: Grafana Labs
+    job_id: 5968728004
+    url_contains: 5968728004
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: official Greenhouse posting no longer exists.
+
+  - company: Indeed
+    job_id: "47198"
+    url_contains: aa89b4d0151e7b12
+    decision: Maybe
+    fit_score: 88
+    reason: >
+      manually verified full description: principal-level ownership of distributed
+      systems, shared platforms, APIs, SQL, operational excellence, mentoring and
+      cross-team architecture. Preserve for strict review; NoSQL remains an unresolved
+      gap and must not be claimed.
+
+  - company: LexisNexis Risk Solutions
+    job_id: R115266
+    url_contains: R115266
+    decision: Apply
+    fit_score: 88
+    reason: >
+      manually verified full description: Alpharetta hybrid Java/J2EE engineering-lead
+      role with hands-on coding, complex data models, TDD, mentoring, direct management,
+      production problem solving and internal/external technical leadership. The Workday
+      discovery excerpt omitted most of these qualifying requirements.
+
+  - company: Stable Kernel
+    job_id: "7854406003"
+    url_contains: 7854406003
+    decision: Skip
+    fit_score: 0
+    reason: >
+      manually verified as no longer available on the employer's official Greenhouse
+      board. Do not carry this posting forward or authorize application documents.
+
+  - company: Mercedes-Benz USA
+    job_id: MER00043Y7
+    url_contains: mer00043y7
+    decision: Apply
+    fit_score: 88
+    reason: >
+      manually verified official posting: principal application architecture role in
+      Atlanta spanning Spring, REST, SQL, integrations, application modernization,
+      architecture governance, production support, coaching and vendor delivery. AWS and
+      AEM require truthful gap positioning but do not erase the strong responsibility fit.
+
+  - company: Initiate Government Solutions
+    job_id: "4424331"
+    url_contains: "4424331"
+    decision: Apply
+    fit_score: 92
+    reason: >
+      browser-reviewed official posting: direct Java, Spring Boot, REST API, SQL,
+      monolith modernization, Docker/Kubernetes, production reliability and technical-lead
+      match. Citizenship and AWS must still be resolved truthfully by strict review.
+
+  - company: Cencora
+    job_id: R2613213
+    url_contains: r2613213
+    decision: Maybe
+    fit_score: 84
+    reason: >
+      browser-reviewed official posting: principal enterprise application modernization,
+      APIs, integrations, distributed systems, SQL-backed commerce workflows, reliability
+      and mentoring align. Cloud, frontend and commerce-platform depth remain fit risks.
+
+  - company: CareFirst
+    job_id: "22431"
+    url_contains: "18117714"
+    decision: Apply
+    fit_score: 93
+    reason: >
+      browser-reviewed official posting: hands-on Java and Spring Boot technical leadership,
+      APIs, microservices, integrations, modernization, production reliability and mentoring
+      are direct matches. MuleSoft, cloud, Kafka and NoSQL are listed as preferred.
+
+  - company: Fresche Solutions
+    job_id: "802"
+    url_contains: "/802"
+    decision: Maybe
+    fit_score: 74
+    reason: >
+      browser-reviewed official posting: Java architecture, enterprise middleware, SQL,
+      consulting workshops and production troubleshooting align, but deep JVM profiling,
+      garbage-collection and performance-tuning evidence is a central unverified requirement,
+      so this remains below the Apply threshold pending truthful evidence.
+
+  - company: Tenable
+    job_id: "5387057008"
+    url_contains: "5387057008"
+    decision: Maybe
+    fit_score: 81
+    reason: >
+      browser-reviewed official posting: backend Java, Spring-style REST services, scalable
+      cloud microservices, testing and production ownership align. Senior-title and localized
+      compensation risks prevent automatic Apply promotion.
+
+  - company: NinjaOne
+    job_id: o6cIAfwk
+    url_contains: o6cIAfwk
+    decision: Apply
+    fit_score: 92
+    reason: >
+      browser-reviewed official posting: 10+ years of Java product engineering, Spring REST
+      APIs, relational data, caching, scalable systems, architecture, mentoring and Georgia
+      remote eligibility closely match. Kotlin is used but Java is the explicit role center.
+
+  - company: U.S. Bank
+    job_id: 2026-0025620
+    url_contains: 2026-0025620
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: the official U.S. Bank Workday posting no longer exists.
+      Do not carry this requisition forward or authorize application documents.
+
+  - company: OneTrust
+    job_id: "8107189"
+    url_contains: "8107189"
+    decision: Apply
+    fit_score: 87
+    reason: >
+      browser-reviewed official Atlanta posting: staff-level developer platform architecture,
+      CI/CD and observability integrations, developer enablement, AI-assisted workflows,
+      mentoring and ambiguous cross-team technical leadership align with the candidate.
+
+  - company: Mastercard
+    job_id: R-280123
+    url_contains: R-280123
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed location mismatch: the role is based in Oslo, Norway and the official
+      posting does not identify a U.S.-remote or Atlanta-metro work arrangement.
+
+  - company: Fresh Consulting
+    url_contains: g37oMsmjZ3
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed location mismatch: although labeled remote, the posting requires onsite
+      attendance in Houston every other week, which is impractical from Atlanta.
+
+  - company: Global Payments
+    job_id: R0074562
+    url_contains: R0074562
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed role-type mismatch: this position owns partner ecosystem strategy,
+      onboarding, certification, integration governance, delivery coordination and
+      escalations, while explicitly not owning engineering architecture, product roadmap,
+      feature prioritization or engineering resources. It reports through Strategic
+      Partnerships and Business Development, so it is partner-program leadership rather
+      than the hands-on engineering, architecture or delivery ownership being targeted.
+
+  - company: Global Payments
+    job_id: R0075528
+    url_contains: R0075528
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed compensation mismatch: the official posting publishes an annual salary
+      range of $87,500 to $139,250, so its maximum does not exceed the candidate's
+      $150,000 minimum target.
+
+  - company: Travelers
+    job_id: R-52751
+    url_contains: R-52751
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed specialization mismatch: this role owns enterprise database migration,
+      modernization and data-platform architecture. That database-platform specialization
+      is outside the candidate's Java/Spring enterprise application, integration and SaaS
+      modernization target lane despite the compatible title, location and compensation.
+
+  - company: OneTrust
+    job_id: "8065291"
+    url_contains: "8065291"
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed unavailable: the official OneTrust Greenhouse URL redirects to the general
+      openings page with an error indicator, and requisition 8065291 is not listed among
+      OneTrust's current openings. Do not carry this requisition forward or authorize
+      application documents.
+
+  - company: Workday
+    job_id: JR-0110566
+    url_contains: JR-0110566
+    decision: Skip
+    fit_score: 0
+    reason: >
+      reviewed required-domain mismatch: the basic qualifications require six or more years
+      of Workday Reporting and Prism, eight or more years of integration development or report
+      building, and eight or more years of Human Resources, Payroll, or Financials domain
+      experience. The current candidate profile does not contain professional evidence for
+      the Workday Reporting/Prism or HR, Payroll, and Financials requirements, so this exact
+      requisition must not enter the resume workflow.
+
+  - company: Fiserv
+    job_id: R-10404240
+    url_contains: R-10404240
+    decision: Apply
+    fit_score: 88
+    reason: >
+      reviewed transferable-cloud fit: the role's Java, SQL, CI/CD, Agile, application
+      architecture, hands-on delivery, mentoring and Atlanta-metro requirements align. The
+      candidate's professional OCI cloud architecture experience plus AWS and GCP training
+      provide a credible cloud foundation, but documents must not claim professional AWS,
+      Azure or GCP production experience.

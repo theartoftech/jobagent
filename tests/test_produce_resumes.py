@@ -124,6 +124,44 @@ def write_empty_applied_snapshot(root: Path) -> Path:
 
 
 class ProduceResumesTests(unittest.TestCase):
+    def setUp(self) -> None:
+        contact_environment = patch.dict(
+            os.environ,
+            {
+                "JOBAGENT_CANDIDATE_EMAIL": "candidate@example.com",
+                "JOBAGENT_RESUME_LINKEDIN_URL": "https://www.linkedin.com/in/candidate-profile",
+                "JOBAGENT_RESUME_PORTFOLIO_URL": "https://portfolio.example.com",
+            },
+        )
+        contact_environment.start()
+        self.addCleanup(contact_environment.stop)
+
+    def test_contact_links_read_runtime_candidate_configuration(self) -> None:
+        from scripts.produce_resumes import configured_contact_links
+
+        with patch.dict(os.environ, {
+            "JOBAGENT_CANDIDATE_EMAIL": "engineer@example.org",
+            "JOBAGENT_RESUME_LINKEDIN_URL": "https://www.linkedin.com/in/example-engineer",
+            "JOBAGENT_RESUME_PORTFOLIO_URL": "https://work.example.org",
+        }):
+            self.assertEqual(
+                (("Email", "mailto:engineer@example.org"),
+                 ("LinkedIn", "https://www.linkedin.com/in/example-engineer"),
+                 ("AI Portfolio", "https://work.example.org")),
+                configured_contact_links(),
+            )
+
+    def test_invalid_contact_configuration_is_rejected(self) -> None:
+        from scripts.produce_resumes import configured_contact_links
+
+        for key, value in (("JOBAGENT_CANDIDATE_EMAIL", ""),
+                           ("JOBAGENT_CANDIDATE_EMAIL", "invalid"),
+                           ("JOBAGENT_RESUME_LINKEDIN_URL", "javascript:alert(1)"),
+                           ("JOBAGENT_RESUME_PORTFOLIO_URL", "https://")):
+            with self.subTest(key=key, value=value), patch.dict(os.environ, {key: value}):
+                with self.assertRaises(ValueError):
+                    configured_contact_links()
+
     def test_resume_artifact_name_uses_configured_candidate_name(self) -> None:
         name = resume_artifact_name(
             "2026-07-24",
@@ -172,9 +210,99 @@ class ProduceResumesTests(unittest.TestCase):
 
             with zipfile.ZipFile(output_path, "r") as generated:
                 generated_xml = generated.read("word/document.xml")
+                settings_root = ET.fromstring(generated.read("word/settings.xml"))
+                document_root = ET.fromstring(generated_xml)
+                relationships_root = ET.fromstring(
+                    generated.read("word/_rels/document.xml.rels")
+                )
+
+            compatibility_mode = next(
+                setting
+                for setting in settings_root.findall(
+                    ".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}compatSetting"
+                )
+                if setting.attrib.get(
+                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}name"
+                )
+                == "compatibilityMode"
+            )
+            opening_summary = next(
+                paragraph
+                for paragraph in document_root.findall(
+                    ".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p"
+                )
+                if "".join(
+                    node.text or ""
+                    for node in paragraph.findall(
+                        ".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t"
+                    )
+                )
+                .startswith("Principal Engineer with over 25 years")
+            )
+            summary_spacing = opening_summary.find(
+                "./{http://schemas.openxmlformats.org/wordprocessingml/2006/main}pPr/"
+                "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}spacing"
+            )
+            contact_paragraph = next(
+                paragraph
+                for paragraph in document_root.findall(
+                    ".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p"
+                )
+                if "".join(
+                    node.text or ""
+                    for node in paragraph.findall(
+                        ".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t"
+                    )
+                )
+                == "Email • LinkedIn • AI Portfolio"
+            )
+            relationship_targets = {
+                relationship.attrib["Id"]: relationship.attrib["Target"]
+                for relationship in relationships_root.findall(
+                    "{http://schemas.openxmlformats.org/package/2006/relationships}Relationship"
+                )
+            }
+            contact_targets = {
+                "".join(
+                    node.text or ""
+                    for node in hyperlink.findall(
+                        ".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t"
+                    )
+                ): relationship_targets[
+                    hyperlink.attrib[
+                        "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
+                    ]
+                ]
+                for hyperlink in contact_paragraph.findall(
+                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}hyperlink"
+                )
+            }
 
         self.assertIn(b'xmlns:acme="urn:jobagent:word-compat"', generated_xml)
         self.assertIn(b'mc:Ignorable="w14 wp14 acme"', generated_xml)
+        self.assertEqual(
+            "15",
+            compatibility_mode.attrib[
+                "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val"
+            ],
+        )
+        self.assertIsNotNone(summary_spacing)
+        self.assertEqual(
+            "240",
+            summary_spacing.attrib[
+                "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}before"
+            ]
+            if summary_spacing is not None
+            else "",
+        )
+        self.assertEqual(
+            {
+                "Email": "mailto:candidate@example.com",
+                "LinkedIn": "https://www.linkedin.com/in/candidate-profile",
+                "AI Portfolio": "https://portfolio.example.com",
+            },
+            contact_targets,
+        )
 
     def test_senior_execution_positioning_softens_principal_summary_signal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -208,7 +336,19 @@ class ProduceResumesTests(unittest.TestCase):
         self.assertIn("Senior Software Engineer with extensive experience", rendered_text)
         self.assertNotIn("over 25 years", rendered_text)
 
-    def test_main_produces_resumes_without_automatically_producing_cover_letters(self) -> None:
+    def test_validation_rejects_legacy_word_compatibility_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            source_path = Path(tmp_dir) / "source.docx"
+            write_source_template(source_path)
+
+            with self.assertRaisesRegex(ValueError, "compatibility level 15"):
+                validate_docx(
+                    source_path=source_path,
+                    resume_path=source_path,
+                    expected_title="Senior Principal Software Engineer",
+                )
+
+    def test_main_produces_resumes_and_cover_letters_for_ready_queue(self) -> None:
         result = ResumeProductionResult(
             generated_on="2026-07-22",
             records=[],
@@ -230,7 +370,13 @@ class ProduceResumesTests(unittest.TestCase):
             patch("scripts.produce_resumes.produce_resumes", return_value=result) as producer,
             patch(
                 "scripts.produce_resumes.produce_cover_letters_for_ready_queue",
-                return_value=SimpleNamespace(records=[], manifest_path=Path("outputs/2026-07-22-cover-letter-production.json")),
+                return_value=SimpleNamespace(
+                    records=[
+                        SimpleNamespace(status="generated"),
+                        SimpleNamespace(status="existing"),
+                    ],
+                    manifest_path=Path("outputs/2026-07-22-cover-letter-production.json"),
+                ),
             ) as cover_letter_producer,
             patch("scripts.produce_resumes.write_workflow_review_html", return_value=result.workflow_html_path),
             patch("builtins.print") as printed,
@@ -238,8 +384,18 @@ class ProduceResumesTests(unittest.TestCase):
             main()
 
         self.assertTrue(producer.called)
-        cover_letter_producer.assert_not_called()
-        self.assertEqual(3, printed.call_count)
+        cover_letter_producer.assert_called_once_with(
+            resume_ready_path=Path("outputs/2026-07-22-resume-ready-jobs.md"),
+            applied_jobs_path=Path("outputs/2026-07-22-applied-jobs.json"),
+            source_dir=Path("Source Docs"),
+            resume_output_dir=Path("outputs/resumes"),
+        )
+        self.assertEqual(5, printed.call_count)
+        printed.assert_any_call("Validated 2 cover letter(s): 1 generated, 1 existing")
+        printed.assert_any_call(
+            "Wrote cover-letter production manifest: "
+            "outputs/2026-07-22-cover-letter-production.json"
+        )
 
     def test_resolve_binary_prefers_path_then_macos_fallback(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -405,6 +561,60 @@ class ProduceResumesTests(unittest.TestCase):
         self.assertIn("--network", docker_command)
         self.assertIn("none", docker_command)
         self.assertIn("jobsearchagent-libreoffice-renderer:1.0.0", docker_command)
+
+    def test_render_docx_falls_back_when_native_renderer_times_out(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            document_path = root / "resume.docx"
+            document_path.write_bytes(b"placeholder")
+            render_dir = root / "render"
+
+            def fake_run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+                self.assertIn("timeout", kwargs)
+                if command[0] == "soffice":
+                    raise subprocess.TimeoutExpired(command, kwargs["timeout"])
+                if command[0] == "docker":
+                    render_dir.mkdir(parents=True, exist_ok=True)
+                    (render_dir / "page-1.png").write_bytes(ONE_PIXEL_PNG)
+                    return subprocess.CompletedProcess(command, 0, "", "")
+                raise AssertionError(f"Unexpected renderer command: {command}")
+
+            with (
+                patch(
+                    "scripts.produce_resumes.resolve_binary",
+                    side_effect=lambda name, _fallback=None: name,
+                ),
+                patch("scripts.produce_resumes.subprocess.run", side_effect=fake_run),
+            ):
+                pages = render_docx(document_path, render_dir)
+
+        self.assertEqual(["page-1.png"], [page.name for page in pages])
+
+    def test_render_docx_can_use_docker_without_trying_native_renderer(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            document_path = root / "resume.docx"
+            document_path.write_bytes(b"placeholder")
+            render_dir = root / "render"
+            commands: list[list[str]] = []
+
+            def fake_run(command: list[str], **_kwargs: object) -> subprocess.CompletedProcess[str]:
+                commands.append(command)
+                render_dir.mkdir(parents=True, exist_ok=True)
+                (render_dir / "page-1.png").write_bytes(ONE_PIXEL_PNG)
+                return subprocess.CompletedProcess(command, 0, "", "")
+
+            with (
+                patch.dict(os.environ, {"JOBAGENT_RENDERER_MODE": "docker"}),
+                patch("scripts.produce_resumes.resolve_binary", return_value="docker"),
+                patch("scripts.produce_resumes.subprocess.run", side_effect=fake_run),
+            ):
+                pages = render_docx(document_path, render_dir)
+
+        self.assertEqual(["page-1.png"], [page.name for page in pages])
+        self.assertEqual(1, len(commands))
+        self.assertEqual("docker", commands[0][0])
+        self.assertFalse(any(command[0] == "soffice" for command in commands))
 
     def test_render_docx_reports_both_native_and_docker_failures(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

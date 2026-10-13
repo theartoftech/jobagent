@@ -131,6 +131,8 @@ class MatchNetworkHtmlTests(unittest.TestCase):
         self.assertIn("Senior Software Engineer", add_notes_section)
         self.assertNotIn("Principal Software Engineer", add_notes_section)
         self.assertNotIn("### MaybeCo", add_notes_section)
+        note = add_notes_section.split("### ExampleCo", 1)[1].strip()
+        self.assertLess(len(note), 300)
 
     def test_run_writes_html_report_alongside_markdown_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -162,11 +164,14 @@ class MatchNetworkHtmlTests(unittest.TestCase):
                 fit="80",
                 url="https://example.com/jobs/1",
             )
+            workflow_review_path = tmp_path / "2026-06-23-workflow-review.json"
+            workflow_review_path.write_text('{"generated_on":"2026-06-23","reviews":[]}', encoding="utf-8")
 
             with (
                 mock.patch.object(match_network, "read_connections", return_value=[]),
                 mock.patch.object(match_network, "parse_recommended_jobs", return_value=[sample_job]),
                 mock.patch.object(match_network, "match_contacts", return_value={"ExampleCo": []}),
+                mock.patch.object(match_network, "write_workflow_review_html") as workflow_renderer,
             ):
                 markdown_path = match_network.run(
                     linkedin_export=tmp_path / "Connections.csv",
@@ -183,6 +188,7 @@ class MatchNetworkHtmlTests(unittest.TestCase):
             rendered = html_path.read_text(encoding="utf-8")
             self.assertIn("<title>2026-06-23 - Daily Job Search</title>", rendered)
             self.assertIn("ExampleCo", rendered)
+            workflow_renderer.assert_called_once_with(review_path=workflow_review_path)
 
 
 if __name__ == "__main__":

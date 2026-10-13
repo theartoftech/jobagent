@@ -25,6 +25,10 @@ scripts/jobagent_python.sh scripts/search_jobs.py \
 
 Generated reports, networking data, and local credentials remain untracked.
 
+LinkedIn connection-request Add Notes are generated through one shared formatter
+using the approved `jhaynes-writing-voice`. The formatter enforces a 299-character
+maximum across networking reports, daily contact pages, and strict workflow detail pages.
+
 ## Privacy Boundary
 
 The repository intentionally excludes `.env.local`, `outputs/`, `Source Docs/`,
@@ -33,6 +37,13 @@ Never commit resumes, contact exports, API keys, email addresses, phone numbers,
 home-directory paths, private network addresses, or generated application artifacts.
 Public configuration uses neutral candidate examples; keep real identity and local
 paths in `.env.local` or another ignored file.
+
+Resume contact hyperlinks read `JOBAGENT_CANDIDATE_EMAIL`,
+`JOBAGENT_RESUME_LINKEDIN_URL`, and `JOBAGENT_RESUME_PORTFOLIO_URL` at runtime.
+The resume URL settings default to the shared `JOBAGENT_LINKEDIN_URL` and
+`JOBAGENT_PORTFOLIO_URL` settings when present, or to the neutral examples in
+`.env.example`. Set the resume-specific values locally to retain exact existing
+document targets without changing networking links.
 
 ## Daily Sentinel And Deep Rotation
 
@@ -120,14 +131,19 @@ artifact. It does not regenerate or duplicate the file. Requisitions with
 different job IDs remain separate roles and receive separate resumes when
 authorized.
 
-The production stage reads no discovery decision queue. It generates only
-missing DOCX files authorized by `resume-ready-jobs.md`, revalidates existing
-authorized artifacts, renders every document to page images, rejects structural
-or rendering failures before publishing new files, independently rejects any
-job matched as applied in the required snapshot, writes
-`outputs/YYYY-MM-DD-resume-production.json`, and finally regenerates the workflow
-HTML so generated resumes become links. Cover letters are a separate, explicitly
-invoked workflow and are never created by the scheduled daily job search.
+The production stage reads no discovery decision queue. For every exact,
+unapplied posting authorized by `resume-ready-jobs.md`, it produces both a
+validated resume and a validated cover letter. It reuses eligible artifacts,
+renders every document to page images, rejects structural or rendering failures,
+independently rejects any job matched as applied in the required snapshot, writes
+the dated resume and cover-letter production manifests, and finally regenerates
+the workflow HTML so both documents become links.
+
+New cover letters use the approved `jhaynes-writing-voice` professional-message
+profile: concise, cordial, purpose-first, and grounded only in verified candidate
+evidence. The cover-letter manifest records that voice. When an authorized exact
+posting has a legacy letter that does not contain the approved voice markers, the
+producer regenerates and revalidates it instead of reusing it.
 
 On macOS, the producer attempts the installed LibreOffice renderer first. If it
 fails, it uses the isolated Linux fallback image
@@ -191,14 +207,19 @@ or confirmation that the posting match was a false positive. Re-run the reviewer
 after resolving the questions; the refreshed resume-ready file remains the gate.
 The **Copy All Gap Questions** action above the queue packages every actionable
 Strong Apply, Apply, or Moderate Stretch gap job into one prompt. It waits for
-the candidate's truthful answers, persists accepted answers by exact posting URL, reruns
+the candidate's truthful answers, persists reusable skill facts once and posting-specific
+interpretations by exact posting URL, reruns
 the reviewer, summarizes which jobs moved or remain blocked, and runs production
 only from the refreshed resume-ready file. Per-job prompt buttons remain available
 for resolving a single role.
-Persist accepted answers in `candidate_workflow_profile.yml` under `gap_resolutions`, keyed
-by the exact posting URL. Supported answers are `do_not_claim`,
+Persist candidate-wide skill facts in `candidate_workflow_profile.yml` under
+`candidate_gap_resolutions`, keyed by skill. The reviewer reuses these facts across
+postings so the candidate does not answer the same experience question repeatedly.
+Persist posting-specific interpretations under `gap_resolutions`, keyed by the exact
+posting URL; these override candidate-wide facts only for that posting. Supported answers are `do_not_claim`,
 `limited_exposure: <context>`, `professional_evidence: <evidence>`, and
-`posting_false_positive: <reason>`. An answered preferred gap can clear its
+`posting_false_positive: <reason>`. The last status is valid only for a posting-specific
+answer. An answered preferred gap can clear its
 question without becoming a résumé claim; required gaps remain blocking unless
 professional evidence or a false-positive correction resolves them.
 

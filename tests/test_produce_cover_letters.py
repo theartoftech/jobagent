@@ -121,6 +121,18 @@ class ProduceCoverLettersTests(unittest.TestCase):
             cover_letter = root / "cover_letters/2026-07-24-ReadyCo-Principal-Engineer-Candidate-Name-Cover-Letter.docx"
             document = Document(cover_letter)
             paragraphs = [paragraph.text for paragraph in document.paragraphs]
+            with zipfile.ZipFile(cover_letter, "r") as archive:
+                settings_root = ET.fromstring(archive.read("word/settings.xml"))
+            compatibility_mode = next(
+                setting
+                for setting in settings_root.findall(
+                    ".//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}compatSetting"
+                )
+                if setting.attrib.get(
+                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}name"
+                )
+                == "compatibilityMode"
+            )
 
         self.assertEqual("July 26, 2026", paragraphs[0])
         signature_index = paragraphs.index("Sincerely,")
@@ -137,6 +149,12 @@ class ProduceCoverLettersTests(unittest.TestCase):
         )
         self.assertTrue(document.paragraphs[signature_index + 1].runs[0].bold)
         self.assertEqual(Pt(9.5), document.paragraphs[signature_index + 2].runs[0].font.size)
+        self.assertEqual(
+            "15",
+            compatibility_mode.attrib[
+                "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val"
+            ],
+        )
 
     def test_generated_cover_letter_links_linkedin_and_portfolio_in_sender_header(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_dir:
@@ -209,9 +227,23 @@ class ProduceCoverLettersTests(unittest.TestCase):
             self.assertIn("July 26, 2026", text)
             self.assertIn("Principal Engineer", text)
             self.assertIn("Oracle Fusion CPQ Cloud", text)
+            self.assertIn(
+                "I am applying for the Principal Engineer position at ReadyCo.",
+                text,
+            )
+            self.assertIn(
+                "I would welcome a conversation about how that experience could support ReadyCo.",
+                text,
+            )
+            self.assertNotIn("I would welcome the opportunity to discuss", text)
             self.assertEqual("generated", result.records[0].status)
             manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
             self.assertEqual("2026-07-24", manifest["authorization_run_date"])
+            self.assertEqual("jhaynes-writing-voice", manifest["writing_voice"])
+            self.assertEqual(
+                "jhaynes-writing-voice",
+                manifest["records"][0]["writing_voice"],
+            )
             self.assertEqual("validated", manifest["records"][0]["validation_status"])
 
     def test_rejects_job_not_authorized_by_strict_review(self) -> None:
@@ -236,6 +268,48 @@ class ProduceCoverLettersTests(unittest.TestCase):
                     render_fn=fake_renderer,
                 )
             self.assertFalse((root / "cover_letters").exists())
+
+    def test_existing_legacy_cover_letter_is_regenerated_in_approved_voice(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            root = Path(temporary_dir)
+            source_dir = root / "Source Docs"
+            source_dir.mkdir()
+            write_source_resume(source_dir / "Candidate_Name_SOURCE_Software_Engineering.docx")
+            ready_path = root / "2026-07-24-resume-ready-jobs.md"
+            write_ready_queue(ready_path)
+            review_path = root / "2026-07-24-workflow-review.json"
+            write_review(review_path, authorized=True)
+            output_dir = root / "cover_letters"
+            output_dir.mkdir()
+            legacy_path = output_dir / "2026-07-24-ReadyCo-Principal-Engineer-Candidate-Name-Cover-Letter.docx"
+            legacy = Document()
+            legacy.add_paragraph("July 26, 2026")
+            legacy.add_paragraph("ReadyCo")
+            legacy.add_paragraph("Principal Engineer")
+            legacy.add_paragraph("Oracle Fusion CPQ Cloud")
+            legacy.add_paragraph(
+                "I would welcome the opportunity to discuss how my experience could support ReadyCo."
+            )
+            legacy.save(legacy_path)
+
+            result = produce_cover_letters(
+                resume_ready_path=ready_path,
+                workflow_review_path=review_path,
+                applied_jobs_path=write_empty_snapshot(root),
+                source_dir=source_dir,
+                output_dir=output_dir,
+                generated_on="2026-07-26",
+                render_fn=fake_renderer,
+            )
+
+            text = "\n".join(paragraph.text for paragraph in Document(legacy_path).paragraphs)
+
+        self.assertEqual("generated", result.records[0].status)
+        self.assertIn(
+            "I would welcome a conversation about how that experience could support ReadyCo.",
+            text,
+        )
+        self.assertNotIn("I would welcome the opportunity to discuss", text)
 
 
 if __name__ == "__main__":

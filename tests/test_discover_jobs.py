@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
+from urllib.error import URLError
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "discover_jobs.py"
@@ -191,6 +193,33 @@ class BuildSearchTermsTests(unittest.TestCase):
 
 
 class CurlTimeoutTests(unittest.TestCase):
+    def test_request_json_redacts_headers_from_curl_failure(self) -> None:
+        failure = subprocess.CalledProcessError(
+            6,
+            [
+                "curl",
+                "-H",
+                "Authorization-Key: top-secret-value",
+                "https://example.com/api",
+            ],
+        )
+
+        with (
+            mock.patch.object(discover_jobs.shutil, "which", return_value="/usr/bin/curl"),
+            mock.patch.object(discover_jobs.subprocess, "run", side_effect=failure),
+        ):
+            with self.assertRaises(URLError) as raised:
+                discover_jobs.request_json(
+                    "https://example.com/api",
+                    headers={"Authorization-Key": "top-secret-value"},
+                )
+
+        message = str(raised.exception)
+        self.assertIn("exit code 6", message)
+        self.assertNotIn("top-secret-value", message)
+        self.assertNotIn("Authorization-Key", message)
+        self.assertNotIn("curl", message)
+
     def test_request_json_sets_subprocess_timeout_padding(self) -> None:
         completed_process = mock.Mock(stdout='{"ok": true}')
 
@@ -315,6 +344,36 @@ class WorkdayRuntimeControlsTests(unittest.TestCase):
         }
         self.today = discover_jobs.dt.date(2026, 6, 23)
         self.max_age_days = 30
+
+    def test_workday_detail_preserves_additional_locations(self) -> None:
+        adapter = discover_jobs.WorkdayAdapter(
+            "https://example.myworkdayjobs.com/Careers"
+        )
+        job = discover_jobs.JobPosting(
+            company="Workday",
+            title="Principal Software Engineer",
+            url=(
+                "https://example.myworkdayjobs.com/Careers/job/USA-CA-Pleasanton/"
+                "Principal-Software-Engineer_JR-1"
+            ),
+            location="USA, CA, Pleasanton",
+        )
+        response = {
+            "jobPostingInfo": {
+                "title": job.title,
+                "jobDescription": "Build distributed systems.",
+                "location": "USA, CA, Pleasanton",
+                "additionalLocations": ["USA, GA, Atlanta"],
+                "remoteType": "Flex",
+                "jobReqId": "JR-1",
+                "externalUrl": job.url,
+            }
+        }
+
+        with mock.patch.object(discover_jobs, "request_json", return_value=response):
+            detailed = adapter.fetch_detail(job, self.today, [])
+
+        self.assertEqual("USA, CA, Pleasanton; USA, GA, Atlanta", detailed.location)
 
     def test_workday_stops_after_too_many_nonproductive_searches(self) -> None:
         terms = [
@@ -850,6 +909,308 @@ jobs:
         self.assertEqual(jobs[0].source, "manual-url->workday")
         verify_mock.assert_called_once()
 
+    def test_verified_manual_metadata_enriches_sparse_verified_job(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manual_path = Path(tmp_dir) / "manual_job_urls.yml"
+            manual_path.write_text(
+                """
+jobs:
+  - company: Example Co
+    title: Platform Architect
+    url: https://jobs.ashbyhq.com/example/role-1
+    source_url: https://www.linkedin.com/jobs/view/123
+    verification_status: official_live
+    verified_on: 2026-09-09
+    posted_on: 2026-09-01
+    location: United States / Remote
+    work_model: Remote
+    job_id: role-1
+    description: Java distributed systems Kubernetes Docker APIs technical leadership mentoring
+""",
+                encoding="utf-8",
+            )
+
+            sparse_job = discover_jobs.JobPosting(
+                company="Example Co",
+                title="Platform Architect",
+                url="https://jobs.ashbyhq.com/example/role-1",
+                location="US-REMOTE / Remote",
+                work_model="Remote",
+                description="FullTime Remote",
+                decision="Skip",
+                fit_score=35,
+                source="ashby",
+                verification_status="official_live",
+            )
+            with mock.patch.object(
+                discover_jobs,
+                "job_from_ats_url",
+                return_value=sparse_job,
+            ):
+                jobs = discover_jobs.discover_manual_job_urls(
+                    manual_path=manual_path,
+                    companies=[{"name": "Example Co", "careers_url": "https://example.com/careers"}],
+                    profile=self.profile,
+                    today=discover_jobs.dt.date(2026, 9, 9),
+                    max_age_days=60,
+                    errors=[],
+                )
+
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0].description, "Java distributed systems Kubernetes Docker APIs technical leadership mentoring")
+        self.assertEqual(jobs[0].location, "United States / Remote")
+        self.assertEqual(jobs[0].posted_on, "2026-09-01")
+        self.assertEqual(jobs[0].posted_age_days, 8)
+        self.assertEqual(jobs[0].source_url, "https://www.linkedin.com/jobs/view/123")
+        self.assertTrue(any("strong keywords: java" in reason for reason in jobs[0].fit_reasons))
+
+    def test_verified_manual_metadata_survives_official_site_waf(self) -> None:
+        self.assertTrue(
+            discover_jobs.looks_like_first_party_listing_url(
+                "https://careers.ibm.com/en_US/careers/SearchJobs"
+            )
+        )
+        self.assertTrue(
+            discover_jobs.is_first_party_job_detail_url(
+                "https://careers.ibm.com/en_US/careers/JobDetail?jobId=119683"
+            )
+        )
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manual_path = Path(tmp_dir) / "manual_job_urls.yml"
+            manual_path.write_text(
+                """
+jobs:
+  - company: IBM
+    title: Senior Java Software Engineer - Legacy Modernization
+    url: https://careers.ibm.com/en_US/careers/JobDetail/Senior-Java-Software-Engineer-Legacy-Modernization/119683
+    verification_status: official_live
+    verified_on: 2026-08-27
+    posted_on: 2026-08-04
+    location: Georgia, United States
+    work_model: Hybrid
+    job_id: "119683"
+    description: Java Spring Framework SQL JPA CI/CD Git Maven Docker Jenkins TDD legacy modernization
+""",
+                encoding="utf-8",
+            )
+
+            with mock.patch.object(
+                discover_jobs,
+                "verify_public_board_hit",
+                return_value=None,
+            ), mock.patch.object(
+                discover_jobs,
+                "request_text_with_status",
+                side_effect=discover_jobs.URLError("site blocked automated recheck"),
+            ):
+                jobs = discover_jobs.discover_manual_job_urls(
+                    manual_path=manual_path,
+                    companies=[
+                        {
+                            "name": "IBM",
+                            "careers_url": "https://careers.ibm.com/en_US/careers/SearchJobs",
+                        }
+                    ],
+                    profile=self.profile,
+                    today=discover_jobs.dt.date(2026, 8, 27),
+                    max_age_days=60,
+                    errors=[],
+                )
+
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0].job_id, "119683")
+        self.assertEqual(jobs[0].posted_age_days, 23)
+        self.assertEqual(jobs[0].verification_status, "official_live")
+        self.assertEqual(jobs[0].source, "manual-url->verified-metadata")
+        self.assertIn("manually surfaced by the candidate", jobs[0].risk_flags)
+
+    def test_verified_manual_metadata_does_not_revive_soft_404_job_page(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manual_path = Path(tmp_dir) / "manual_job_urls.yml"
+            manual_path.write_text(
+                """
+jobs:
+  - company: Stripe
+    title: Staff Software Engineer, Startup Products
+    url: https://stripe.com/careers/listing/staff-software-engineer-startup-products/8146271
+    verification_status: official_live
+    verified_on: 2026-08-31
+    posted_on: 2026-08-24
+    location: United States
+    work_model: Remote
+    job_id: "8146271"
+    description: Staff software engineer backend services APIs technical leadership
+""",
+                encoding="utf-8",
+            )
+
+            with (
+                mock.patch.object(discover_jobs, "verify_public_board_hit", return_value=None),
+                mock.patch.object(
+                    discover_jobs,
+                    "request_text_with_status",
+                    return_value=(
+                        200,
+                        "<html><h1>Page not found</h1><p>We couldn't find that page.</p></html>",
+                        "https://stripe.com/careers/listing/staff-software-engineer-startup-products/8146271",
+                    ),
+                ),
+            ):
+                jobs = discover_jobs.discover_manual_job_urls(
+                    manual_path=manual_path,
+                    companies=[
+                        {
+                            "name": "Stripe",
+                            "careers_url": "https://stripe.com/jobs/search",
+                        }
+                    ],
+                    profile=self.profile,
+                    today=discover_jobs.dt.date(2026, 8, 31),
+                    max_age_days=60,
+                    errors=[],
+                )
+
+        self.assertEqual([], jobs)
+
+    def test_verified_manual_metadata_without_posted_date_uses_verification_date(self) -> None:
+        entry = {
+            "company": "Indeed",
+            "title": "Principal Software Engineer V",
+            "url": "https://www.indeed.com/viewjob?jk=aa89b4d0151e7b12",
+            "verification_status": "official_live",
+            "verified_on": "2026-08-31",
+            "location": "United States",
+            "work_model": "Remote",
+            "job_id": "47198",
+            "description": "Principal software engineer distributed systems APIs SQL technical leadership",
+        }
+
+        job = discover_jobs.job_from_verified_manual_metadata(
+            entry=entry,
+            company={"name": "Indeed", "careers_url": "https://www.indeed.com/careers"},
+            profile=self.profile,
+            today=discover_jobs.dt.date(2026, 8, 31),
+            max_age_days=60,
+        )
+
+        self.assertIsNotNone(job)
+        assert job is not None
+        self.assertEqual(job.posted_on, "2026-08-31")
+        self.assertEqual(job.posted_age_days, 0)
+        self.assertIn("official posting date unavailable", job.date_basis)
+
+    def test_manual_company_name_takes_precedence_over_generic_ats_domain_matching(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manual_path = Path(tmp_dir) / "manual_job_urls.yml"
+            manual_path.write_text(
+                """
+jobs:
+  - company: Oracle
+    title: Lead Principal Platform Software Engineer
+    url: https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/jobsearch/job/338426
+    verification_status: official_live
+    verified_on: 2026-08-27
+    posted_on: 2026-08-13
+    location: United States
+    work_model: Remote
+    job_id: "338426"
+    description: Java OCI distributed systems Kubernetes technical leadership
+""",
+                encoding="utf-8",
+            )
+
+            with mock.patch.object(discover_jobs, "job_from_ats_url", return_value=None):
+                jobs = discover_jobs.discover_manual_job_urls(
+                    manual_path=manual_path,
+                    companies=[
+                        {"name": "Salesforce", "careers_url": "https://www.salesforce.com/company/careers/jobs/"},
+                        {"name": "Oracle", "careers_url": "https://careers.oracle.com/jobs/"},
+                    ],
+                    profile=self.profile,
+                    today=discover_jobs.dt.date(2026, 8, 27),
+                    max_age_days=60,
+                    errors=[],
+                )
+
+        self.assertEqual(1, len(jobs))
+        self.assertEqual("Oracle", jobs[0].company)
+        self.assertEqual("338426", jobs[0].job_id)
+
+    def test_manual_company_name_is_preserved_when_company_is_not_configured(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manual_path = Path(tmp_dir) / "manual_job_urls.yml"
+            manual_path.write_text(
+                """
+jobs:
+  - company: Camunda
+    title: Senior Software Engineer, Backend - Distributed Systems
+    url: https://jobs.ashbyhq.com/camunda/example-job-id
+    verification_status: official_live
+    verified_on: 2026-09-04
+    location: United States East
+    work_model: Remote
+    description: Java distributed systems APIs technical leadership
+""",
+                encoding="utf-8",
+            )
+
+            with (
+                mock.patch.object(
+                    discover_jobs,
+                    "match_company_for_url",
+                    return_value={"name": "Salesforce", "careers_url": "https://example.com"},
+                ) as match_mock,
+                mock.patch.object(discover_jobs, "job_from_ats_url", return_value=None),
+                mock.patch.object(
+                    discover_jobs,
+                    "request_text_with_status",
+                    side_effect=discover_jobs.URLError("site blocked automated recheck"),
+                ),
+            ):
+                jobs = discover_jobs.discover_manual_job_urls(
+                    manual_path=manual_path,
+                    companies=[{"name": "Salesforce", "careers_url": "https://example.com"}],
+                    profile=self.profile,
+                    today=discover_jobs.dt.date(2026, 9, 4),
+                    max_age_days=60,
+                    errors=[],
+                )
+
+        match_mock.assert_not_called()
+        self.assertEqual(1, len(jobs))
+        self.assertEqual("Camunda", jobs[0].company)
+
+    def test_unverified_manual_metadata_is_not_trusted_when_fetch_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            manual_path = Path(tmp_dir) / "manual_job_urls.yml"
+            manual_path.write_text(
+                """
+jobs:
+  - company: Example Co
+    title: Principal Software Engineer
+    url: https://example.com/jobs/123
+    posted_on: 2026-08-20
+    description: Java Spring Boot
+""",
+                encoding="utf-8",
+            )
+
+            with mock.patch.object(
+                discover_jobs,
+                "verify_public_board_hit",
+                return_value=None,
+            ):
+                jobs = discover_jobs.discover_manual_job_urls(
+                    manual_path=manual_path,
+                    companies=[{"name": "Example Co", "careers_url": "https://example.com/careers"}],
+                    profile=self.profile,
+                    today=discover_jobs.dt.date(2026, 8, 27),
+                    max_age_days=60,
+                    errors=[],
+                )
+
+        self.assertEqual(jobs, [])
+
 
 class ManualFindRegressionFixtureTests(unittest.TestCase):
     def test_linkedin_miss_regressions_have_deterministic_intake_paths(self) -> None:
@@ -1273,6 +1634,296 @@ class ADPAdapterTests(unittest.TestCase):
 
 
 class FirstPartyListingAdapterTests(unittest.TestCase):
+    def test_strategic_oracle_cpq_partner_boards_use_supported_adapters(self) -> None:
+        expected = {
+            "https://careers.techmahindra.com/currentopportunity.aspx": "firstparty-listing",
+            "https://careers.wipro.com/viewalljobs/?locale=en_US": "firstparty-listing",
+            "https://careers.dxc.com/": "firstparty-listing",
+            "https://www.trinamix.com/careers/": "firstparty-listing",
+            "https://jobs.birlasoft.com/go/US/684844/": "firstparty-listing",
+            "https://centroid.applytojob.com/apply": "firstparty-listing",
+            "https://www.inoapps.com/join-inoapps/": "firstparty-listing",
+            "https://argano.com/careers/open-positions.html": "firstparty-listing",
+            "https://infovity.com/careers/": "firstparty-listing",
+            "https://vigilant-inc.com/careers/": "firstparty-listing",
+            "https://www.zensar.com/careers": "firstparty-listing",
+            "https://nexinfo.com/careers/": "firstparty-listing",
+            "https://www.jadeglobal.com/careers": "firstparty-listing",
+            "https://cherryroad.com/who-we-are/careers/": "firstparty-listing",
+            "https://terillium.com/careers/": "firstparty-listing",
+            "https://speridiantechnologies.applytojob.com/apply": "firstparty-listing",
+        }
+
+        for url, adapter_name in expected.items():
+            with self.subTest(url=url):
+                adapter = discover_jobs.adapter_for_url(url)
+                self.assertIsNotNone(adapter)
+                self.assertEqual(adapter_name, adapter.name)
+
+    def test_oracle_consulting_boards_use_supported_discovery_adapters(self) -> None:
+        expected = {
+            "https://www.kpmguscareers.com/job-search/": "firstparty-listing",
+            "https://huron.wd1.myworkdayjobs.com/huroncareers": "workday",
+            "https://jobs.us.pwc.com/oracle-jobs": "firstparty-listing",
+            "https://www.accenture.com/us-en/careers": "firstparty-listing",
+            "https://careers.hcltech.com/go/United-States-Experienced/9557855/": "firstparty-listing",
+            "https://www.infosys.com/careers/americas/apply.html": "firstparty-listing",
+            "https://apply.deloitte.com/en_US/careers": "firstparty-listing",
+            "https://careers.ltm.com/viewalljobs/": "firstparty-listing",
+            "https://www.capgemini.com/careers/join-capgemini/job-search/": "firstparty-listing",
+            "https://external-mythics.icims.com/jobs/search?hashed=-435768531&ss=1": "icims",
+            "https://www.logicom.net/careers/head-office/vacancies-list/": "firstparty-listing",
+            "https://atawayglobal.catsone.com/careers/97420/": "firstparty-listing",
+        }
+
+        for url, adapter_name in expected.items():
+            with self.subTest(url=url):
+                adapter = discover_jobs.adapter_for_url(url)
+                self.assertIsNotNone(adapter)
+                self.assertEqual(adapter_name, adapter.name)
+
+    def test_oracle_consulting_job_detail_urls_are_recognized(self) -> None:
+        urls = [
+            "https://www.kpmguscareers.com/jobdetail/?jobId=134344",
+            "https://careers.hcltech.com/job/Subject-Matter-Expert/87475-en_US/",
+            "https://careers.ltm.com/job/Atlanta-Oracle-CPQ-Architect-GA/123456/",
+            "https://www.logicom.net/careers/head-office/other/cloud-solutions-architect/",
+            "https://atawayglobal.catsone.com/careers/97420/jobs/16788418-manager-practice-erp-oracle-cloud-hf",
+        ]
+
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertTrue(discover_jobs.is_first_party_job_detail_url(url))
+
+    def test_aon_listing_uses_public_jobs_api(self) -> None:
+        company = {
+            "name": "Aon",
+            "careers_url": "https://jobs.aon.com/jobs",
+            "title_aliases": ["Principal Software Engineer"],
+        }
+        profile = {
+            "title_targets": ["Principal Software Engineer"],
+            "strong_keywords": ["java", "backend", "api"],
+            "acceptable_secondary_keywords": ["integration"],
+            "exclude_if_primary_focus": [],
+        }
+        response = {
+            "jobs": [
+                {
+                    "data": {
+                        "slug": "12345",
+                        "req_id": "12345",
+                        "title": "Principal Software Engineer",
+                        "description": "Java backend APIs and enterprise integrations.",
+                        "full_location": "Atlanta, Georgia, United States",
+                        "tags4": ["Hybrid"],
+                        "posted_date": "2026-08-27T13:32:00+0000",
+                        "meta_data": {
+                            "canonical_url": "https://jobs.aon.com/jobs/12345?lang=en-us"
+                        },
+                    }
+                }
+            ]
+        }
+
+        with mock.patch.object(discover_jobs, "request_json", return_value=response) as request_mock:
+            jobs = discover_jobs.FirstPartyListingAdapter(company["careers_url"]).discover(
+                company,
+                profile,
+                discover_jobs.dt.date(2026, 8, 29),
+                60,
+                [],
+            )
+
+        self.assertEqual(1, len(jobs))
+        self.assertEqual("12345", jobs[0].job_id)
+        self.assertEqual("2026-08-27", jobs[0].posted_on)
+        self.assertEqual("Hybrid", jobs[0].work_model)
+        self.assertIn("keywords=Principal+Software+Engineer", request_mock.call_args_list[0].args[0])
+
+    def test_oracle_recruiting_listing_uses_public_requisition_api(self) -> None:
+        listing_url = (
+            "https://egup.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/"
+            "en/sites/CX/requisitions/"
+        )
+        company = {
+            "name": "Vertiv",
+            "careers_url": listing_url,
+            "title_aliases": ["Principal Software Engineer"],
+        }
+        profile = {
+            "title_targets": ["Principal Software Engineer"],
+            "strong_keywords": ["java", "backend", "api"],
+            "acceptable_secondary_keywords": ["integration"],
+            "exclude_if_primary_focus": [],
+        }
+        response = {
+            "items": [
+                {
+                    "requisitionList": [
+                        {
+                            "Id": "20279999",
+                            "Title": "Principal Software Engineer",
+                            "PostedDate": "2026-08-28",
+                            "PrimaryLocation": "Atlanta, GA, United States",
+                            "WorkplaceType": "Hybrid",
+                            "ShortDescriptionStr": "Java backend APIs and enterprise integrations.",
+                            "ExternalQualificationsStr": "Senior technical leadership.",
+                            "ExternalResponsibilitiesStr": "Own platform architecture.",
+                        }
+                    ]
+                }
+            ]
+        }
+
+        with mock.patch.object(discover_jobs, "request_json", return_value=response) as request_mock:
+            jobs = discover_jobs.FirstPartyListingAdapter(listing_url).discover(
+                company,
+                profile,
+                discover_jobs.dt.date(2026, 8, 29),
+                60,
+                [],
+            )
+
+        self.assertEqual(1, len(jobs))
+        self.assertEqual("20279999", jobs[0].job_id)
+        self.assertEqual("2026-08-28", jobs[0].posted_on)
+        self.assertEqual("Hybrid", jobs[0].work_model)
+        self.assertEqual(
+            "https://egup.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/job/20279999",
+            jobs[0].url,
+        )
+        self.assertIn("recruitingCEJobRequisitions", request_mock.call_args_list[0].args[0])
+        self.assertIn("keyword%3DPrincipal+Software+Engineer", request_mock.call_args_list[0].args[0])
+
+    def test_oracle_recruiting_hydrates_empty_summary_once_per_requisition(self) -> None:
+        listing_url = (
+            "https://ebwh.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/"
+            "en/sites/CX_1001/requisitions/"
+        )
+        company = {
+            "name": "Macy's",
+            "careers_url": listing_url,
+            "title_aliases": ["Principal Software Engineer"],
+        }
+        profile = {
+            "title_targets": ["Principal Software Engineer"],
+            "strong_keywords": ["java", "backend", "api"],
+            "acceptable_secondary_keywords": ["integration"],
+            "exclude_if_primary_focus": [],
+        }
+        summary_response = {
+            "items": [
+                {
+                    "requisitionList": [
+                        {
+                            "Id": "88267",
+                            "Title": "Principal, Engineer - MarTech",
+                            "PostedDate": "2026-07-07",
+                            "PrimaryLocation": "Johns Creek, GA, United States",
+                            "WorkplaceType": "",
+                            "ShortDescriptionStr": "",
+                            "ExternalQualificationsStr": None,
+                            "ExternalResponsibilitiesStr": None,
+                        }
+                    ]
+                }
+            ]
+        }
+        detail_response = {
+            "items": [
+                {
+                    "Id": "88267",
+                    "Title": "Principal, Engineer - MarTech",
+                    "ExternalPostedStartDate": "2026-07-07T11:53:33+00:00",
+                    "PrimaryLocation": "Johns Creek, GA, United States",
+                    "WorkplaceType": "On-site",
+                    "ExternalDescriptionStr": (
+                        "Expert Java architecture with required Python, Adobe MarTech, and GCP."
+                    ),
+                    "ExternalQualificationsStr": "Eight years of hands-on Java experience.",
+                    "ExternalResponsibilitiesStr": "Lead enterprise platform implementation.",
+                }
+            ]
+        }
+
+        def response_for(url: str) -> dict[str, object]:
+            if "recruitingCEJobRequisitionDetails" in url:
+                return detail_response
+            return summary_response
+
+        with mock.patch.object(discover_jobs, "request_json", side_effect=response_for) as request_mock:
+            jobs = discover_jobs.FirstPartyListingAdapter(listing_url).discover(
+                company,
+                profile,
+                discover_jobs.dt.date(2026, 9, 7),
+                60,
+                [],
+            )
+
+        self.assertEqual(1, len(jobs))
+        self.assertEqual("88267", jobs[0].job_id)
+        self.assertEqual("Onsite", jobs[0].work_model)
+        self.assertIn("Adobe MarTech", jobs[0].description)
+        detail_calls = [
+            call.args[0]
+            for call in request_mock.call_args_list
+            if "recruitingCEJobRequisitionDetails" in call.args[0]
+        ]
+        self.assertEqual(1, len(detail_calls))
+        self.assertIn("Id%3D88267", detail_calls[0])
+
+    def test_salesforce_shared_board_is_supported_as_first_party(self) -> None:
+        listing_url = (
+            "https://www.salesforce.com/company/careers/jobs/"
+            "?search=MuleSoft&country=United%20States%20of%20America&pagesize=20"
+        )
+        detail_url = (
+            "https://www.salesforce.com/company/careers/jobs/JR345537/"
+            "software-engineer-mts-automation-mulesoft-agentic-cloud-services/"
+        )
+
+        self.assertTrue(discover_jobs.looks_like_first_party_listing_url(listing_url))
+        self.assertTrue(discover_jobs.is_first_party_job_detail_url(detail_url))
+        self.assertFalse(discover_jobs.looks_like_icims_url(listing_url))
+        self.assertEqual(discover_jobs.adapter_for_url(listing_url).name, "firstparty-listing")
+
+    def test_cognizant_is_first_party_and_not_misclassified_as_icims(self) -> None:
+        listing_url = "https://careers.cognizant.com/us-en/jobs/"
+        detail_url = (
+            "https://careers.cognizant.com/us-en/jobs/00070025471/"
+            "senior-lead-engineer-java/"
+        )
+
+        self.assertTrue(discover_jobs.looks_like_first_party_listing_url(listing_url))
+        self.assertTrue(discover_jobs.is_first_party_job_detail_url(detail_url))
+        self.assertFalse(discover_jobs.looks_like_icims_url(listing_url))
+        self.assertEqual(discover_jobs.adapter_for_url(listing_url).name, "firstparty-listing")
+
+    def test_cognizant_cloudflare_challenge_is_reported_as_an_adapter_error(self) -> None:
+        company = {"name": "Cognizant", "careers_url": "https://careers.cognizant.com/us-en/jobs/"}
+        errors: list[discover_jobs.DiscoveryError] = []
+        challenge_page = "<html><title>Just a moment...</title>Enable JavaScript and cookies to continue</html>"
+
+        with mock.patch.object(discover_jobs, "request_text", return_value=challenge_page):
+            jobs = discover_jobs.FirstPartyListingAdapter(company["careers_url"]).discover(
+                company,
+                {
+                    "title_targets": ["Principal Software Engineer"],
+                    "strong_keywords": ["java"],
+                    "acceptable_secondary_keywords": [],
+                    "exclude_if_primary_focus": [],
+                },
+                discover_jobs.dt.date(2026, 8, 27),
+                60,
+                errors,
+            )
+
+        self.assertEqual(jobs, [])
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].source, "firstparty-listing")
+        self.assertIn("access challenge", errors[0].message)
+
     def test_listing_page_skips_malformed_candidate_urls(self) -> None:
         company = {"name": "Stripe", "careers_url": "https://stripe.com/jobs"}
         profile = {
@@ -1347,6 +1998,43 @@ class FirstPartyListingAdapterTests(unittest.TestCase):
             jobs[0].url,
             "https://stripe.com/jobs/listing/staff-software-engineer-stream-compute/7767063",
         )
+
+    def test_salesforce_listing_discovers_jr_detail_urls(self) -> None:
+        listing_url = (
+            "https://www.salesforce.com/company/careers/jobs/"
+            "?search=Slack&country=United%20States%20of%20America&pagesize=20"
+        )
+        detail_url = (
+            "https://www.salesforce.com/company/careers/jobs/JR341884/"
+            "sr-data-engineer-enterprise-slack/"
+        )
+        listing_page = f'<a href="{detail_url}">Sr. Data Engineer, Enterprise - Slack</a>'
+        detail_page = """
+        <html><head><title>Sr. Data Engineer, Enterprise - Slack</title></head>
+        <body>United States. Software engineering and distributed data systems.</body></html>
+        """
+        company = {"name": "Slack", "careers_url": listing_url}
+        profile = {
+            "title_targets": ["Staff Software Engineer"],
+            "strong_keywords": ["software", "distributed"],
+            "acceptable_secondary_keywords": [],
+            "exclude_if_primary_focus": [],
+        }
+
+        def fake_request_text(url: str, *, timeout: int = 10) -> str:
+            return listing_page if url == listing_url else detail_page
+
+        with mock.patch.object(discover_jobs, "request_text", side_effect=fake_request_text):
+            jobs = discover_jobs.FirstPartyListingAdapter(listing_url).discover(
+                company,
+                profile,
+                discover_jobs.dt.date(2026, 8, 27),
+                60,
+                [],
+            )
+
+        self.assertEqual([job.url for job in jobs], [detail_url])
+        self.assertEqual(jobs[0].job_id, "JR341884")
 
 
 class IntuitAdapterTests(unittest.TestCase):
@@ -1438,6 +2126,29 @@ class HighSignalCompanyConfigTests(unittest.TestCase):
             )
         )
 
+    def test_oracle_cpq_customer_boards_use_supported_discovery_adapters(self) -> None:
+        registry = discover_jobs.load_ats_registry(Path("ats_registry.yml"))
+
+        for company_name in ("Vertiv", "DNV", "Aon", "Cloud Software Group"):
+            urls = discover_jobs.ats_registry_urls_for_company(registry, {"name": company_name})
+            self.assertEqual(1, len(urls), company_name)
+            self.assertIsInstance(
+                discover_jobs.adapter_for_url(urls[0]),
+                discover_jobs.FirstPartyListingAdapter,
+                company_name,
+            )
+
+    def test_oracle_cpq_customer_job_detail_urls_are_recognized(self) -> None:
+        detail_urls = (
+            "https://egup.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/job/12345",
+            "https://jobs.dnv.com/job-search/group/software/atlanta/senior-software-engineer/123",
+            "https://jobs.aon.com/jobs/12345?lang=en-us",
+            "https://careers.cloud.com/jobs/principal-software-engineer-remote-united-states",
+        )
+
+        for url in detail_urls:
+            self.assertTrue(discover_jobs.is_first_party_job_detail_url(url), url)
+
 
 class AtsRegistryConfigTests(unittest.TestCase):
     def test_high_value_registry_entries_resolve_to_supported_adapters(self) -> None:
@@ -1465,6 +2176,33 @@ class AtsRegistryConfigTests(unittest.TestCase):
 
 
 class JobOverrideTests(unittest.TestCase):
+    def test_apply_job_overrides_stops_using_expired_company_skip(self) -> None:
+        job = discover_jobs.JobPosting(
+            company="Block",
+            title="Staff Software Engineer",
+            url="https://block.xyz/careers/jobs/123",
+            fit_score=92,
+            decision="Apply",
+            risk_flags=[],
+        )
+        overrides = [
+            {
+                "company": "Block",
+                "decision": "Skip",
+                "fit_score": "0",
+                "expires_on": "2026-10-28",
+            }
+        ]
+
+        discover_jobs.apply_job_overrides(
+            [job],
+            overrides,
+            as_of=discover_jobs.dt.date(2026, 10, 29),
+        )
+
+        self.assertEqual("Apply", job.decision)
+        self.assertEqual(92, job.fit_score)
+
     def test_apply_job_overrides_forces_reviewed_stretch_job_to_skip(self) -> None:
         job = discover_jobs.JobPosting(
             company="NCR Voyix",
@@ -1488,6 +2226,24 @@ class JobOverrideTests(unittest.TestCase):
         self.assertEqual(job.decision, "Skip")
         self.assertEqual(job.fit_score, 35)
         self.assertIn("reviewed stretch: requires 7+ years C++ on Windows", job.risk_flags)
+
+    def test_apply_job_overrides_supports_title_contains_skip(self) -> None:
+        job = discover_jobs.JobPosting(
+            company="Hightouch",
+            title="Solutions Engineer, Enterprise East (Pre-Sales)",
+            url="https://example.com/hightouch/1",
+            fit_score=90,
+            decision="Apply",
+            risk_flags=[],
+        )
+
+        discover_jobs.apply_job_overrides(
+            [job],
+            [{"title_contains": "pre-sales", "decision": "Skip", "fit_score": "0"}],
+        )
+
+        self.assertEqual("Skip", job.decision)
+        self.assertEqual(0, job.fit_score)
 
 
 class DiscoveryCachingTests(unittest.TestCase):
@@ -1542,7 +2298,7 @@ class DiscoveryCachingTests(unittest.TestCase):
             )
             second = discover_jobs.job_from_ats_url(
                 company=self.company,
-                official_url="https://boards.greenhouse.io/exampleco/jobs/999",
+                official_url="https://boards.greenhouse.io/exampleco/jobs/99999",
                 target_title="Senior Software Engineer",
                 hit=discover_jobs.PublicBoardHit(
                     company="ExampleCo",
@@ -1560,8 +2316,51 @@ class DiscoveryCachingTests(unittest.TestCase):
             )
 
         self.assertIsNotNone(first)
-        self.assertIsNotNone(second)
+        self.assertIsNone(second)
         adapter.discover.assert_called_once()
+
+    def test_job_from_ats_url_prefers_exact_requisition_over_duplicate_title(self) -> None:
+        requested_url = "https://jobs.ashbyhq.com/camunda/92ef5a95-5d25-44e6-aa5b-58e8549f8520"
+        requested_job = discover_jobs.JobPosting(
+            company="Camunda",
+            title="Senior Software Engineer, Backend - Distributed Systems",
+            url=requested_url,
+            job_id="92ef5a95-5d25-44e6-aa5b-58e8549f8520",
+            description="Java distributed systems APIs",
+        )
+        wrong_job = discover_jobs.JobPosting(
+            company="Camunda",
+            title="Senior Software Engineer, Backend - Distributed Systems",
+            url="https://jobs.ashbyhq.com/camunda/af27a3de-d3ba-40dd-976f-9767bdc1e7e8",
+            job_id="af27a3de-d3ba-40dd-976f-9767bdc1e7e8",
+            description="Go reliability engineering",
+        )
+        adapter = mock.Mock()
+        adapter.name = "ashby"
+        adapter.discover.return_value = [wrong_job, requested_job]
+
+        with mock.patch.object(discover_jobs, "adapter_for_url", return_value=adapter):
+            result = discover_jobs.job_from_ats_url(
+                company={"name": "Camunda", "careers_url": ""},
+                official_url=requested_url,
+                target_title=requested_job.title,
+                hit=discover_jobs.PublicBoardHit(
+                    company="Camunda",
+                    source="manual-url",
+                    query="manual_job_urls.yml",
+                    target_title=requested_job.title,
+                    title=requested_job.title,
+                    url=requested_url,
+                ),
+                profile=self.profile,
+                today=self.today,
+                max_age_days=self.max_age_days,
+                errors=[],
+            )
+
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertEqual(requested_url, result.url)
 
     def test_discover_company_dedupes_by_ats_identity_not_raw_url(self) -> None:
         company = {"name": "ExampleCo", "careers_url": "https://example.com/careers"}
@@ -2359,6 +3158,34 @@ class XPostDiscoveryTests(unittest.TestCase):
         self.assertLess(len(payload["jobs"][0]["description"]), 5000)
         self.assertGreater(len(payload["jobs"][0]["description"]), len(payload["jobs"][1]["description"]))
         self.assertLess(len(payload["jobs"][1]["description"]), 5000)
+
+    def test_compact_apply_description_preserves_role_intro_and_trailing_qualifications(self) -> None:
+        description = (
+            "Position Purpose: Lead enterprise platform architecture. "
+            + ("delivery context " * 400)
+            + "Minimum Qualifications: Java, Spring Boot, REST APIs, and SQL are required."
+        )
+        job = discover_jobs.JobPosting(
+            company="ExampleCo",
+            title="Principal Software Engineer",
+            url="https://example.com/jobs/compact",
+            description=description,
+            decision="Apply",
+            source="workday",
+        )
+
+        payload = discover_jobs.build_discovered_jobs_payload(
+            jobs=[job],
+            errors=[],
+            generated_on="2026-08-25",
+            max_age_days=60,
+        )
+
+        compacted = payload["jobs"][0]["description"]
+        self.assertLessEqual(len(compacted), discover_jobs.MAX_COMPACT_DESCRIPTION_CHARS)
+        self.assertTrue(compacted.startswith("Position Purpose:"))
+        self.assertIn("[middle omitted]", compacted)
+        self.assertIn("Minimum Qualifications: Java, Spring Boot, REST APIs, and SQL are required.", compacted)
 
     def test_write_x_post_summary_outputs_verified_and_manual_sections(self) -> None:
         manual_lead = discover_jobs.XPostLead(

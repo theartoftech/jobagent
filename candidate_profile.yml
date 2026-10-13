@@ -1,4 +1,23 @@
 target_profile:
+  unsupported_required_languages:
+    - German
+  hybrid_allowed_metro_tokens:
+    - Atlanta
+    - Alpharetta
+    - Sandy Springs
+    - Dunwoody
+    - Roswell
+    - Marietta
+    - Smyrna
+    - Decatur
+    - Brookhaven
+    - Norcross
+    - Peachtree Corners
+    - Duluth
+    - Johns Creek
+    - Kennesaw
+    - Douglasville
+    - Lithia Springs
   title_targets:
     - Senior Principal Software Engineer
     - Principal Software Engineer
@@ -148,7 +167,6 @@ target_profile:
     - Model Context Protocol
     - MCP
     - responsible AI awareness
-    - presales support
     - technical discovery
     - client workshops
     - implementation handoff
@@ -181,7 +199,8 @@ target_profile:
     - DevOps-only
     - DevSecOps-only
     - data warehouse architect
-    - sales-only presales
+    - pre-sales role
+    - presales role
     - account management
     - project management without technical ownership
     - non-technical business advisory
@@ -215,8 +234,7 @@ target_profile:
     target_minimum: 150000
     unknown_compensation_policy: Do not reject an otherwise strong match solely because compensation is unpublished
 
-  excluded_companies:
-    - Oracle
+  excluded_companies: []
 
   travel:
     acceptable:

@@ -90,6 +90,14 @@ class MarkAppliedJobsTests(unittest.TestCase):
         self.assertEqual("96922204080", extract_requisition_id(trust_and_safety))
         self.assertEqual("98200474400", extract_requisition_id(traffic))
 
+    def test_extracts_cvs_style_requisition_id_without_separator_after_r(self) -> None:
+        url = (
+            "https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers/job/"
+            "IL---Work-from-home/Staff-Software-Development-Engineer_R0993767-1"
+        )
+
+        self.assertEqual("R0993767-1", extract_requisition_id(url))
+
     def test_company_title_fallback_remains_available_without_requisition_ids(self) -> None:
         report_job = ReportJob(
             company="ExampleCo",

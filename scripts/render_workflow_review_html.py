@@ -14,12 +14,21 @@ from typing import Any, Mapping
 from urllib.parse import quote, urlparse
 
 if __package__:
+    from scripts.linkedin_connection_notes import (
+        LINKEDIN_CONNECTION_NOTE_MAX_CHARS,
+        build_linkedin_connection_note,
+    )
+    from scripts.render_daily_job_search_html import NetworkingCompanySection, parse_networking_markdown
+    from scripts.mark_applied_jobs import extract_requisition_id
     from scripts.resume_artifacts import (
         load_validated_resume_artifacts,
         resolve_manifest_artifact_path,
         resume_artifact_name,
     )
 else:
+    from linkedin_connection_notes import LINKEDIN_CONNECTION_NOTE_MAX_CHARS, build_linkedin_connection_note
+    from render_daily_job_search_html import NetworkingCompanySection, parse_networking_markdown
+    from mark_applied_jobs import extract_requisition_id
     from resume_artifacts import load_validated_resume_artifacts, resolve_manifest_artifact_path, resume_artifact_name
 
 
@@ -36,6 +45,7 @@ DECISION_ORDER = (
 class ReviewRecord:
     company: str
     title: str
+    job_id: str
     url: str
     location: str
     work_model: str
@@ -108,10 +118,12 @@ def boolean_value(item: dict[str, Any], key: str) -> bool:
 
 
 def parse_review(item: dict[str, Any]) -> ReviewRecord:
+    url = string_value(item.get("url"))
     return ReviewRecord(
         company=string_value(item.get("company")),
         title=string_value(item.get("title")),
-        url=string_value(item.get("url")),
+        job_id=string_value(item.get("job_id")) or extract_requisition_id(url),
+        url=url,
         location=string_value(item.get("location")),
         work_model=string_value(item.get("work_model")),
         source_decision=string_value(item.get("source_decision")),
@@ -214,6 +226,8 @@ def resolution_prompt(record: ReviewRecord) -> str:
         "For each gap question, answer with truthful professional evidence, limited exposure, "
         "do not claim, or posting false positive.\n\n"
         f"Questions:\n{questions}\n\n"
+        "Save candidate-wide skill facts under candidate_gap_resolutions so they are answered once. "
+        "Use the exact posting URL under gap_resolutions only for posting-specific interpretations.\n\n"
         "Then re-run scripts/review_job_fit.py and confirm this job appears in "
         "outputs/YYYY-MM-DD-resume-ready-jobs.md before generating a resume or cover letter."
     )
@@ -260,8 +274,10 @@ def batch_resolution_prompt(records: list[ReviewRecord], generated_on: str) -> s
         "posting_false_positive: <reason>. Unanswered questions must remain unresolved.\n\n"
         + "\n\n".join(job_blocks)
         + "\n\nAfter the candidate answers:\n"
-        "1. Validate every answer and save only accepted answers in candidate_workflow_profile.yml under gap_resolutions, "
-        "keyed by each exact posting URL. Never apply an answer to a different job URL automatically.\n"
+        "1. Validate every answer. Save candidate-wide skill facts in candidate_workflow_profile.yml under "
+        "candidate_gap_resolutions so the candidate answers each factual experience question once. Save only "
+        "posting-specific interpretations under gap_resolutions, keyed by the exact posting URL. "
+        "Never store posting_false_positive as a candidate-wide answer.\n"
         f"2. Re-run scripts/review_job_fit.py for {generated_on} using outputs/{generated_on}-discovered-jobs.json "
         f"and outputs/{generated_on}-applied-jobs.json.\n"
         "3. Report separately which jobs moved to Resume Ready, which still need answers, and which were "
@@ -304,7 +320,7 @@ def resume_artifact_link(
         artifact_name = resume_artifact_name(generated_on, record.company, record.title)
         artifact_path = resume_dir / artifact_name
     if not artifact_path.is_file() or artifact_path.stat().st_size == 0:
-        return '<span class="resume-missing">Not generated</span>'
+        return '<span class="resume-missing">Resume not generated</span>'
     relative_path = Path(os.path.relpath(artifact_path, start=link_from_dir or resume_dir.parent))
     href = quote(relative_path.as_posix(), safe="/")
     return f'<a class="resume-link" href="{escape(href)}">Open generated resume</a>'
@@ -340,7 +356,7 @@ def cover_letter_artifact_link(
 ) -> str:
     artifact_path = produced_artifacts.get((record.company.casefold(), record.url))
     if artifact_path is None or not artifact_path.is_file() or artifact_path.stat().st_size == 0:
-        return '<span class="resume-missing">Not generated</span>'
+        return '<span class="resume-missing">Cover letter not generated</span>'
     relative_path = Path(os.path.relpath(artifact_path, start=link_from_dir or artifact_path.parents[1]))
     href = quote(relative_path.as_posix(), safe="/")
     return f'<a class="resume-link" href="{escape(href)}">Open cover letter</a>'
@@ -496,6 +512,82 @@ def render_detail_list(items: list[str], *, empty_text: str = "None") -> str:
     return "<ul>" + "".join(f"<li>{escape(item)}</li>" for item in items) + "</ul>"
 
 
+def normalize_company_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
+
+
+def load_networking_sections(path: Path) -> dict[str, NetworkingCompanySection]:
+    if not path.exists():
+        return {}
+    sections, _ = parse_networking_markdown(path.read_text(encoding="utf-8"))
+    return {normalize_company_key(company): section for company, section in sections.items()}
+
+
+def recruiter_message(record: ReviewRecord, contact_name: str = "") -> str:
+    return build_linkedin_connection_note(
+        company=record.company,
+        role=record.title,
+        contact_name=contact_name,
+    )
+
+
+def render_linkedin_outreach(
+    record: ReviewRecord,
+    networking: NetworkingCompanySection | None,
+) -> str:
+    contacts = networking.contacts[:8] if networking is not None else []
+    if contacts:
+        rows: list[str] = []
+        for contact in contacts:
+            parsed = urlparse(contact.linkedin_url)
+            profile = (
+                f'<a href="{escape(contact.linkedin_url)}" target="_blank" '
+                'rel="noopener noreferrer">Open profile</a>'
+                if parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+                else '<span class="empty-copy">Profile unavailable</span>'
+            )
+            rows.append(
+                "<tr>"
+                f"<td><strong>{escape(contact.name)}</strong></td>"
+                f"<td>{escape(contact.current_role or 'Role unavailable')}</td>"
+                f"<td>{escape(contact.current_company or record.company)}</td>"
+                f"<td>{escape(contact.match_source or 'networking report')}</td>"
+                f"<td>{escape(contact.why_reach_out or 'Current-company contact')}</td>"
+                f"<td>{profile}</td>"
+                "</tr>"
+            )
+        contacts_html = (
+            "<h3>Known contacts</h3>"
+            '<div class="contact-table-wrap"><table class="contact-table"><thead><tr>'
+            "<th>Name</th><th>Role</th><th>Company</th><th>Confirmation</th>"
+            "<th>Why reach out</th><th>LinkedIn</th>"
+            f"</tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
+        )
+        message_name = contacts[0].name
+        message_heading = f"Suggested message for {message_name}"
+    else:
+        contacts_html = (
+            '<p class="outreach-notice">No matching current-company LinkedIn contacts were found '
+            "in the latest networking report. Use the introductory message with a recruiter or "
+            "hiring manager you find on LinkedIn.</p>"
+        )
+        message_name = ""
+        message_heading = "Suggested LinkedIn connection note"
+
+    message = recruiter_message(record, message_name)
+
+    return (
+        '<section class="section wide linkedin-outreach"><h2>LinkedIn outreach</h2>'
+        f"{contacts_html}<h3>{escape(message_heading)}</h3>"
+        '<div class="outreach-message">'
+        f'<div class="message-text">{escape(message)}</div>'
+        '<div class="message-actions"><button class="copy-outreach" type="button">Copy message</button>'
+        f'<span class="message-count">{len(message)} / {LINKEDIN_CONNECTION_NOTE_MAX_CHARS} characters</span>'
+        '<span class="copy-status" role="status" aria-live="polite"></span></div>'
+        "</div></section>"
+    )
+
+
 def render_workflow_detail_document(
     *,
     generated_on: str,
@@ -504,6 +596,7 @@ def render_workflow_detail_document(
     detail_dir: Path,
     produced_artifacts: Mapping[tuple[str, str], Path],
     produced_cover_letters: Mapping[tuple[str, str], Path],
+    networking: NetworkingCompanySection | None,
 ) -> str:
     resolved_gap_items = [f"{gap}: {answer}" for gap, answer in record.resolved_gaps.items()]
     location = f"{record.location or 'Unknown'} / {record.work_model or 'Unknown'}"
@@ -558,6 +651,19 @@ li + li {{ margin-top:5px; }}
 .positioning {{ margin:12px 0 0; padding:15px; border-left:4px solid var(--amber); background:#fff8e8; white-space:pre-line; }}
 .final-action {{ padding:15px; border-left:4px solid var(--green); background:#edf8f2; font-weight:700; }}
 .empty-copy {{ margin:0; color:var(--muted); }}
+.outreach-notice {{ margin:0 0 18px; padding:13px 15px; border-left:4px solid #0b63a5; background:#edf6fc; }}
+.contact-table-wrap {{ overflow-x:auto; }}
+.contact-table {{ width:100%; min-width:900px; border-collapse:collapse; }}
+.contact-table th,.contact-table td {{ padding:10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }}
+.contact-table th {{ color:#344054; background:#edf3f8; font-size:12px; text-transform:uppercase; }}
+.contact-table a {{ color:#0b63a5; font-weight:750; }}
+.outreach-message {{ padding:16px; border:1px solid #b9d8e8; background:#f7fbfe; }}
+.message-text {{ white-space:pre-wrap; }}
+.message-actions {{ display:flex; align-items:center; gap:12px; margin-top:14px; }}
+.copy-outreach {{ min-height:38px; padding:8px 12px; border:1px solid #0b63a5; border-radius:6px; color:#fff; background:#0b63a5; font:inherit; font-weight:750; cursor:pointer; }}
+.copy-outreach:hover {{ background:#084f83; }}
+.copy-status {{ color:var(--muted); font-size:13px; }}
+.message-count {{ color:var(--muted); font-size:13px; }}
 .job-link,.resume-link {{ color:#0b63a5; font-weight:750; }}
 @media (max-width:850px) {{ .summary-grid,.content-grid {{ grid-template-columns:1fr; }} .section.wide {{ grid-column:auto; }} main {{ width:min(100% - 20px,1320px); }} }}
 </style>
@@ -575,6 +681,7 @@ li + li {{ margin-top:5px; }}
   </div>
 </header>
 <dl class="summary-grid">
+  <div class="summary-item"><dt>Job ID</dt><dd>{escape(record.job_id or 'Not provided')}</dd></div>
   <div class="summary-item"><dt>Location / work model</dt><dd>{escape(location)}</dd></div>
   <div class="summary-item"><dt>Resume base</dt><dd>{escape(record.recommended_resume_base or 'none')}</dd></div>
   <div class="summary-item"><dt>Resume positioning</dt><dd>{escape(record.resume_positioning)}</dd></div>
@@ -596,8 +703,25 @@ li + li {{ margin-top:5px; }}
   <section class="section"><h2>Other review signals</h2><h3>Risk flags</h3>{render_detail_list(record.risk_flags)}<h3>Hard blockers</h3>{render_detail_list(record.hard_blockers)}</section>
   <section class="section"><h2>Questions for Candidate</h2>{render_detail_list(record.questions_for_candidate, empty_text='No unresolved questions.')}</section>
   <section class="section wide"><h2>Recommended action</h2><div class="final-action">{escape(record.final_action or 'No action supplied.')}</div></section>
+  {render_linkedin_outreach(record, networking)}
 </div>
 </main>
+<script>
+document.addEventListener("click", async (event) => {{
+  const target = event.target;
+  if (!(target instanceof HTMLButtonElement) || !target.classList.contains("copy-outreach")) return;
+  const container = target.closest(".outreach-message");
+  const message = container?.querySelector(".message-text")?.textContent?.trim();
+  const status = container?.querySelector(".copy-status");
+  if (!message || !(status instanceof HTMLElement)) throw new Error("Outreach message markup is incomplete.");
+  try {{
+    await navigator.clipboard.writeText(message);
+    status.textContent = "Copied.";
+  }} catch (error) {{
+    status.textContent = "Copy failed. Select the message and copy it manually.";
+  }}
+}});
+</script>
 </body>
 </html>
 """
@@ -897,6 +1021,7 @@ def write_workflow_detail_pages(
     resume_dir: Path,
     produced_artifacts: Mapping[tuple[str, str], Path],
     produced_cover_letters: Mapping[tuple[str, str], Path],
+    networking_sections: Mapping[str, NetworkingCompanySection],
 ) -> list[Path]:
     ready = sorted(
         (record for record in reviews if record.should_generate_resume and not record.already_applied),
@@ -919,6 +1044,7 @@ def write_workflow_detail_pages(
                 detail_dir=detail_dir,
                 produced_artifacts=produced_artifacts,
                 produced_cover_letters=produced_cover_letters,
+                networking=networking_sections.get(normalize_company_key(record.company)),
             ),
             encoding="utf-8",
         )
@@ -946,6 +1072,9 @@ def write_workflow_review_html(*, review_path: Path, output_path: Path | None = 
         if cover_letter_manifest_path.exists()
         else {}
     )
+    networking_sections = load_networking_sections(
+        review_path.parent / f"{generated_on}-networking-matches.md"
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
     resume_dir = destination.parent / "resumes"
     write_workflow_detail_pages(
@@ -955,6 +1084,7 @@ def write_workflow_review_html(*, review_path: Path, output_path: Path | None = 
         resume_dir=resume_dir,
         produced_artifacts=produced_artifacts,
         produced_cover_letters=produced_cover_letters,
+        networking_sections=networking_sections,
     )
     destination.write_text(
         render_document(

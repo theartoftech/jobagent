@@ -767,6 +767,99 @@ class WriteInspectionQueueTests(unittest.TestCase):
 
         self.assertNotIn("R0157400", markdown)
 
+    def test_filter_overridden_jobs_supports_exact_company_skip(self) -> None:
+        temporal = build_job_inspection_queue.InspectionJob(
+            company="Temporal Technologies",
+            title="Staff Software Engineer",
+            job_id="TEMP-1",
+            posted_on="2026-08-26",
+            posted_age_days=2,
+            location="United States",
+            work_model="Remote",
+            fit_score=95,
+            decision="Apply",
+            source="greenhouse",
+            url="https://example.com/temporal/TEMP-1",
+            risk_flags=(),
+        )
+        partner = build_job_inspection_queue.InspectionJob(
+            company="Temporal Technologies Partner",
+            title="Staff Software Engineer",
+            job_id="PARTNER-1",
+            posted_on="2026-08-26",
+            posted_age_days=2,
+            location="United States",
+            work_model="Remote",
+            fit_score=95,
+            decision="Apply",
+            source="greenhouse",
+            url="https://example.com/partner/PARTNER-1",
+            risk_flags=(),
+        )
+
+        filtered = build_job_inspection_queue.filter_overridden_jobs(
+            [temporal, partner],
+            [{"company": "Temporal Technologies", "decision": "Skip"}],
+        )
+
+        self.assertEqual([partner], filtered)
+
+    def test_filter_overridden_jobs_supports_title_contains_skip(self) -> None:
+        pre_sales = build_job_inspection_queue.InspectionJob(
+            company="Hightouch",
+            title="Solutions Engineer, Enterprise East (Pre-Sales)",
+            job_id="PRE-1",
+            posted_on="2026-08-26",
+            posted_age_days=2,
+            location="United States",
+            work_model="Remote",
+            fit_score=90,
+            decision="Apply",
+            source="greenhouse",
+            url="https://example.com/hightouch/PRE-1",
+            risk_flags=(),
+        )
+
+        filtered = build_job_inspection_queue.filter_overridden_jobs(
+            [pre_sales],
+            [{"title_contains": "pre-sales", "decision": "Skip"}],
+        )
+
+        self.assertEqual([], filtered)
+
+    def test_filter_overridden_jobs_releases_expired_company_skip(self) -> None:
+        block = build_job_inspection_queue.InspectionJob(
+            company="Block",
+            title="Staff Software Engineer",
+            job_id="BLOCK-1",
+            posted_on="2026-09-28",
+            posted_age_days=0,
+            location="United States",
+            work_model="Remote",
+            fit_score=95,
+            decision="Apply",
+            source="greenhouse",
+            url="https://example.com/block/BLOCK-1",
+            risk_flags=(),
+        )
+        overrides = [
+            {
+                "company": "Block",
+                "decision": "Skip",
+                "expires_on": "2026-10-28",
+            }
+        ]
+
+        active = build_job_inspection_queue.filter_overridden_jobs(
+            [block], overrides, as_of=build_job_inspection_queue.dt.date(2026, 10, 28)
+        )
+        expired = build_job_inspection_queue.filter_overridden_jobs(
+            [block], overrides, as_of=build_job_inspection_queue.dt.date(2026, 10, 29)
+        )
+
+        self.assertEqual([], active)
+        self.assertEqual([block], expired)
+
 
 if __name__ == "__main__":
     unittest.main()

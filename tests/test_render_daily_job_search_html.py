@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from scripts.render_daily_job_search_html import (
+    HumanSearchCompany,
     build_default_paths,
     build_detail_directory,
     build_detail_filename,
@@ -16,6 +17,7 @@ from scripts.render_daily_job_search_html import (
     parse_report_rows,
     remove_networking_appendix,
     render_document,
+    render_report_tabs,
     write_html_report,
 )
 
@@ -97,6 +99,24 @@ SAMPLE_NETWORKING = "\n".join(
         "Would you be open to helping?",
     ]
 )
+
+
+class HumanSearchChecklistTests(unittest.TestCase):
+    def test_landing_page_shows_manual_check_count_in_tab(self) -> None:
+        html = render_report_tabs(
+            title="2026-06-23 - Daily Job Search",
+            jobs_html="<h1>Jobs</h1>",
+            companies=[
+                HumanSearchCompany(
+                    name=f"Company {index}",
+                    careers_url=f"https://company-{index}.example.com/careers",
+                )
+                for index in range(1, 6)
+            ],
+        )
+
+        self.assertIn(">Companies to Check (5)</button>", html)
+        self.assertIn("0 of 5 searched", html)
 
 
 class RenderDailyJobSearchHtmlTests(unittest.TestCase):
@@ -325,7 +345,8 @@ class RenderDailyJobSearchHtmlTests(unittest.TestCase):
             self.assertIn("Recruiters / Talent Acquisition", apply_html)
             self.assertIn("Engineering Hiring Managers", apply_html)
             self.assertIn("Add Note for New LinkedIn Connections", apply_html)
-            self.assertIn("I am looking at the Senior Engineer role at Example Co", apply_html)
+            self.assertIn("I&#x27;m interested in the Senior Engineer role at Example Co", apply_html)
+            self.assertRegex(apply_html, r"\d+ / 299 characters")
             self.assertIn("No current-company LinkedIn contacts found.", maybe_html)
             self.assertIn("live-profile-confirmed", apply_html)
 

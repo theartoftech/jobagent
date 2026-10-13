@@ -1,8 +1,198 @@
 companies:
+  Tech Mahindra:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.techmahindra.com/currentopportunity.aspx
+
+  Wipro:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.wipro.com/viewalljobs/?locale=en_US
+
+  DXC Technology:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.dxc.com/
+
+  Trinamix:
+    ats:
+      - type: firstparty-listing
+        url: https://www.trinamix.com/careers/
+
+  Birlasoft:
+    ats:
+      - type: firstparty-listing
+        url: https://jobs.birlasoft.com/go/US/684844/
+
+  Centroid Systems:
+    ats:
+      - type: firstparty-listing
+        url: https://centroid.applytojob.com/apply
+
+  Inoapps:
+    ats:
+      - type: firstparty-listing
+        url: https://www.inoapps.com/join-inoapps/
+
+  Argano:
+    ats:
+      - type: firstparty-listing
+        url: https://argano.com/careers/open-positions.html
+
+  Infovity:
+    ats:
+      - type: firstparty-listing
+        url: https://infovity.com/careers/
+
+  Vigilant Technologies:
+    ats:
+      - type: firstparty-listing
+        url: https://vigilant-inc.com/careers/
+
+  Zensar Technologies:
+    ats:
+      - type: firstparty-listing
+        url: https://www.zensar.com/careers
+
+  NexInfo:
+    ats:
+      - type: firstparty-listing
+        url: https://nexinfo.com/careers/
+
+  Jade Global:
+    ats:
+      - type: firstparty-listing
+        url: https://www.jadeglobal.com/careers
+
+  CherryRoad Technologies:
+    ats:
+      - type: firstparty-listing
+        url: https://cherryroad.com/who-we-are/careers/
+
+  Terillium:
+    ats:
+      - type: firstparty-listing
+        url: https://terillium.com/careers/
+
+  Speridian Technologies:
+    ats:
+      - type: firstparty-listing
+        url: https://speridiantechnologies.applytojob.com/apply
+
+  KPMG:
+    ats:
+      - type: firstparty-listing
+        url: https://www.kpmguscareers.com/job-search/
+
+  Huron:
+    ats:
+      - type: workday
+        url: https://huron.wd1.myworkdayjobs.com/huroncareers
+
+  PwC:
+    ats:
+      - type: firstparty-listing
+        url: https://jobs.us.pwc.com/oracle-jobs
+
+  Accenture:
+    ats:
+      - type: firstparty-listing
+        url: https://www.accenture.com/us-en/careers
+
+  HCLTech:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.hcltech.com/go/United-States-Experienced/9557855/
+
+  Infosys:
+    ats:
+      - type: firstparty-listing
+        url: https://www.infosys.com/careers/americas/apply.html
+
+  Deloitte:
+    ats:
+      - type: firstparty-listing
+        url: https://apply.deloitte.com/en_US/careers
+
+  LTM Limited:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.ltm.com/viewalljobs/
+
+  Capgemini:
+    ats:
+      - type: firstparty-listing
+        url: https://www.capgemini.com/careers/join-capgemini/job-search/
+
+  Mythics:
+    ats:
+      - type: icims
+        url: https://external-mythics.icims.com/jobs/search?hashed=-435768531&ss=1
+
+  Logicom:
+    ats:
+      - type: firstparty-listing
+        url: https://www.logicom.net/careers/head-office/vacancies-list/
+
+  Ataway:
+    ats:
+      - type: firstparty-listing
+        url: https://atawayglobal.catsone.com/careers/97420/
+
+  Vertiv:
+    ats:
+      - type: oraclecloud
+        url: https://egup.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/requisitions/
+
+  DNV:
+    ats:
+      - type: firstparty-listing
+        url: https://jobs.dnv.com/
+
+  Aon:
+    ats:
+      - type: firstparty-listing
+        url: https://jobs.aon.com/jobs
+
+  Cloud Software Group:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.cloud.com/jobs/search
+
+  Salesforce:
+    ats:
+      - type: firstparty-listing
+        url: https://www.salesforce.com/company/careers/jobs/?search=Principal%20Software%20Engineer&country=United%20States%20of%20America&pagesize=20
+
+  MuleSoft:
+    ats:
+      - type: firstparty-listing
+        url: https://www.salesforce.com/company/careers/jobs/?search=MuleSoft&country=United%20States%20of%20America&pagesize=20
+
+  Slack:
+    ats:
+      - type: firstparty-listing
+        url: https://www.salesforce.com/company/careers/jobs/?search=Slack&country=United%20States%20of%20America&pagesize=20
+
   OneTrust:
     ats:
       - type: greenhouse
         url: https://job-boards.greenhouse.io/onetrust
+
+  Macy's:
+    ats:
+      - type: oraclecloud
+        url: https://ebwh.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/requisitions/
+
+  IBM:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.ibm.com/en_US/careers/SearchJobs
+
+  Cognizant:
+    ats:
+      - type: firstparty-listing
+        url: https://careers.cognizant.com/us-en/jobs/
 
   RELX:
     ats:
@@ -142,11 +332,6 @@ companies:
     ats:
       - type: greenhouse
         url: https://job-boards.greenhouse.io/theweathercompany
-
-  Temporal Technologies:
-    ats:
-      - type: greenhouse
-        url: https://job-boards.greenhouse.io/temporaltechnologies
 
   Automattic:
     ats:

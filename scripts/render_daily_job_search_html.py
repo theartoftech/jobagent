@@ -9,6 +9,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import quote, urlencode
 
+try:
+    from scripts.linkedin_connection_notes import (
+        LINKEDIN_CONNECTION_NOTE_MAX_CHARS,
+        build_linkedin_connection_note,
+    )
+except ModuleNotFoundError:
+    from linkedin_connection_notes import LINKEDIN_CONNECTION_NOTE_MAX_CHARS, build_linkedin_connection_note
+
 
 NETWORKING_START = "<!-- networking-pass:start -->"
 NETWORKING_END = "<!-- networking-pass:end -->"
@@ -514,10 +522,9 @@ def build_linkedin_people_searches(row: ReportRow) -> list[LinkedinPeopleSearch]
 
 
 def linkedin_connection_note(row: ReportRow) -> str:
-    return (
-        f"Hi, I am looking at the {row.role} role at {row.company}. "
-        "My background is senior Java/backend, enterprise integrations, SQL, production support, "
-        "and technical delivery. Would you be open to pointing me toward the right hiring contact?"
+    return build_linkedin_connection_note(
+        company=row.company,
+        role=row.role,
     )
 
 
@@ -831,7 +838,7 @@ def render_report_tabs(*, title: str, jobs_html: str, companies: list[HumanSearc
     return f"""
 <nav class="report-tabs" role="tablist" aria-label="Daily job search views">
   <button class="tab-button" id="jobs-tab" type="button" role="tab" aria-selected="true" aria-controls="jobs-panel" data-tab-target="jobs-panel">Jobs</button>
-  <button class="tab-button" id="companies-tab" type="button" role="tab" aria-selected="false" aria-controls="companies-panel" data-tab-target="companies-panel">Companies to Check</button>
+  <button class="tab-button" id="companies-tab" type="button" role="tab" aria-selected="false" aria-controls="companies-panel" data-tab-target="companies-panel">Companies to Check ({len(companies)})</button>
   <a class="companion-report-link" href="{html.escape(workflow_review_href, quote=True)}">Open Strict Workflow Review</a>
 </nav>
 <section class="tab-panel" id="jobs-panel" role="tabpanel" aria-labelledby="jobs-tab">
@@ -979,8 +986,12 @@ def render_contact_detail_page(
         )
         + "\n</ul>"
     )
+    connection_note = linkedin_connection_note(row)
     parts.append("<h2>Add Note for New LinkedIn Connections</h2>")
-    parts.append(f'<div class="message-block">{html.escape(linkedin_connection_note(row))}</div>')
+    parts.append(f'<div class="message-block">{html.escape(connection_note)}</div>')
+    parts.append(
+        f'<p class="meta">{len(connection_note)} / {LINKEDIN_CONNECTION_NOTE_MAX_CHARS} characters</p>'
+    )
 
     if company_section is not None and company_section.relevant_jobs:
         parts.append("<h2>Other Relevant Jobs From This Company</h2>")

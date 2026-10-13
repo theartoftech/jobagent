@@ -23,9 +23,13 @@ from pathlib import Path
 from typing import Iterable
 
 try:
+    from scripts.linkedin_connection_notes import build_linkedin_connection_note
     from scripts.render_daily_job_search_html import write_html_report
+    from scripts.render_workflow_review_html import write_workflow_review_html
 except ModuleNotFoundError:
+    from linkedin_connection_notes import build_linkedin_connection_note
     from render_daily_job_search_html import write_html_report
+    from render_workflow_review_html import write_workflow_review_html
 
 
 DEFAULT_LINKEDIN_EXPORT = Path("linkedin-export.zip")
@@ -411,11 +415,11 @@ def recruiter_note_jobs(jobs: list[Job]) -> dict[str, list[Job]]:
 
 
 def recruiter_add_note(company: str, jobs: list[Job]) -> str:
-    role_summary = summarize_intro_titles(jobs)
-    return (
-        f"Hi, I am exploring {company} roles including {role_summary}. "
-        "My background is Java/Spring backend, REST APIs, SQL, enterprise integrations, "
-        "Oracle systems, and technical leadership. Could you point me to the right recruiter?"
+    if not jobs:
+        raise ValueError("At least one job is required for a recruiter connection note")
+    return build_linkedin_connection_note(
+        company=company,
+        role=jobs[0].title,
     )
 
 
@@ -561,6 +565,9 @@ def run(
     if update_report:
         update_daily_report(daily_report, build_daily_section(networking_markdown))
     write_html_report(report_path=daily_report, networking_path=output_path)
+    workflow_review_path = out_dir / f"{today.isoformat()}-workflow-review.json"
+    if workflow_review_path.exists():
+        write_workflow_review_html(review_path=workflow_review_path)
 
     return output_path
 

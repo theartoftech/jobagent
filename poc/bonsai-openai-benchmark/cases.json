@@ -1,0 +1,24 @@
+[
+  {
+    "name": "configuration-error-handling",
+    "prompt": "Review this Python configuration helper:\n\n```python\ndef required_setting(name: str) -> str:\n    try:\n        return os.environ[name]\n    except KeyError:\n        return \"\"\n```\n\nThe caller sends the returned value as an Authorization header. Explain the important failure modes, recommend a minimal correction, and define representative tests.",
+    "required_concepts": [
+      "silent fallback",
+      "explicit error",
+      "empty",
+      "KeyError",
+      "test"
+    ]
+  },
+  {
+    "name": "local-model-routing-decision",
+    "prompt": "A coding assistant can either reason with a hosted frontier model or delegate a bounded read-only task to a local 27B quantized model. The local model has a 16K context window and no per-token charge, but its output must be checked by the hosted model. Design a routing policy that genuinely reduces hosted usage without lowering final-answer reliability. Include measurable acceptance criteria and fail-closed behavior.",
+    "required_concepts": [
+      "bounded",
+      "verification",
+      "token",
+      "latency",
+      "fail"
+    ]
+  }
+]

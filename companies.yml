@@ -1,6 +1,7 @@
 companies:
   - name: Salesforce
-    careers_url: https://careers.salesforce.com/en/jobs/
+    careers_url: https://www.salesforce.com/company/careers/jobs/
+    human_search_url: "https://www.salesforce.com/company/careers/jobs/?search=Principal%20Software%20Engineer&country=United%20States%20of%20America&pagesize=20#results"
     notes: >
       Prioritize backend Java, enterprise SaaS, platform engineering, API, integration,
       CPQ, quote-to-cash, and Atlanta/Georgia/remote-friendly roles. Avoid Salesforce
@@ -8,7 +9,8 @@ companies:
       unless clearly secondary.
 
   - name: MuleSoft
-    careers_url: https://careers.salesforce.com/en/jobs/
+    careers_url: https://www.salesforce.com/company/careers/jobs/
+    human_search_url: "https://www.salesforce.com/company/careers/jobs/?search=MuleSoft&country=United%20States%20of%20America&pagesize=20#results"
     notes: >
       Search as part of Salesforce. Prioritize backend API platform, integration runtime,
       Java, REST, enterprise integration, platform engineering, solution architecture,
@@ -18,7 +20,8 @@ companies:
       technical delivery ownership.
 
   - name: Slack
-    careers_url: https://careers.salesforce.com/en/jobs/
+    careers_url: https://www.salesforce.com/company/careers/jobs/
+    human_search_url: "https://www.salesforce.com/company/careers/jobs/?search=Slack&country=United%20States%20of%20America&pagesize=20#results"
     notes: >
       Search as part of Salesforce. Consider backend/platform application roles only.
       Avoid AWS/Terraform/EKS-heavy infrastructure roles and West Coast office requirements.
@@ -209,7 +212,7 @@ companies:
       are primarily Linux kernel, support, DevOps, or infrastructure-only.
 
   - name: IBM
-    careers_url: https://www.ibm.com/careers/search?field_keyword_17[0]=Remote
+    careers_url: https://careers.ibm.com/en_US/careers/SearchJobs
     notes: >
       Prioritize Java backend, enterprise application engineering, hybrid cloud application
       modernization, integration, database-heavy software engineering, and consulting-engineer
@@ -484,7 +487,9 @@ companies:
       up to 50% can be acceptable for strong-fit roles. Avoid Government/Public Services
       or clearance-linked roles, client-travel-heavy postings, cloud-infrastructure-first
       roles, data/AI-only transformation roles, non-technical business advisory, and
-      implementation work where technical ownership is not central.
+      implementation work where technical ownership is not central. Include Oracle CPQ,
+      quote-to-cash, Oracle integration, and enterprise-application modernization roles when
+      they provide meaningful architecture, implementation, or technical-delivery ownership.
 
   - name: Capgemini
     careers_url: https://www.capgemini.com/careers/join-capgemini/job-search/
@@ -496,7 +501,9 @@ companies:
       for strong-fit roles. Also consider solution architecture, implementation
       architecture, integration consulting, and delivery leadership roles. Avoid sales-only
       presales, non-technical advisory, management consulting, high-travel client-delivery
-      roles, cloud-infrastructure-first roles, and data/AI-only transformation postings.
+      roles, cloud-infrastructure-first roles, and data/AI-only transformation postings. Give
+      particular weight to Oracle CPQ, quote-to-cash, Oracle integration, and technical Oracle
+      consulting roles that match the candidate's implementation and product background.
 
   - name: U.S. Bank
     careers_url: https://careers.usbank.com/
@@ -570,14 +577,6 @@ companies:
       Integration and automation platform target. Prioritize Sr. Software Engineer,
       Java, REST APIs, integration/iPaaS, multi-tenant SaaS, RDBMS, Docker/Kubernetes,
       cloud architecture, enterprise automation, and remote roles.
-
-  - name: Temporal Technologies
-    careers_url: https://temporal.io/careers
-    notes: >
-      Workflow orchestration / durable execution platform target. Prioritize Senior or
-      Staff Software Engineer roles in SDK, Cloud, Compute, Open Source Server,
-      Observability, Developer Experience, Java SDK adjacency, distributed systems,
-      workflow automation, and U.S. remote roles.
 
   - name: DealHub
     careers_url: https://dealhub.io/careers/
@@ -1407,6 +1406,28 @@ companies:
       analyst-only, data-science-only, infrastructure-only, or frontend-heavy roles unless
       backend/platform software engineering is central.
 
+  - name: Oracle
+    careers_url: https://careers.oracle.com/jobs/
+    human_search_url: https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?keyword=Principal%20Software%20Engineer&mode=location
+    official_search_domains:
+      - careers.oracle.com
+      - oraclecloud.com
+    title_aliases:
+      - Senior Principal Software Engineer
+      - Lead Principal Software Engineer
+      - Principal Platform Software Engineer
+      - Principal Application Software Engineer
+      - Software Architect
+      - Cloud Architect
+      - Solutions Architect
+    notes: >
+      Direct product-engineering and architecture target. Prioritize senior principal,
+      lead principal, platform, application, cloud, architecture, and technical-lead roles
+      involving Java, OCI, Kubernetes, Docker, distributed systems, APIs, enterprise SaaS,
+      modernization, production reliability, integrations, and mentoring. Prior Oracle
+      employment is a strength rather than an exclusion. Apply the same compensation,
+      location, seniority, freshness, and no-stretch rules used for every other company.
+
   - name: Apps Associates
     careers_url: https://appsassociates.com/careers/
     oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=21229615
@@ -1461,6 +1482,7 @@ companies:
 
   - name: Cognizant
     careers_url: https://careers.cognizant.com/us-en/jobs/
+    human_search_url: https://careers.cognizant.com/us-en/jobs/?keyword=Java&location=United%20States&cname=United%20States&pagesize=20#results
     oracle_partner_url: https://www.oracle.com/partner/cognizant/
     official_search_domains:
       - careers.cognizant.com
@@ -1492,3 +1514,466 @@ companies:
       technical advisory, and professional-services delivery. Avoid offshore-only roles,
       functional-only ERP/HCM work, support-only assignments, and postings requiring a
       primary stack or Oracle module specialization the candidate cannot truthfully claim.
+
+  - name: KPMG
+    careers_url: https://www.kpmguscareers.com/job-search/
+    official_search_domains:
+      - kpmguscareers.com
+      - kpmg.com
+    title_aliases:
+      - Oracle Technical Architect
+      - Oracle CPQ Consultant
+      - Enterprise Application Architect
+      - Technical Delivery Director
+    notes: >
+      Oracle consulting and advisory target. Prioritize Oracle CPQ and quote-to-cash,
+      enterprise applications, Java/API integration, solution architecture, implementation
+      leadership, technical advisory, platform modernization, and client-facing technical
+      delivery. Treat the candidate's professional-services background as a strength. Avoid
+      audit, tax, finance-only advisory, pre-sales, clearance-dependent federal work, and
+      functional Oracle roles without meaningful technical ownership.
+
+  - name: Huron
+    careers_url: https://www.huronconsultinggroup.com/en/careers
+    human_search_url: https://huron.wd1.myworkdayjobs.com/huroncareers?q=oracle
+    official_search_domains:
+      - huronconsultinggroup.com
+      - huron.wd1.myworkdayjobs.com
+    title_aliases:
+      - Oracle Technical Architect
+      - Enterprise Application Consultant
+      - Integration Architect
+      - Technical Delivery Director
+    notes: >
+      Professional-services and technology-delivery target with explicit Oracle platform work.
+      Prioritize Oracle CPQ and quote-to-cash, enterprise application delivery, Java/API
+      integrations, solution architecture, implementation leadership, healthcare or education
+      platform modernization, and client-facing technical delivery. Avoid strategy-only,
+      change-management-only, functional ERP, pre-sales, and roles lacking hands-on technical
+      ownership.
+
+  - name: HCLTech
+    careers_url: https://careers.hcltech.com/go/United-States-Experienced/9557855/
+    official_search_domains:
+      - careers.hcltech.com
+      - hcltech.com
+    title_aliases:
+      - Oracle CPQ Consultant
+      - Oracle Technical Architect
+      - Java Architect
+      - Technical Delivery Lead
+    notes: >
+      Oracle and enterprise technology consulting target, also known as HCL Technologies
+      Limited. Prioritize U.S. roles involving Oracle CPQ, quote-to-cash, Java/Spring backend
+      services, APIs, integrations, application modernization, solution architecture,
+      implementation leadership, and technical delivery. Avoid offshore-only assignments,
+      support-only work, pre-sales, functional-only ERP roles, and mandatory platform skills
+      the candidate cannot truthfully claim.
+
+  - name: LTM Limited
+    careers_url: https://careers.ltm.com/viewalljobs/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=4340253&filterValueStore=search_CPQ
+    official_search_domains:
+      - careers.ltm.com
+      - ltm.com
+      - careers.ltimindtree.com
+    title_aliases:
+      - Oracle CPQ Consultant
+      - Oracle Technical Architect
+      - Java Architect
+      - Principal Consultant
+    notes: >
+      Oracle consulting and technology-services target, formerly LTIMindtree Limited. Prioritize
+      U.S. or U.S.-remote Oracle CPQ and quote-to-cash, Java/backend engineering, APIs,
+      integrations, enterprise modernization, solution architecture, implementation leadership,
+      and technical advisory roles. Avoid offshore-only roles, support-only assignments,
+      pre-sales, functional-only ERP work, and roles centered on unrelated stacks.
+
+  - name: Mythics
+    careers_url: https://mythics.com/careers/
+    human_search_url: https://external-mythics.icims.com/jobs/search?hashed=-435768531&ss=1
+    official_search_domains:
+      - mythics.com
+      - external-mythics.icims.com
+    title_aliases:
+      - Oracle Technical Architect
+      - Oracle Applications Architect
+      - Technical Consultant
+      - Applications Modernization Practice Lead
+    notes: >
+      High-priority U.S. Oracle partner and consulting target. Prioritize Oracle CPQ,
+      quote-to-cash, Oracle SaaS application modernization, Java/API integrations, OCI-adjacent
+      application engineering, solution architecture, implementation leadership, and remote
+      client-facing technical delivery. Avoid sales and pre-sales, clearance-dependent roles,
+      infrastructure-only work, and functional Oracle specialties outside the candidate's
+      demonstrated experience.
+
+  - name: Logicom
+    careers_url: https://www.logicom.net/careers/head-office/vacancies-list/
+    official_search_domains:
+      - logicom.net
+    title_aliases:
+      - Oracle Technical Architect
+      - Enterprise Application Consultant
+      - Integration Architect
+    notes: >
+      Oracle partner watch-list target. Prioritize only U.S.-remote-compatible roles involving
+      Oracle CPQ, quote-to-cash, enterprise applications, Java/API integrations, solution
+      architecture, implementation, or technical delivery. Most current operations are outside
+      the United States, so enforce location rules strictly. Avoid sales, distribution,
+      infrastructure support, pre-sales, and non-U.S. onsite or hybrid roles.
+
+  - name: Ataway
+    careers_url: https://www.ataway.com/careers/
+    human_search_url: https://atawayglobal.catsone.com/careers/97420/
+    official_search_domains:
+      - ataway.com
+      - atawayglobal.catsone.com
+    title_aliases:
+      - Oracle CPQ Consultant
+      - Oracle Technical Architect
+      - Integration Consultant
+      - Technical Delivery Lead
+    notes: >
+      Oracle consulting and professional-services watch-list target. Prioritize U.S. or
+      U.S.-remote Oracle CPQ and quote-to-cash, Java/API integrations, solution architecture,
+      implementation leadership, technical consulting, and enterprise application delivery.
+      Avoid pre-sales, functional-only ERP or HCM roles, talent-pool-only listings, non-U.S.
+      onsite roles, and positions without meaningful technical ownership.
+
+  - name: Tech Mahindra
+    careers_url: https://careers.techmahindra.com/currentopportunity.aspx
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=4133966&filterValueStore=search_CPQ
+    official_search_domains:
+      - techmahindra.com
+      - careers.techmahindra.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Technical Architect
+      - Java Architect
+      - Technical Delivery Lead
+    notes: >
+      U.S. Oracle consulting and engineering target. Prioritize Oracle CPQ, quote-to-cash,
+      Java/API integrations, application modernization, architecture, and technical delivery.
+      Avoid offshore-only, pre-sales, support-only, and functional-only assignments.
+
+  - name: Wipro
+    careers_url: https://careers.wipro.com/viewalljobs/?locale=en_US
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=4134618&filterValueStore=search_CPQ
+    official_search_domains:
+      - wipro.com
+      - careers.wipro.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Technical Architect
+      - Principal Consultant
+      - Java Architect
+    notes: >
+      U.S. Oracle consulting and technology-delivery target. Prioritize Oracle CPQ,
+      quote-to-cash, Java/backend systems, APIs, enterprise integrations, architecture, and
+      implementation leadership. Avoid pre-sales, offshore-only, and functional-only roles.
+
+  - name: DXC Technology
+    careers_url: https://careers.dxc.com/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=4-502001180139&filterValueStore=search_CPQ
+    official_search_domains:
+      - dxc.com
+      - careers.dxc.com
+    title_aliases:
+      - Oracle Technical Architect
+      - Enterprise Application Architect
+      - Principal Software Engineer
+      - Technical Delivery Director
+    notes: >
+      U.S. consulting, advisory, and software-engineering target. Prioritize Oracle CPQ,
+      enterprise applications, Java/API integration, modernization, architecture, and client
+      delivery. Avoid infrastructure-only, support-only, pre-sales, and clearance-gated roles.
+
+  - name: Trinamix
+    careers_url: https://www.trinamix.com/careers/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=51389615&filterValueStore=search_CPQ
+    official_search_domains:
+      - trinamix.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Cloud Technical Architect
+      - Integration Architect
+      - Principal Consultant
+    notes: >
+      High-priority U.S.-headquartered Oracle implementation partner. Prioritize Oracle CPQ,
+      quote-to-cash, Oracle Cloud applications, integrations, solution architecture, and
+      implementation leadership. Avoid functional-only ERP, pre-sales, and offshore-only roles.
+
+  - name: Birlasoft
+    careers_url: https://jobs.birlasoft.com/go/US/684844/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=12706842&filterValueStore=search_CPQ
+    official_search_domains:
+      - birlasoft.com
+      - jobs.birlasoft.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Senior Architect
+      - Technical Lead Application Development
+      - Principal Consultant
+    notes: >
+      U.S. enterprise-application and consulting target. Prioritize remote or Atlanta-compatible
+      Oracle CPQ, Java/API engineering, architecture, integrations, modernization, and delivery
+      leadership. Reject nonlocal hybrid, pre-sales, offshore-only, and unrelated-stack roles.
+
+  - name: Centroid Systems
+    careers_url: https://centroid.applytojob.com/apply
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=47391449&filterValueStore=search_CPQ
+    official_search_domains:
+      - centroid.com
+      - centroid.applytojob.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - OCI Architect
+      - Oracle Integration Architect
+      - Oracle Technical Lead
+    notes: >
+      U.S. Oracle cloud and managed-services target. Prioritize Oracle CPQ, OCI-adjacent
+      application architecture, APIs, integrations, implementation leadership, and remote
+      technical delivery. Avoid DBA-only, infrastructure-only, sales, and non-U.S. roles.
+
+  - name: Inoapps
+    careers_url: https://www.inoapps.com/join-inoapps/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=39309961&filterValueStore=search_CPQ
+    official_search_domains:
+      - inoapps.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Technical Architect
+      - Integration Consultant
+      - Professional Services Engineer
+    notes: >
+      Oracle professional-services and product-development target with a U.S. office. Prioritize
+      Oracle CPQ, quote-to-cash, integrations, architecture, implementation leadership, and
+      hands-on technical delivery. Avoid functional-only, pre-sales, and non-U.S. onsite roles.
+
+  - name: Argano
+    careers_url: https://argano.com/careers/open-positions.html
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=4-150622211257&filterValueStore=search_CPQ
+    official_search_domains:
+      - argano.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Quote to Cash Architect
+      - Oracle Technical Consultant
+      - Technical Delivery Director
+    notes: >
+      High-priority enterprise transformation consultancy. Prioritize Oracle CPQ,
+      quote-to-cash, enterprise integrations, solution architecture, implementation leadership,
+      and technical advisory. Avoid pre-sales and functional-only ERP roles.
+
+  - name: Infovity
+    careers_url: https://infovity.com/careers/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=50701523&filterValueStore=search_CPQ
+    official_search_domains:
+      - infovity.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Cloud Solution Architect
+      - Oracle Technical Lead
+      - Integration Architect
+    notes: >
+      U.S. Oracle applications and technology consultancy. Prioritize Oracle CPQ,
+      subscription and revenue workflows, integrations, Fusion middleware, architecture, and
+      implementation leadership. Avoid functional-only, HCM-only, and finance-only roles.
+
+  - name: Vigilant Technologies
+    careers_url: https://vigilant-inc.com/careers/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=29059469&filterValueStore=search_CPQ
+    official_search_domains:
+      - vigilant-inc.com
+    title_aliases:
+      - Oracle CPQ Consultant
+      - Oracle Application Engineer
+      - Oracle Technical Architect
+      - Cloud Architect
+    notes: >
+      Oracle professional and managed-services watch-list target. Prioritize Oracle CPQ,
+      application engineering, Java/API integration, architecture, and technical consulting.
+      Reject .NET-primary, DBA-only, infrastructure-only, pre-sales, and non-U.S. roles.
+
+  - name: Zensar Technologies
+    careers_url: https://www.zensar.com/careers
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=PS203787-IN&filterValueStore=search_CPQ
+    official_search_domains:
+      - zensar.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Principal Consultant
+      - Enterprise Application Architect
+      - Java Architect
+    notes: >
+      U.S. digital transformation and technology-services target. Prioritize Oracle CPQ,
+      enterprise applications, Java/API engineering, modernization, architecture, and technical
+      delivery. Avoid offshore-only, pre-sales, support-only, and unrelated-stack roles.
+
+  - name: NexInfo
+    careers_url: https://nexinfo.com/careers/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=20587838&filterValueStore=search_CPQ
+    official_search_domains:
+      - nexinfo.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle SaaS Solution Architect
+      - Integration Architect
+      - Principal Consultant
+    notes: >
+      U.S. SaaS implementation and managed-services target. Prioritize Oracle CPQ,
+      customer sales and service workflows, integrations, cloud migration, solution architecture,
+      and technical delivery. Avoid generic staffing, functional-only, and pre-sales roles.
+
+  - name: Jade Global
+    careers_url: https://www.jadeglobal.com/careers
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=10622368&filterValueStore=search_CPQ
+    official_search_domains:
+      - jadeglobal.com
+      - jadeglobal.wd5.myworkdayjobs.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Technical Architect
+      - Integration Architect
+      - Principal Consultant
+    notes: >
+      U.S.-headquartered technology consulting target. Prioritize Oracle CPQ, enterprise SaaS,
+      Java/API integrations, cloud modernization, architecture, and client-facing technical
+      delivery. Avoid offshore-only, functional-only, and pre-sales positions.
+
+  - name: CherryRoad Technologies
+    careers_url: https://cherryroad.com/who-we-are/careers/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=22205066&filterValueStore=search_CPQ
+    official_search_domains:
+      - cherryroad.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Technical Architect
+      - Enterprise Application Consultant
+      - Technical Delivery Lead
+    notes: >
+      U.S. remote-first Oracle and public-sector technology consultancy. Prioritize Oracle CPQ,
+      enterprise applications, integrations, architecture, modernization, and implementation
+      leadership. Avoid clearance-required, functional-only, support-only, and pre-sales roles.
+
+  - name: Terillium
+    careers_url: https://terillium.com/careers/
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=30963307&filterValueStore=search_CPQ
+    official_search_domains:
+      - terillium.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Fusion Technical Architect
+      - Oracle Integration Consultant
+      - Technical Delivery Lead
+    notes: >
+      U.S.-based Oracle implementation consultancy. Prioritize Oracle CPQ, Fusion Cloud,
+      integrations, solution architecture, implementation ownership, and client-facing technical
+      delivery. Avoid JD Edwards-only, functional-only, pre-sales, and impractical travel roles.
+
+  - name: Speridian Technologies
+    careers_url: https://speridiantechnologies.applytojob.com/apply
+    oracle_partner_url: https://partner-finder.oracle.com/?page=shell&shell=partner-finder&partner-finder=partner-finder-profile&CompanyNumber=41821299&filterValueStore=search_CPQ
+    official_search_domains:
+      - speridian.com
+      - speridiantechnologies.applytojob.com
+    title_aliases:
+      - Oracle CPQ Architect
+      - Oracle Technical Architect
+      - Integration Architect
+      - Technical Delivery Lead
+    notes: >
+      U.S. technology consulting and software-delivery target. Prioritize Oracle CPQ,
+      enterprise applications, Java/API integration, architecture, implementation leadership,
+      and public-sector delivery. Avoid sales, pre-sales, functional-only, and non-U.S. roles.
+
+  - name: Vertiv
+    careers_url: https://www.vertiv.com/en-us/about/career-center/
+    human_search_url: https://egup.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX/requisitions/
+    oracle_customer_url: https://www.oracle.com/customers/vertiv/
+    official_search_domains:
+      - vertiv.com
+      - egup.fa.us2.oraclecloud.com
+    title_aliases:
+      - Principal Software Engineer
+      - Software Architect
+      - Enterprise Applications Architect
+      - Oracle CPQ Architect
+      - Technical Lead
+    notes: >
+      Oracle CPQ customer and digital-infrastructure target. Prioritize senior application
+      engineering, enterprise applications, Oracle CPQ and quote-to-cash, Java/backend
+      services, APIs, integrations, workflow automation, platform modernization, production
+      reliability, solution architecture, and technical leadership. Treat direct experience
+      operating and modernizing Oracle CPQ as a strong differentiator. Avoid hardware,
+      electrical, thermal, manufacturing, field-service, and infrastructure-only roles unless
+      enterprise software engineering or business-application ownership is central.
+
+  - name: DNV
+    careers_url: https://jobs.dnv.com/
+    human_search_url: https://jobs.dnv.com/locations/usa
+    oracle_customer_url: https://www.oracle.com/customers/dnv-cpq/
+    official_search_domains:
+      - jobs.dnv.com
+      - dnv.com
+    title_aliases:
+      - Principal Software Engineer
+      - Software Architect
+      - Enterprise Application Architect
+      - Oracle CPQ Consultant
+      - Technical Lead
+    notes: >
+      Oracle CPQ customer and assurance-software target. Prioritize senior software and
+      enterprise-application engineering, Oracle CPQ and quote-to-cash, Java/backend services,
+      APIs, integrations, workflow automation, Veracity or digital-platform work, solution
+      architecture, technical consulting, and technical leadership. Treat the candidate's
+      CPQ product-engineering and professional-services experience as directly relevant.
+      Avoid engineering-domain consulting, auditing, maritime, energy, field-inspection,
+      and certification roles unless software or enterprise-application ownership is central.
+
+  - name: Aon
+    careers_url: https://jobs.aon.com/jobs
+    human_search_url: https://jobs.aon.com/jobs/locations
+    oracle_customer_url: https://www.oracle.com/customers/aon-cx/
+    official_search_domains:
+      - jobs.aon.com
+      - aon.com
+    title_aliases:
+      - Principal Software Engineer
+      - Application Architect
+      - Solution Architect
+      - Enterprise Application Consultant
+      - Technical Delivery Lead
+    notes: >
+      Oracle CX and CPQ-adjacent enterprise-application target with Atlanta and Alpharetta
+      locations. Prioritize senior application engineering, quote-to-cash and sales-platform
+      modernization, Java/backend services, APIs, integrations, workflow automation, solution
+      architecture, technical delivery, and enterprise consulting. Treat insurance-domain
+      knowledge as secondary unless explicitly required. Avoid actuarial, brokerage, sales,
+      benefits-administration, analytics-only, and business-consulting roles without meaningful
+      software engineering or enterprise-application ownership.
+
+  - name: Cloud Software Group
+    careers_url: https://careers.cloud.com/jobs/search
+    human_search_url: https://careers.cloud.com/jobs/search
+    oracle_customer_url: https://www.oracle.com/customers/cloud-software-group/
+    official_search_domains:
+      - careers.cloud.com
+      - cloud.com
+      - tibco.wd5.myworkdayjobs.com
+    title_aliases:
+      - Principal Software Engineer
+      - Lead Application Development Engineer
+      - Enterprise Applications Architect
+      - Oracle CPQ Architect
+      - Quote to Cash Architect
+    notes: >
+      High-priority Oracle CPQ, Fusion, Subscription Management, and quote-to-cash customer.
+      Prioritize internal enterprise-application engineering, Oracle CPQ and Fusion platform
+      ownership, quote-to-cash and subscription workflows, Java/backend services, APIs,
+      integrations, application modernization, solution architecture, production reliability,
+      and technical leadership across Cloud Software Group, Citrix, TIBCO, Spotfire, and
+      Jaspersoft. Avoid pre-sales, account strategy, sales-only, support-only, security-only,
+      data-science-only, and product-specific roles unless hands-on software engineering or
+      internal enterprise-application ownership is central.

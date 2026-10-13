@@ -53,6 +53,35 @@ class ScoringImprovementTests(unittest.TestCase):
         self.assertIn("target title match", job.fit_reasons)
         self.assertGreaterEqual(job.fit_score, 65)
 
+    def test_semantic_director_title_variant_counts_as_target_title_match(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": ["Director of Software Engineering"],
+        }
+        job = self.make_job(
+            title="Director, Software Engineering & Development",
+            description="Lead Java platform engineering, REST APIs, and enterprise modernization.",
+        )
+
+        discover_jobs.score_job(job, profile, 45)
+
+        self.assertIn("target title match", job.fit_reasons)
+        self.assertGreaterEqual(job.fit_score, 65)
+
+    def test_unrelated_director_title_does_not_count_as_target_title_match(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": ["Director of Software Engineering"],
+        }
+        job = self.make_job(
+            title="Director, Product Marketing",
+            description="Own positioning, campaigns, and market research.",
+        )
+
+        discover_jobs.score_job(job, profile, 45)
+
+        self.assertNotIn("target title match", job.fit_reasons)
+
     def test_staffing_company_gets_consulting_lane_boost(self) -> None:
         job = self.make_job(
             title="Implementation Consultant",
@@ -126,6 +155,138 @@ class ScoringImprovementTests(unittest.TestCase):
             "customer-facing title lacks substantial software engineering ownership",
             job.risk_flags,
         )
+
+    def test_sales_engineer_disguised_as_solutions_engineer_is_hard_rejected(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": [*BASE_PROFILE["title_targets"], "Solutions Engineer"],
+            "strong_keywords": [
+                *BASE_PROFILE["strong_keywords"],
+                "kubernetes",
+                "docker",
+                "distributed systems",
+            ],
+        }
+        job = self.make_job(
+            title="Senior Principal Solutions Engineer",
+            description=(
+                "We are looking for a Sales Engineer to join our global sales team. "
+                "Partner with Account Executives to qualify opportunities and drive "
+                "technical sales efforts through product demos and proof-of-concept "
+                "engagements. Own technical sales wins for a Java Spring Boot SQL "
+                "distributed systems platform running on Kubernetes and Docker."
+            ),
+        )
+
+        discover_jobs.score_job(job, profile, 60, company={"name": "Database Co"})
+
+        self.assertEqual("Skip", job.decision)
+        self.assertLessEqual(job.fit_score, 45)
+        self.assertIn("primary pre-sales / sales engineering role", job.risk_flags)
+
+    def test_account_solution_architect_is_hard_rejected_as_sales_role(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": [*BASE_PROFILE["title_targets"], "Solution Architect"],
+        }
+        job = self.make_job(
+            title="Account Solution Architect",
+            description=(
+                "Support strategic accounts with Java, Spring Boot, REST API, and SQL "
+                "architecture throughout the customer lifecycle."
+            ),
+        )
+
+        discover_jobs.score_job(job, profile, 60)
+
+        self.assertEqual("Skip", job.decision)
+        self.assertIn("primary pre-sales / sales engineering role", job.risk_flags)
+
+    def test_technology_sales_solution_architect_is_hard_rejected(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": [*BASE_PROFILE["title_targets"], "Solution Architect"],
+        }
+        job = self.make_job(
+            title="Global Specialist Solution Architect",
+            description=(
+                "Join the Technology Sales team to provide deep technical sales support "
+                "for go-to-market programs and partner with the Account Executive."
+            ),
+        )
+
+        discover_jobs.score_job(job, profile, 60)
+
+        self.assertEqual("Skip", job.decision)
+        self.assertIn("primary pre-sales / sales engineering role", job.risk_flags)
+
+    def test_primary_mobile_engineer_title_is_hard_rejected(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": [*BASE_PROFILE["title_targets"], "Staff Software Engineer"],
+        }
+        job = self.make_job(
+            title="Staff Android Software Engineer, Consumer Platform",
+            description="Build Java services, REST APIs, SQL data flows, and Android applications.",
+        )
+
+        discover_jobs.score_job(job, profile, 60)
+
+        self.assertEqual("Skip", job.decision)
+        self.assertIn("primary mobile application engineering role", job.risk_flags)
+
+    def test_remote_uk_role_is_hard_rejected(self) -> None:
+        job = self.make_job(
+            title="Senior Software Engineer",
+            description="Java Spring Boot REST API SQL backend services",
+        )
+        job.location = "Remote UK"
+        job.work_model = "Remote"
+
+        discover_jobs.score_job(job, BASE_PROFILE, 60)
+
+        self.assertEqual("Skip", job.decision)
+        self.assertIn("remote role appears outside target geography", job.risk_flags)
+
+    def test_co_sell_solutions_engineer_is_hard_rejected(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": [*BASE_PROFILE["title_targets"], "Solutions Engineer"],
+        }
+        job = self.make_job(
+            title="Staff Solutions Engineer",
+            description=(
+                "Partner with Sales and Account Management and co-sell the developer "
+                "platform. Build API proof-of-concepts and sample integrations, create "
+                "compelling product demos and presentations, and bring prior sales "
+                "engineering experience supporting enterprise merchants."
+            ),
+        )
+
+        discover_jobs.score_job(job, profile, 60, company={"name": "Payments Co"})
+
+        self.assertEqual("Skip", job.decision)
+        self.assertIn("primary pre-sales / sales engineering role", job.risk_flags)
+
+    def test_required_german_speaking_role_is_hard_rejected(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "title_targets": [*BASE_PROFILE["title_targets"], "Solutions Engineer"],
+            "unsupported_required_languages": ["German"],
+        }
+        job = self.make_job(
+            title="Solutions Engineer, Enterprise (Pre-Sales) - German speaking",
+            description=(
+                "Lead technical discovery and design enterprise integrations using REST APIs, "
+                "Java, Spring Boot, and distributed systems. Fluent German is required."
+            ),
+        )
+
+        discover_jobs.score_job(job, profile, 60, company={"name": "Example Co"})
+
+        self.assertEqual("Skip", job.decision)
+        self.assertLessEqual(job.fit_score, 45)
+        self.assertIn("required spoken language unsupported: German", job.risk_flags)
 
     def test_configuration_only_forward_deployed_title_is_deprioritized(self) -> None:
         profile = {
@@ -206,6 +367,47 @@ class ScoringImprovementTests(unittest.TestCase):
 
         self.assertEqual(job.decision, "Skip")
         self.assertIn("location likely incompatible", job.risk_flags)
+
+    def test_non_atlanta_hybrid_role_is_hard_rejected(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "hybrid_allowed_metro_tokens": ["Atlanta", "Alpharetta", "Douglasville"],
+        }
+        job = discover_jobs.JobPosting(
+            company="Mastercard",
+            title="Senior Software Engineer",
+            url="https://example.com/jobs/ofallon",
+            location="O'Fallon, Missouri",
+            work_model="Hybrid",
+            posted_age_days=3,
+            description="Java Spring Boot REST API SQL distributed systems",
+        )
+
+        discover_jobs.score_job(job, profile, 60)
+
+        self.assertEqual("Skip", job.decision)
+        self.assertLessEqual(job.fit_score, 45)
+        self.assertIn("hybrid location outside Atlanta metro", job.risk_flags)
+
+    def test_atlanta_metro_hybrid_role_remains_eligible(self) -> None:
+        profile = {
+            **BASE_PROFILE,
+            "hybrid_allowed_metro_tokens": ["Atlanta", "Alpharetta", "Douglasville"],
+        }
+        job = discover_jobs.JobPosting(
+            company="Example Co",
+            title="Senior Software Engineer",
+            url="https://example.com/jobs/atlanta",
+            location="Atlanta, Georgia",
+            work_model="Hybrid",
+            posted_age_days=3,
+            description="Java Spring Boot REST API SQL distributed systems",
+        )
+
+        discover_jobs.score_job(job, profile, 60)
+
+        self.assertNotEqual("Skip", job.decision)
+        self.assertNotIn("hybrid location outside Atlanta metro", job.risk_flags)
 
     def test_exclusion_penalty_is_not_applied_for_single_weak_mention(self) -> None:
         job = self.make_job(
@@ -449,6 +651,36 @@ class ScoringImprovementTests(unittest.TestCase):
         discover_jobs.score_job(job, BASE_PROFILE, 60, company={"name": "Example Co"})
 
         self.assertNotIn("required .NET tech stack", job.risk_flags)
+
+    def test_required_csharp_stack_prevents_apply_recommendation(self) -> None:
+        job = self.make_job(
+            title="Technical Consultant",
+            description=(
+                "Qualifications: knowledge of C# is required. Configure and extend "
+                "enterprise applications, troubleshoot integrations, and work with SQL."
+            ),
+        )
+
+        discover_jobs.score_job(job, BASE_PROFILE, 60, company={"name": "Aderant"})
+
+        self.assertEqual(job.decision, "Skip")
+        self.assertLess(job.fit_score, 50)
+        self.assertIn("required .NET tech stack", job.risk_flags)
+
+    def test_associate_technical_consultant_is_rejected_as_junior_scope(self) -> None:
+        job = self.make_job(
+            title="Associate Technical Consultant",
+            description=(
+                "Implement enterprise applications using Java, Spring Boot, REST APIs, "
+                "SQL, integrations, and customer-facing technical delivery."
+            ),
+        )
+
+        discover_jobs.score_job(job, BASE_PROFILE, 60, company={"name": "Aderant"})
+
+        self.assertEqual(job.decision, "Skip")
+        self.assertLess(job.fit_score, 50)
+        self.assertIn("junior associate-level role below target scope", job.risk_flags)
 
     def test_clustered_hard_stack_gaps_prevent_apply_recommendation(self) -> None:
         job = self.make_job(

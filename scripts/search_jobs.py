@@ -39,6 +39,11 @@ try:
 except ModuleNotFoundError:
     from mark_applied_jobs import DEFAULT_JOBTRACKER_SSH_HOST
 
+try:
+    from scripts.job_override_dates import filter_companies_by_overrides
+except ModuleNotFoundError:
+    from job_override_dates import filter_companies_by_overrides
+
 
 MAX_DETAILED_COMPANY_SECTIONS_IN_PLAN = 25
 MAX_SUGGESTED_SEARCHES_PER_COMPANY_IN_PLAN = 3
@@ -285,11 +290,16 @@ def select_human_search_companies(
         for company in eligible
         if str(company["name"]) not in suggested_names
     ][:count]
-
-    if selected:
-        return selected
-
-    return eligible[:count]
+    selected_names = {str(company["name"]) for company in selected}
+    for company in eligible:
+        if len(selected) >= count:
+            break
+        name = str(company["name"])
+        if name in selected_names:
+            continue
+        selected.append(company)
+        selected_names.add(name)
+    return selected
 
 
 def update_human_search_state(
@@ -305,12 +315,21 @@ def update_human_search_state(
         if str(name) in all_name_set
     ]
 
-    if len(set(current_names)) >= len(all_name_set):
+    selected_names = [
+        str(company.get("name", "")).strip()
+        for company in selected_companies
+        if str(company.get("name", "")).strip()
+    ]
+    unsearched_names = [name for name in all_names if name not in set(current_names)]
+
+    if not unsearched_names:
         current_names = []
+    elif len(selected_names) > len(unsearched_names):
+        current_names = selected_names[len(unsearched_names):]
+        return {"suggested_company_names": current_names}
 
     seen = set(current_names)
-    for company in selected_companies:
-        name = str(company.get("name", "")).strip()
+    for name in selected_names:
         if name and name not in seen:
             current_names.append(name)
             seen.add(name)
@@ -322,7 +341,9 @@ def format_human_search_companies(companies: list[dict[str, Any]]) -> list[str]:
     lines: list[str] = []
     for index, company in enumerate(companies, start=1):
         name = str(company.get("name", "")).strip()
-        careers_url = str(company.get("careers_url", "")).strip()
+        careers_url = str(
+            company.get("human_search_url") or company.get("careers_url", "")
+        ).strip()
         if careers_url:
             lines.append(f"{index}. {name} - {careers_url}")
         else:
@@ -454,6 +475,12 @@ def write_search_plan(
         "`manual_job_urls.yml`, and include them in the current dated discovery and strict workflow reports."
     )
     lines.append(
+        "Use the authenticated AI Apply MCP as a bounded read-only discovery and application-status source. "
+        "The candidate profile and search rules in this repository remain authoritative; do not inherit AI Apply's saved exclusions. "
+        "Resolve every candidate to a live official company or ATS posting before Apply or Maybe, treat an AI Apply internal job ID "
+        "as source-scoped rather than an employer requisition ID, and never call `queue_job_for_review` or `submit_application`."
+    )
+    lines.append(
         "USAJOBS federal-job discovery is included when `USAJOBS_USER_AGENT` and "
         "`USAJOBS_AUTHORIZATION_KEY` are present in the local environment; if either "
         "is missing, the run should skip USAJOBS with a diagnostic rather than fail."
@@ -492,7 +519,9 @@ def write_search_plan(
         "This stage must use `resume-ready-jobs.md` as its sole authorization queue. If the exact job posting already "
         "has a validated resume in a prior production manifest, reuse and link that prior artifact instead of "
         "regenerating it. Treat different job IDs as different roles. Generate and validate one cover letter for each "
-        "exact Resume Ready posting using the same applied snapshot. Validate every DOCX and rendered page, and "
+        "exact Resume Ready posting using the same applied snapshot and `$jhaynes-writing-voice`. Keep every claim "
+        "grounded in verified candidate evidence, and regenerate legacy letters that do not match the approved voice. "
+        "Validate every DOCX and rendered page, and "
         "regenerate the workflow HTML only after all authorized artifacts pass."
     )
     lines.append("")
@@ -713,6 +742,11 @@ def write_search_plan(
         "resolve to the official posting, add the official URL to `manual_job_urls.yml`, and include the role in the current dated reports."
     )
     lines.append(
+        "Treat AI Apply MCP results the same way: preserve AI Apply as the source, deduplicate before deep review, resolve a live official "
+        "company or ATS posting, and keep unresolved results as verification items only. Scheduled runs are read-only and must never call "
+        "`queue_job_for_review` or `submit_application`."
+    )
+    lines.append(
         "If a role is strong but either missing an official posting date or verified live beyond the 60-day window, keep it in a secondary `Needs Freshness Verification` section rather than discarding it."
     )
     lines.append("")
@@ -851,6 +885,7 @@ def write_report_template(
         "- Remove roles from the active carry-forward set after jobtracker marks them as already applied.",
         "- Treat manually surfaced official live job URLs as valid candidate inputs for the current report after live verification.",
         "- Treat browser-reviewed job findings from LinkedIn, Indeed, or any other site as manual intake: preserve the source, resolve the official URL, and include qualifying roles in this dated report.",
+        "- Use AI Apply MCP only for bounded read-only discovery and application-status reconciliation; resolve an official company or ATS posting before promotion, never treat an AI Apply internal job ID as an employer requisition ID, and never call queue_job_for_review or submit_application.",
         "- Carry manually surfaced roles forward until applied, delisted, or disqualified.",
         "- If an official posting lacks a visible date, keep the displayed date honest but treat the role as freshest for ranking.",
         "- Social scans should stay shallow and cheap: no deep thread crawling, no per-link job verification.",
@@ -880,21 +915,28 @@ def main() -> None:
     parser.add_argument("--companies", default="companies.yml")
     parser.add_argument("--profile", default="candidate_profile.yml")
     parser.add_argument("--rules", default="search_rules.md")
+    parser.add_argument("--job-overrides", default="job_overrides.yml")
     parser.add_argument("--out", default="outputs")
 
     args = parser.parse_args()
 
     companies_doc = load_yaml(Path(args.companies))
+    overrides_doc = load_yaml(Path(args.job_overrides))
     profile_doc = load_yaml(Path(args.profile))
     rules_text = read_text(Path(args.rules))
 
     companies = normalize_company_entries(companies_doc)
+    raw_overrides = overrides_doc.get("overrides", []) if isinstance(overrides_doc, dict) else overrides_doc
+    if not isinstance(raw_overrides, list) or not all(isinstance(item, dict) for item in raw_overrides):
+        raise ValueError("job_overrides.yml must contain a top-level 'overrides' list")
+    run_date = dt.date.today()
+    companies = filter_companies_by_overrides(companies, raw_overrides, as_of=run_date)
     profile = get_profile_section(profile_doc)
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    today = dt.date.today().isoformat()
+    today = run_date.isoformat()
     human_search_companies = write_human_search_rotation(
         today=today,
         companies=companies,

@@ -1,4 +1,5 @@
 import json
+import datetime as dt
 import sys
 import tempfile
 import unittest
@@ -9,6 +10,7 @@ from scripts.mark_applied_jobs import TrackerJob, write_tracker_jobs_snapshot
 from scripts.review_job_fit import (
     classify_review,
     is_excluded_company,
+    is_skipped_by_job_override,
     load_carry_forward_jobs,
     main,
     merge_current_and_carry_forward_jobs,
@@ -18,6 +20,7 @@ from scripts.review_job_fit import (
 PROFILE = {
     "confirmed_strengths": ["Java", "Spring Boot", "REST APIs", "SQL", "Oracle CPQ", "quote-to-cash"],
     "do_not_claim": ["React", "AWS", "Go", "ledgering", "settlement", "double-entry accounting"],
+    "salary_floor": 150000,
     "hard_reject_if_primary": [
         "React-heavy frontend",
         "Go primary stack",
@@ -29,6 +32,149 @@ PROFILE = {
 
 
 class ReviewJobFitTests(unittest.TestCase):
+    def test_published_compensation_maximum_below_floor_is_a_hard_blocker(self) -> None:
+        job = {
+            "company": "ExampleCo",
+            "title": "Principal Java Engineer",
+            "description": (
+                "Build Java services. The estimated annual salary range is "
+                "$87,500.00-$139,250.00."
+            ),
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 95,
+            "risk_flags": [],
+            "url": "https://example.com/jobs/below-floor",
+        }
+
+        review = classify_review(job=job, workflow_profile=PROFILE)
+
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+        self.assertIn(
+            "published compensation maximum $139,250 does not exceed $150,000 floor",
+            review.hard_blockers,
+        )
+
+    def test_published_compensation_must_strictly_exceed_floor(self) -> None:
+        job = {
+            "company": "ExampleCo",
+            "title": "Principal Java Engineer",
+            "description": "Build Java services. Base salary range: $140k-$150k annually.",
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 95,
+            "risk_flags": [],
+            "url": "https://example.com/jobs/at-floor",
+        }
+
+        review = classify_review(job=job, workflow_profile=PROFILE)
+
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertIn(
+            "published compensation maximum $150,000 does not exceed $150,000 floor",
+            review.hard_blockers,
+        )
+
+    def test_published_compensation_above_floor_remains_eligible(self) -> None:
+        job = {
+            "company": "ExampleCo",
+            "title": "Principal Java Engineer",
+            "description": "Build Java services. Annual compensation range: $145,000-$150,001.",
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 95,
+            "risk_flags": [],
+            "url": "https://example.com/jobs/above-floor",
+        }
+
+        review = classify_review(job=job, workflow_profile=PROFILE)
+
+        self.assertEqual("STRONG APPLY", review.workflow_decision)
+        self.assertFalse(any("compensation maximum" in item for item in review.hard_blockers))
+
+    def test_unpublished_or_hourly_compensation_does_not_trigger_annual_floor(self) -> None:
+        descriptions = [
+            "Build Java services. Compensation is competitive.",
+            "Build Java services. Contract pay range is $70-$90 per hour.",
+        ]
+
+        for index, description in enumerate(descriptions):
+            with self.subTest(description=description):
+                job = {
+                    "company": "ExampleCo",
+                    "title": "Principal Java Engineer",
+                    "description": description,
+                    "location": "Remote US",
+                    "work_model": "Remote",
+                    "decision": "Apply",
+                    "fit_score": 95,
+                    "risk_flags": [],
+                    "url": f"https://example.com/jobs/unknown-{index}",
+                }
+
+                review = classify_review(job=job, workflow_profile=PROFILE)
+
+                self.assertEqual("STRONG APPLY", review.workflow_decision)
+                self.assertFalse(
+                    any("compensation maximum" in item for item in review.hard_blockers)
+                )
+
+    def test_invalid_salary_floor_fails_explicitly(self) -> None:
+        job = {
+            "company": "ExampleCo",
+            "title": "Principal Java Engineer",
+            "description": "Build Java services. Annual salary range: $160,000-$180,000.",
+            "decision": "Apply",
+            "fit_score": 95,
+            "url": "https://example.com/jobs/invalid-floor",
+        }
+        profile = {**PROFILE, "salary_floor": "not-a-number"}
+
+        with self.assertRaisesRegex(ValueError, "salary_floor must be a positive number"):
+            classify_review(job=job, workflow_profile=profile)
+
+    def test_expired_company_override_does_not_exclude_role(self) -> None:
+        job = {
+            "company": "Block",
+            "title": "Staff Software Engineer",
+            "url": "https://block.xyz/careers/jobs/123",
+            "job_id": "123",
+        }
+        overrides = [
+            {
+                "company": "Block",
+                "decision": "Skip",
+                "expires_on": "2026-10-28",
+            }
+        ]
+
+        self.assertTrue(
+            is_skipped_by_job_override(job, overrides, as_of=dt.date(2026, 10, 28))
+        )
+        self.assertFalse(
+            is_skipped_by_job_override(job, overrides, as_of=dt.date(2026, 10, 29))
+        )
+
+    def test_job_override_title_marker_excludes_role_from_strict_review(self) -> None:
+        job = {
+            "company": "Block",
+            "title": "Staff Android Software Engineer, Consumer Platform",
+            "url": "https://example.com/jobs/1",
+            "job_id": "1",
+        }
+        overrides = [
+            {
+                "title_contains": "Android Software Engineer",
+                "decision": "Skip",
+            }
+        ]
+
+        self.assertTrue(is_skipped_by_job_override(job, overrides))
+
     def test_excluded_employer_is_filtered_by_exact_company_name(self) -> None:
         profile = {"excluded_companies": ["Oracle"]}
 
@@ -192,6 +338,7 @@ class ReviewJobFitTests(unittest.TestCase):
         job = {
             "company": "ExampleCo",
             "title": "Senior Software Engineer, Java Platform",
+            "job_id": "REQ-12345",
             "description": "Build Java Spring Boot REST APIs with SQL for enterprise SaaS workflows.",
             "location": "Remote US",
             "work_model": "Remote",
@@ -201,11 +348,123 @@ class ReviewJobFitTests(unittest.TestCase):
             "url": "https://example.com/job",
         }
         review = classify_review(job=job, workflow_profile=PROFILE)
+        self.assertEqual(review.job_id, "REQ-12345")
         self.assertEqual(review.workflow_decision, "APPLY")
         self.assertTrue(review.should_generate_resume)
         self.assertEqual(review.recommended_resume_base, "software_engineering")
         self.assertEqual(review.overqualified_risk, "medium")
         self.assertEqual(review.resume_positioning, "senior_lead_execution_forward")
+
+    def test_configured_associate_technical_consultant_title_is_rejected(self) -> None:
+        profile = {
+            **PROFILE,
+            "excluded_role_title_markers": ["associate technical consultant"],
+        }
+        job = {
+            "company": "Aderant",
+            "title": "Associate Technical Consultant",
+            "description": "Implement Java and SQL enterprise integrations for customers.",
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 90,
+            "risk_flags": [],
+            "url": "https://example.com/associate-consultant",
+        }
+
+        review = classify_review(job=job, workflow_profile=profile)
+
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+        self.assertIn(
+            "excluded role type: associate technical consultant",
+            review.hard_blockers,
+        )
+
+    def test_confirmed_language_satisfies_disjunctive_required_language_list(self) -> None:
+        job = {
+            "company": "Fresh Consulting",
+            "title": "Staff Software Engineer (Distributed Systems and Orchestration)",
+            "description": (
+                "Requirements: 15 years of software development experience with strong "
+                "proficiency in a systems language such as Go, Rust, C++, or Java. "
+                "Lead distributed systems, Kubernetes orchestration, CI/CD, and technical leadership."
+            ),
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 88,
+            "risk_flags": [],
+            "url": "https://example.com/disjunctive-language-list",
+        }
+
+        review = classify_review(job=job, workflow_profile=PROFILE)
+
+        self.assertNotIn("Go", review.required_gaps)
+        self.assertNotIn("Go primary stack", review.hard_blockers)
+        self.assertEqual("STRONG APPLY", review.workflow_decision)
+        self.assertTrue(review.should_generate_resume)
+
+    def test_confirmed_language_does_not_satisfy_conjunctive_required_language_list(self) -> None:
+        job = {
+            "company": "PlatformCo",
+            "title": "Staff Software Engineer",
+            "description": (
+                "Requirements: professional Java and Go experience. "
+                "Lead distributed systems, Kubernetes orchestration, CI/CD, and technical leadership."
+            ),
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 88,
+            "risk_flags": [],
+            "url": "https://example.com/conjunctive-language-list",
+        }
+
+        review = classify_review(job=job, workflow_profile=PROFILE)
+
+        self.assertIn("Go", review.required_gaps)
+        self.assertIn("Go primary stack", review.hard_blockers)
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+
+    def test_explicit_nonremote_location_outside_atlanta_is_rejected(self) -> None:
+        profile = {**PROFILE, "hybrid_allowed_metro_tokens": ["Atlanta", "Douglasville"]}
+        job = {
+            "company": "Mastercard",
+            "title": "Senior Software Engineer - Java",
+            "description": "Build Java APIs and distributed systems.",
+            "location": "Oslo, Norway",
+            "work_model": "Unknown",
+            "decision": "Apply",
+            "fit_score": 88,
+            "risk_flags": ["work model unclear"],
+            "url": "https://example.com/oslo-java",
+        }
+
+        review = classify_review(job=job, workflow_profile=profile)
+
+        self.assertIn("physical location outside Atlanta metro without remote status", review.hard_blockers)
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+
+    def test_generic_us_location_with_unknown_work_model_is_not_rejected(self) -> None:
+        profile = {**PROFILE, "hybrid_allowed_metro_tokens": ["Atlanta", "Douglasville"]}
+        job = {
+            "company": "PlatformCo",
+            "title": "Principal Software Engineer",
+            "description": "Build Java APIs and distributed systems.",
+            "location": "United States",
+            "work_model": "Unknown",
+            "decision": "Apply",
+            "fit_score": 88,
+            "risk_flags": ["work model unclear"],
+            "url": "https://example.com/us-location",
+        }
+
+        review = classify_review(job=job, workflow_profile=profile)
+
+        self.assertNotIn("physical location outside Atlanta metro without remote status", review.hard_blockers)
 
     def test_principal_role_has_low_overqualified_risk_and_architect_positioning(self) -> None:
         job = {
@@ -447,6 +706,135 @@ class ReviewJobFitTests(unittest.TestCase):
         self.assertEqual({"Go": "do_not_claim", "Kafka": "do_not_claim"}, review.resolved_gaps)
         self.assertEqual([], review.questions_for_candidate)
         self.assertTrue(review.should_generate_resume)
+
+    def test_candidate_wide_answer_suppresses_duplicate_questions(self) -> None:
+        profile = {
+            **PROFILE,
+            "candidate_gap_resolutions": {"AWS": "do_not_claim"},
+        }
+        jobs = [
+            {
+                "company": "CloudCo",
+                "title": f"Staff Java Engineer {index}",
+                "description": "Build Java services. AWS experience is preferred.",
+                "location": "Remote US",
+                "work_model": "Remote",
+                "decision": "Apply",
+                "fit_score": 90,
+                "risk_flags": [],
+                "url": f"https://example.com/cloud-{index}",
+            }
+            for index in (1, 2)
+        ]
+
+        reviews = [classify_review(job=job, workflow_profile=profile) for job in jobs]
+
+        for review in reviews:
+            self.assertEqual({"AWS": "do_not_claim"}, review.resolved_gaps)
+            self.assertEqual([], review.questions_for_candidate)
+            self.assertTrue(review.should_generate_resume)
+
+    def test_candidate_gap_resolution_applies_across_postings(self) -> None:
+        profile = {
+            **PROFILE,
+            "candidate_gap_resolutions": {
+                "AWS": "limited_exposure: training only; no professional production experience",
+            },
+        }
+        job = {
+            "company": "CloudCo",
+            "title": "Principal Java Engineer",
+            "description": "Build Java services. AWS experience is preferred.",
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 90,
+            "risk_flags": [],
+            "url": "https://example.com/cloud-principal",
+        }
+
+        review = classify_review(job=job, workflow_profile=profile)
+
+        self.assertEqual(
+            {"AWS": "limited_exposure: training only; no professional production experience"},
+            review.resolved_gaps,
+        )
+        self.assertEqual([], review.questions_for_candidate)
+
+    def test_candidate_limited_exposure_does_not_clear_required_gap(self) -> None:
+        profile = {
+            **PROFILE,
+            "candidate_gap_resolutions": {
+                "AWS": "limited_exposure: training only; no professional production experience",
+            },
+        }
+        job = {
+            "company": "CloudCo",
+            "title": "Principal Java Engineer",
+            "description": "Required qualifications include professional AWS experience.",
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 90,
+            "risk_flags": [],
+            "url": "https://example.com/cloud-required",
+        }
+
+        review = classify_review(job=job, workflow_profile=profile)
+
+        self.assertEqual(["AWS"], review.required_gaps)
+        self.assertEqual([], review.questions_for_candidate)
+        self.assertIn(review.workflow_decision, {"SKIP", "EXTREME STRETCH"})
+        self.assertFalse(review.should_generate_resume)
+
+    def test_posting_gap_resolution_overrides_candidate_wide_answer(self) -> None:
+        job_url = "https://example.com/cloud-specific"
+        profile = {
+            **PROFILE,
+            "candidate_gap_resolutions": {"AWS": "do_not_claim"},
+            "gap_resolutions": {
+                job_url: {
+                    "AWS": "posting_false_positive: AWS is listed only as an example",
+                }
+            },
+        }
+        job = {
+            "company": "CloudCo",
+            "title": "Principal Java Engineer",
+            "description": "Build Java services. AWS experience is preferred.",
+            "location": "Remote US",
+            "work_model": "Remote",
+            "decision": "Apply",
+            "fit_score": 90,
+            "risk_flags": [],
+            "url": job_url,
+        }
+
+        review = classify_review(job=job, workflow_profile=profile)
+
+        self.assertEqual(
+            {"AWS": "posting_false_positive: AWS is listed only as an example"},
+            review.resolved_gaps,
+        )
+
+    def test_candidate_wide_posting_false_positive_is_rejected(self) -> None:
+        profile = {
+            **PROFILE,
+            "candidate_gap_resolutions": {
+                "AWS": "posting_false_positive: AWS is listed only as an example",
+            },
+        }
+        job = {
+            "company": "CloudCo",
+            "title": "Principal Java Engineer",
+            "description": "Build Java services. AWS experience is preferred.",
+            "decision": "Apply",
+            "fit_score": 90,
+            "url": "https://example.com/cloud",
+        }
+
+        with self.assertRaisesRegex(ValueError, "cannot use posting_false_positive"):
+            classify_review(job=job, workflow_profile=profile)
 
     def test_gap_resolution_is_scoped_to_exact_posting_url(self) -> None:
         job = {

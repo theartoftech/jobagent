@@ -32,6 +32,7 @@ else:
 DEFAULT_TRACKER_ENDPOINT = "http://127.0.0.1:8086/api/analytics/workflow-runs"
 TOKEN_ENVIRONMENT_VARIABLE = "JOBTRACKER_ANALYTICS_IMPORT_TOKEN"
 ENDPOINT_ENVIRONMENT_VARIABLE = "JOBTRACKER_ANALYTICS_URL"
+LOCATION_MAXIMUM = 300
 
 SOURCE_DECISIONS = {
     "strong apply": "strong_apply",
@@ -159,6 +160,8 @@ def map_decision(value: object, *, source: bool) -> str:
 
 def map_work_model(value: object) -> str:
     normalized = normalized_text(value)
+    if "not stated" in normalized or "not specified" in normalized:
+        return "unspecified"
     if "hybrid" in normalized:
         return "hybrid"
     if "remote" in normalized or "virtual" in normalized:
@@ -265,8 +268,8 @@ def build_posting(review: dict[str, Any]) -> dict[str, Any]:
         else f"url:{hashlib.sha256(url.encode('utf-8')).hexdigest()}"
     )
     location_value = str(review.get("location") or "").strip() or None
-    if location_value is not None and len(location_value) > 300:
-        raise ValueError("Workflow review location exceeds 300 characters")
+    if location_value is not None and len(location_value) > LOCATION_MAXIMUM:
+        location_value = location_value[: LOCATION_MAXIMUM - 3].rstrip(" ;,") + "..."
     try:
         fit_score = float(review.get("source_fit_score"))
     except (TypeError, ValueError) as error:
@@ -303,6 +306,26 @@ def validate_date(value: object) -> str:
     return value
 
 
+def dedupe_postings(postings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep the first current-review record for each exact posting identity."""
+    seen_requisition_ids: set[str] = set()
+    seen_urls: set[str] = set()
+    deduped: list[dict[str, Any]] = []
+    for posting in postings:
+        requisition_id = str(posting.get("requisition_id") or "").strip().casefold()
+        url = str(posting.get("canonical_url") or "").strip().casefold()
+        if requisition_id and requisition_id in seen_requisition_ids:
+            continue
+        if url and url in seen_urls:
+            continue
+        deduped.append(posting)
+        if requisition_id:
+            seen_requisition_ids.add(requisition_id)
+        if url:
+            seen_urls.add(url)
+    return deduped
+
+
 def build_import_payload(
     *,
     review: dict[str, Any],
@@ -319,7 +342,7 @@ def build_import_payload(
         raise ValueError("Workflow review must contain a reviews list of objects")
     if len(raw_reviews) > 500:
         raise ValueError(f"Workflow review has {len(raw_reviews)} postings; tracker limit is 500")
-    postings = [build_posting(item) for item in raw_reviews]
+    postings = dedupe_postings([build_posting(item) for item in raw_reviews])
     postings.sort(key=lambda item: (item["company"].casefold(), item["title"].casefold(), item["posting_key"]))
     gap_count = sum(len(item["gaps"]) for item in postings)
     if gap_count > 5000:

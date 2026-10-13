@@ -6,6 +6,9 @@
 __pycache__/
 *.py[cod]
 outputs/
+outputs-contacts/
+.coverage
+htmlcov/
 Source Docs/
 resume_templates.json
 /*_profile.yml

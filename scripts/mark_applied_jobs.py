@@ -73,6 +73,7 @@ def extract_requisition_id(value: str) -> str:
         r"\bREQ[_-]\d+\b",
         r"\bJR[-_]\d+\b",
         r"\bR[-_]\d+\b",
+        r"(?<![A-Z0-9])R\d{6,}(?:-\d+)?(?!\d)",
         r"\bJ\d{6,}\b",
         r"\b\d{5,}\b",
     ]

@@ -32,6 +32,21 @@ try:
 except ModuleNotFoundError:
     yaml = None
 
+try:
+    from scripts.language_requirements import required_unsupported_spoken_languages
+except ModuleNotFoundError:
+    from language_requirements import required_unsupported_spoken_languages
+
+try:
+    from scripts.location_requirements import hybrid_location_outside_allowed_metro
+except ModuleNotFoundError:
+    from location_requirements import hybrid_location_outside_allowed_metro
+
+try:
+    from scripts.job_override_dates import filter_companies_by_overrides, override_is_active
+except ModuleNotFoundError:
+    from job_override_dates import filter_companies_by_overrides, override_is_active
+
 
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -42,6 +57,8 @@ SUBPROCESS_TIMEOUT_PADDING_SECONDS = 2
 DEFAULT_MAX_AGE_DAYS = 60
 MIN_APPLY_FIT_SCORE = 76
 MAX_SEARCH_TERMS_PER_COMPANY = 24
+MAX_FIRST_PARTY_API_SEARCH_TERMS_PER_COMPANY = 8
+MAX_FIRST_PARTY_API_RESULTS_PER_TERM = 25
 MAX_DETAIL_FETCHES_PER_COMPANY = 25
 MAX_INTUIT_SEARCH_TERMS_PER_COMPANY = 8
 MAX_WORKDAY_NON_PRODUCTIVE_SEARCHES_PER_COMPANY = 6
@@ -288,6 +305,7 @@ ATS_DOMAIN_MARKERS = [
 ]
 
 UNAVAILABLE_TEXT_MARKERS = [
+    "page not found",
     "job not found",
     "job is no longer available",
     "job has expired",
@@ -402,6 +420,19 @@ def truncate_text(value: str, max_chars: int) -> str:
     return text[: max_chars - 3].rstrip() + "..."
 
 
+def compact_text_preserving_ends(value: str, max_chars: int) -> str:
+    text = value or ""
+    if len(text) <= max_chars:
+        return text
+    marker = "\n\n[middle omitted]\n\n"
+    if max_chars <= len(marker):
+        return truncate_text(text, max_chars)
+    content_chars = max_chars - len(marker)
+    head_chars = (content_chars * 3) // 5
+    tail_chars = content_chars - head_chars
+    return text[:head_chars].rstrip() + marker + text[-tail_chars:].lstrip()
+
+
 def build_discovered_jobs_payload(
     *,
     jobs: list[JobPosting],
@@ -414,7 +445,10 @@ def build_discovered_jobs_payload(
         job_dict = asdict(job)
         description = str(job_dict.get("description") or "")
         if job.decision in {"Apply", "Maybe"}:
-            job_dict["description"] = truncate_text(description, MAX_COMPACT_DESCRIPTION_CHARS)
+            job_dict["description"] = compact_text_preserving_ends(
+                description,
+                MAX_COMPACT_DESCRIPTION_CHARS,
+            )
         else:
             job_dict["description"] = truncate_text(description, MAX_SKIP_DESCRIPTION_CHARS)
         serialized_jobs.append(job_dict)
@@ -546,6 +580,14 @@ def ats_registry_urls_for_company(registry: dict[str, list[str]], company: dict[
     return list(registry.get(company_name, []))
 
 
+def curl_failure_message(
+    error: subprocess.CalledProcessError | subprocess.TimeoutExpired,
+) -> str:
+    if isinstance(error, subprocess.TimeoutExpired):
+        return f"request timed out after {error.timeout} seconds"
+    return f"request failed with exit code {error.returncode}"
+
+
 def request_text(url: str, *, timeout: int = 10) -> str:
     if shutil.which("curl"):
         try:
@@ -566,7 +608,7 @@ def request_text(url: str, *, timeout: int = 10) -> str:
                 timeout=timeout + SUBPROCESS_TIMEOUT_PADDING_SECONDS,
             )
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-            raise URLError(str(exc)) from exc
+            raise URLError(curl_failure_message(exc)) from exc
         return result.stdout
 
     request = Request(
@@ -604,7 +646,7 @@ def request_text_with_status(url: str, *, timeout: int = 10) -> tuple[int, str, 
                 timeout=timeout + SUBPROCESS_TIMEOUT_PADDING_SECONDS,
             )
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-            raise URLError(str(exc)) from exc
+            raise URLError(curl_failure_message(exc)) from exc
 
         body, _, status_line = result.stdout.rpartition(f"\n{marker}:")
         status_parts = status_line.split(":", 1)
@@ -673,7 +715,7 @@ def request_json(
                 timeout=timeout + SUBPROCESS_TIMEOUT_PADDING_SECONDS,
             )
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-            raise URLError(str(exc)) from exc
+            raise URLError(curl_failure_message(exc)) from exc
         if not result.stdout.strip():
             raise ValueError("empty JSON response")
         return json.loads(result.stdout)
@@ -1079,13 +1121,72 @@ def extract_ashby_slug(url: str, page: str = "") -> str | None:
     return None
 
 
+ORACLE_CPQ_PARTNER_LISTING_PATHS: dict[str, set[str]] = {
+    "careers.techmahindra.com": {"/currentopportunity.aspx"},
+    "careers.wipro.com": {"/viewalljobs"},
+    "careers.dxc.com": {""},
+    "trinamix.com": {"/careers"},
+    "jobs.birlasoft.com": {"/go/US/684844"},
+    "centroid.applytojob.com": {"/apply"},
+    "inoapps.com": {"/join-inoapps"},
+    "argano.com": {"/careers/open-positions.html"},
+    "infovity.com": {"/careers"},
+    "vigilant-inc.com": {"/careers"},
+    "zensar.com": {"/careers"},
+    "nexinfo.com": {"/careers"},
+    "jadeglobal.com": {"/careers"},
+    "cherryroad.com": {"/who-we-are/careers"},
+    "terillium.com": {"/careers"},
+    "speridiantechnologies.applytojob.com": {"/apply"},
+}
+
+
 def looks_like_first_party_listing_url(url: str) -> bool:
     parsed = urlparse(url)
     host = parsed.netloc.lower().removeprefix("www.")
     normalized_path = parsed.path.rstrip("/")
+    if normalized_path in ORACLE_CPQ_PARTNER_LISTING_PATHS.get(host, set()):
+        return True
+    if host.endswith(".oraclecloud.com"):
+        return (
+            "/hcmUI/CandidateExperience/" in parsed.path
+            and normalized_path.endswith("/requisitions")
+        )
+    if host == "jobs.dnv.com" and normalized_path == "":
+        return True
+    if host == "jobs.aon.com" and normalized_path == "/jobs":
+        return True
+    if host == "careers.cloud.com" and normalized_path == "/jobs/search":
+        return True
     if host == "stripe.com" and normalized_path in {"/jobs", "/jobs/search"}:
         return True
     if host == "southerncompany.jobs" and normalized_path in {"", "/jobs"}:
+        return True
+    if host == "careers.ibm.com" and normalized_path == "/en_US/careers/SearchJobs":
+        return True
+    if host == "careers.cognizant.com" and normalized_path == "/us-en/jobs":
+        return True
+    if host == "salesforce.com" and normalized_path == "/company/careers/jobs":
+        return True
+    if host == "kpmguscareers.com" and normalized_path == "/job-search":
+        return True
+    if host == "careers.hcltech.com" and normalized_path.startswith("/go/United-States"):
+        return True
+    if host == "careers.ltm.com" and normalized_path == "/viewalljobs":
+        return True
+    if host == "logicom.net" and normalized_path == "/careers/head-office/vacancies-list":
+        return True
+    if host == "atawayglobal.catsone.com" and normalized_path == "/careers/97420":
+        return True
+    if host == "jobs.us.pwc.com" and normalized_path == "/oracle-jobs":
+        return True
+    if host == "accenture.com" and normalized_path == "/us-en/careers":
+        return True
+    if host == "infosys.com" and normalized_path == "/careers/americas/apply.html":
+        return True
+    if host == "apply.deloitte.com" and normalized_path == "/en_US/careers":
+        return True
+    if host == "capgemini.com" and normalized_path == "/careers/join-capgemini/job-search":
         return True
     return host == "blackrock.com" and normalized_path in {
         "/corporate/careers/job-search",
@@ -1096,10 +1197,63 @@ def looks_like_first_party_listing_url(url: str) -> bool:
 def is_first_party_job_detail_url(url: str) -> bool:
     parsed = urlparse(url)
     host = parsed.netloc.lower().removeprefix("www.")
+    normalized_path = parsed.path.rstrip("/")
+    if host in {"centroid.applytojob.com", "speridiantechnologies.applytojob.com"}:
+        return normalized_path.startswith("/apply/")
+    if host == "careers.techmahindra.com":
+        return normalized_path.lower().endswith("/jobdetails.aspx") or "jobid=" in parsed.query.lower()
+    if host in {"careers.wipro.com", "jobs.birlasoft.com"}:
+        return normalized_path.startswith("/job/")
+    if host == "careers.dxc.com":
+        return normalized_path.startswith("/job/") or normalized_path.startswith("/global/en/job/")
+    if host in {
+        "trinamix.com",
+        "inoapps.com",
+        "argano.com",
+        "infovity.com",
+        "vigilant-inc.com",
+        "zensar.com",
+        "nexinfo.com",
+        "jadeglobal.com",
+        "cherryroad.com",
+        "terillium.com",
+    }:
+        return any(segment in normalized_path for segment in ("/job/", "/jobs/", "/career/", "/careers/")) and not looks_like_first_party_listing_url(url)
+    if host.endswith(".oraclecloud.com"):
+        return (
+            "/hcmUI/CandidateExperience/" in parsed.path
+            and re.search(r"/job/\d+/?$", parsed.path) is not None
+        )
+    if host == "jobs.dnv.com":
+        return parsed.path.startswith("/job-search/")
+    if host == "jobs.aon.com":
+        return re.fullmatch(r"/jobs/\d+/?", parsed.path) is not None
+    if host == "careers.cloud.com":
+        return parsed.path.startswith("/jobs/") and parsed.path.rstrip("/") != "/jobs/search"
     if host == "stripe.com":
         return "/jobs/listing/" in parsed.path
     if host == "southerncompany.jobs":
         return "/job/" in parsed.path
+    if host == "careers.ibm.com":
+        return "/en_US/careers/JobDetail" in parsed.path
+    if host == "careers.cognizant.com":
+        return re.search(r"/us-en/jobs/\d+/[^/]+/?$", parsed.path) is not None
+    if host == "salesforce.com":
+        return re.search(r"/company/careers/jobs/JR\d+/[^/]+/?$", parsed.path) is not None
+    if host == "kpmguscareers.com":
+        job_id = parse_qs(parsed.query).get("jobId", [""])[0]
+        return normalized_path == "/jobdetail" and job_id.isdigit()
+    if host == "careers.hcltech.com":
+        return parsed.path.startswith("/job/")
+    if host == "careers.ltm.com":
+        return parsed.path.startswith("/job/")
+    if host == "logicom.net":
+        return (
+            parsed.path.startswith("/careers/")
+            and normalized_path != "/careers/head-office/vacancies-list"
+        )
+    if host == "atawayglobal.catsone.com":
+        return re.search(r"/careers/97420/jobs/\d+", parsed.path) is not None
     return host == "blackrock.com" and "/job/" in parsed.path
 
 
@@ -1120,12 +1274,12 @@ def is_intuit_job_detail_url(url: str) -> bool:
 
 
 def looks_like_icims_url(url: str, page: str = "") -> bool:
-    haystacks = [url, page]
-    return any(
-        marker in haystack
-        for haystack in haystacks
-        for marker in ["icims.com/jobs", "careers.icims.com", "/jobs/search", "/jobs/"]
-    )
+    parsed = urlparse(url)
+    host = parsed.netloc.casefold().removeprefix("www.")
+    if host == "icims.com" or host.endswith(".icims.com"):
+        return True
+    lowered_page = page.casefold()
+    return "icims.com/jobs" in lowered_page or "careers.icims.com" in lowered_page
 
 
 def looks_like_insight_global_url(url: str, page: str = "") -> bool:
@@ -1345,6 +1499,26 @@ def is_workday_fatal_error_response(response: dict[str, Any]) -> bool:
     return bool(error_code and http_status in {"400", "403", "404"} and error_code in {"S21", "S12", "S13"})
 
 
+def workday_detail_locations(info: dict[str, Any], fallback: str) -> str:
+    locations: list[str] = []
+    primary = str(info.get("location") or fallback).strip()
+    if primary:
+        locations.append(primary)
+
+    additional = info.get("additionalLocations", [])
+    if isinstance(additional, list):
+        for item in additional:
+            if isinstance(item, str):
+                location = item.strip()
+            elif isinstance(item, dict):
+                location = str(item.get("descriptor") or item.get("name") or "").strip()
+            else:
+                location = ""
+            if location:
+                locations.append(location)
+    return "; ".join(dedupe(locations))
+
+
 class WorkdayAdapter(Adapter):
     name = "workday"
 
@@ -1529,7 +1703,7 @@ class WorkdayAdapter(Adapter):
 
         job.description = html_to_text(str(info.get("jobDescription", "")))
         job.title = str(info.get("title") or job.title).strip()
-        job.location = str(info.get("location") or job.location).strip()
+        job.location = workday_detail_locations(info, job.location)
         job.work_model = str(info.get("remoteType") or infer_work_model(job.location, job.description))
         job.url = str(info.get("externalUrl") or job.url)
         job.job_id = str(info.get("jobReqId") or job.job_id)
@@ -2003,10 +2177,32 @@ class FirstPartyListingAdapter(Adapter):
         max_age_days: int,
         errors: list[DiscoveryError],
     ) -> list[JobPosting]:
+        parsed = urlparse(self.url)
+        host = parsed.netloc.lower().removeprefix("www.")
+        if host == "jobs.aon.com":
+            return self._discover_aon(company, profile, today, max_age_days, errors)
+        if host.endswith(".oraclecloud.com"):
+            return self._discover_oracle_recruiting(
+                company,
+                profile,
+                today,
+                max_age_days,
+                errors,
+            )
+
         try:
             page = request_text(self.url)
         except (HTTPError, URLError, TimeoutError, ValueError) as exc:
             errors.append(DiscoveryError(company["name"], self.name, str(exc)))
+            return []
+        if page_looks_like_access_challenge(page):
+            errors.append(
+                DiscoveryError(
+                    company["name"],
+                    self.name,
+                    f"{self.url}: official site access challenge blocked automated listing inspection",
+                )
+            )
             return []
 
         candidate_urls = [
@@ -2022,6 +2218,214 @@ class FirstPartyListingAdapter(Adapter):
             seen.add(url)
             jobs.extend(fetch_job_page_jobs(company, url, today, profile, max_age_days, errors, self.name))
         return dedupe_postings(jobs)
+
+    def _discover_aon(
+        self,
+        company: dict[str, Any],
+        profile: dict[str, Any],
+        today: dt.date,
+        max_age_days: int,
+        errors: list[DiscoveryError],
+    ) -> list[JobPosting]:
+        jobs: list[JobPosting] = []
+        for term in build_search_terms(profile, company)[:MAX_FIRST_PARTY_API_SEARCH_TERMS_PER_COMPANY]:
+            api_url = f"https://jobs.aon.com/api/jobs?{urlencode({'keywords': term, 'limit': MAX_FIRST_PARTY_API_RESULTS_PER_TERM})}"
+            try:
+                response = request_json(api_url)
+            except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+                errors.append(DiscoveryError(company["name"], self.name, f"{api_url}: {exc}"))
+                continue
+            postings = response.get("jobs", []) if isinstance(response, dict) else []
+            for item in postings:
+                data = item.get("data", {}) if isinstance(item, dict) else {}
+                if not isinstance(data, dict):
+                    continue
+                job_id = str(data.get("req_id") or data.get("slug") or "").strip()
+                title = str(data.get("title") or "").strip()
+                if not job_id or not title:
+                    continue
+                metadata = data.get("meta_data", {})
+                canonical_url = (
+                    str(metadata.get("canonical_url") or "").strip()
+                    if isinstance(metadata, dict)
+                    else ""
+                )
+                location = str(
+                    data.get("full_location")
+                    or data.get("location_name")
+                    or data.get("city")
+                    or ""
+                ).strip()
+                workplace_tags = data.get("tags4", [])
+                workplace = " ".join(str(value) for value in workplace_tags) if isinstance(workplace_tags, list) else str(workplace_tags or "")
+                description = html_to_text(
+                    str(data.get("description") or data.get("responsibilities") or "")
+                )
+                posted_on, age, date_basis = parse_posted_age(
+                    str(data.get("posted_date") or ""),
+                    today,
+                )
+                job = JobPosting(
+                    company=company["name"],
+                    title=title,
+                    url=canonical_url or f"https://jobs.aon.com/jobs/{job_id}?lang=en-us",
+                    location=location,
+                    work_model=infer_work_model(f"{location} {workplace}", description),
+                    posted_on=posted_on,
+                    posted_age_days=age,
+                    date_basis=f"posted_date: {date_basis}" if date_basis else "posted_date",
+                    description=description,
+                    source=self.name,
+                    job_id=job_id,
+                )
+                score_job(job, profile, max_age_days, company=company)
+                jobs.append(job)
+        return dedupe_postings(jobs)
+
+    def _discover_oracle_recruiting(
+        self,
+        company: dict[str, Any],
+        profile: dict[str, Any],
+        today: dt.date,
+        max_age_days: int,
+        errors: list[DiscoveryError],
+    ) -> list[JobPosting]:
+        parsed = urlparse(self.url)
+        site_match = re.search(r"/sites/([^/]+)", parsed.path)
+        if not site_match:
+            raise ValueError(f"Oracle Recruiting URL is missing a site number: {self.url}")
+        site_number = site_match.group(1)
+        origin = f"{parsed.scheme}://{parsed.netloc}"
+        api_base = f"{origin}/hcmRestApi/resources/latest/recruitingCEJobRequisitions"
+        summaries_by_id: dict[str, dict[str, Any]] = {}
+        for term in build_search_terms(profile, company)[:MAX_FIRST_PARTY_API_SEARCH_TERMS_PER_COMPANY]:
+            finder = (
+                f"findReqs;siteNumber={site_number},keyword={term},"
+                f"limit={MAX_FIRST_PARTY_API_RESULTS_PER_TERM},sortBy=POSTING_DATES_DESC"
+            )
+            api_url = f"{api_base}?{urlencode({'onlyData': 'true', 'expand': 'requisitionList', 'finder': finder})}"
+            try:
+                response = request_json(api_url)
+            except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+                errors.append(DiscoveryError(company["name"], self.name, f"{api_url}: {exc}"))
+                continue
+            roots = response.get("items", []) if isinstance(response, dict) else []
+            for root in roots:
+                postings = root.get("requisitionList", []) if isinstance(root, dict) else []
+                for item in postings:
+                    if not isinstance(item, dict):
+                        continue
+                    job_id = str(item.get("Id") or "").strip()
+                    title = str(item.get("Title") or "").strip()
+                    if not job_id or not title:
+                        continue
+                    summaries_by_id.setdefault(job_id, item)
+
+        title_targets = build_title_target_set(profile, company)
+        detail_api = f"{origin}/hcmRestApi/resources/latest/recruitingCEJobRequisitionDetails"
+        detail_fetches = 0
+        detail_cap_reported = False
+        jobs: list[JobPosting] = []
+        for job_id, summary in summaries_by_id.items():
+            item = summary
+            title = str(item.get("Title") or "").strip()
+            description = html_to_text(
+                " ".join(
+                    str(item.get(key) or "")
+                    for key in (
+                        "ShortDescriptionStr",
+                        "ExternalDescriptionStr",
+                        "ExternalResponsibilitiesStr",
+                        "ExternalQualificationsStr",
+                    )
+                )
+            )
+            title_is_relevant = not title_targets or any(
+                title_similarity(target, title) >= 0.4 for target in title_targets
+            )
+            if not description and title_is_relevant:
+                if detail_fetches >= MAX_DETAIL_FETCHES_PER_COMPANY:
+                    if not detail_cap_reported:
+                        errors.append(
+                            DiscoveryError(
+                                company["name"],
+                                self.name,
+                                f"Oracle detail hydration capped at {MAX_DETAIL_FETCHES_PER_COMPANY} "
+                                "matching requisitions",
+                            )
+                        )
+                        detail_cap_reported = True
+                else:
+                    detail_fetches += 1
+                    detail_finder = f"ById;Id={job_id},siteNumber={site_number}"
+                    detail_url = f"{detail_api}?{urlencode({'onlyData': 'true', 'expand': 'all', 'finder': detail_finder})}"
+                    try:
+                        detail_response = request_json(detail_url)
+                        details = (
+                            detail_response.get("items", [])
+                            if isinstance(detail_response, dict)
+                            else []
+                        )
+                        detail = next(
+                            (
+                                candidate
+                                for candidate in details
+                                if isinstance(candidate, dict)
+                                and str(candidate.get("Id") or "").strip() == job_id
+                            ),
+                            None,
+                        )
+                        if detail is None:
+                            raise ValueError(f"No detail record returned for requisition {job_id}")
+                        item = {**summary, **detail}
+                        title = str(item.get("Title") or title).strip()
+                        description = html_to_text(
+                            " ".join(
+                                str(item.get(key) or "")
+                                for key in (
+                                    "ShortDescriptionStr",
+                                    "ExternalDescriptionStr",
+                                    "ExternalResponsibilitiesStr",
+                                    "ExternalQualificationsStr",
+                                )
+                            )
+                        )
+                    except (
+                        HTTPError,
+                        URLError,
+                        TimeoutError,
+                        ValueError,
+                        json.JSONDecodeError,
+                    ) as exc:
+                        errors.append(
+                            DiscoveryError(company["name"], self.name, f"{detail_url}: {exc}")
+                        )
+
+            location = str(item.get("PrimaryLocation") or "").strip()
+            workplace = str(item.get("WorkplaceType") or "").strip()
+            posted_value = str(
+                item.get("PostedDate") or item.get("ExternalPostedStartDate") or ""
+            )
+            posted_on, age, date_basis = parse_posted_age(posted_value, today)
+            job = JobPosting(
+                company=company["name"],
+                title=title,
+                url=(
+                    f"{origin}/hcmUI/CandidateExperience/en/sites/"
+                    f"{site_number}/job/{job_id}"
+                ),
+                location=location,
+                work_model=infer_work_model(f"{location} {workplace}", description),
+                posted_on=posted_on,
+                posted_age_days=age,
+                date_basis=f"PostedDate: {date_basis}" if date_basis else "PostedDate",
+                description=description,
+                source=self.name,
+                job_id=job_id,
+            )
+            score_job(job, profile, max_age_days, company=company)
+            jobs.append(job)
+        return jobs
 
 
 class IntuitAdapter(Adapter):
@@ -3270,6 +3674,14 @@ def page_looks_unavailable(status: int, page: str) -> bool:
     return any(marker in lowered for marker in UNAVAILABLE_TEXT_MARKERS)
 
 
+def page_looks_like_access_challenge(page: str) -> bool:
+    lowered = html_to_text(page[:20000]).casefold()
+    return (
+        "just a moment" in lowered
+        and "enable javascript and cookies to continue" in lowered
+    ) or "challenges.cloudflare.com" in page.casefold()
+
+
 def important_title_tokens(title: str) -> set[str]:
     words = re.findall(r"[a-z0-9+#.]+", title.lower())
     ignored = {
@@ -3458,8 +3870,32 @@ def job_from_ats_url(
             adapter_result_cache[cache_key] = jobs
     if not jobs:
         return None
-    jobs.sort(key=lambda job: title_similarity(target_title, job.title), reverse=True)
-    best = jobs[0]
+
+    requested_url = canonicalize_url(official_url).rstrip("/")
+    exact_matches = [
+        job for job in jobs
+        if canonicalize_url(job.url).rstrip("/") == requested_url
+    ]
+    requested_identity = extract_requisition_hint(official_url)
+    if requested_identity == official_url:
+        parsed = urlparse(official_url)
+        path_parts = [part for part in parsed.path.split("/") if part]
+        if parsed.netloc.casefold() in {"jobs.ashbyhq.com", "jobs.lever.co"} and len(path_parts) >= 2:
+            requested_identity = path_parts[-1]
+        else:
+            requested_identity = ""
+    if not exact_matches and requested_identity:
+        exact_matches = [
+            job for job in jobs
+            if requested_identity.casefold() == str(job.job_id).casefold()
+            or requested_identity.casefold() in canonicalize_url(job.url).casefold()
+        ]
+    if requested_identity and not exact_matches:
+        return None
+
+    candidates = exact_matches or jobs
+    candidates.sort(key=lambda job: title_similarity(target_title, job.title), reverse=True)
+    best = candidates[0]
     if title_similarity(target_title, best.title) < 0.4:
         return None
     best.source = f"public-board:{hit.source}->{adapter.name}"
@@ -3693,16 +4129,114 @@ def load_job_overrides(path: Path) -> list[dict[str, str]]:
     return overrides
 
 
-def apply_job_overrides(jobs: list[JobPosting], overrides: list[dict[str, str]]) -> None:
+def job_from_verified_manual_metadata(
+    *,
+    entry: dict[str, str],
+    company: dict[str, Any],
+    profile: dict[str, Any],
+    today: dt.date,
+    max_age_days: int,
+) -> JobPosting | None:
+    if entry.get("verification_status", "").casefold() != "official_live":
+        return None
+
+    required_fields = ("title", "description", "verified_on")
+    if any(not entry.get(field, "").strip() for field in required_fields):
+        return None
+
+    if entry.get("posted_on", "").strip():
+        posted_on, posted_age_days, date_basis = parse_posted_age(entry["posted_on"], today)
+        if not posted_on or posted_age_days is None:
+            return None
+    else:
+        posted_on = today.isoformat()
+        posted_age_days = 0
+        date_basis = "official posting date unavailable; treated as freshest bucket"
+
+    location = entry.get("location", "")
+    description = entry["description"]
+    work_model = entry.get("work_model", "") or infer_work_model(location, description)
+    job = JobPosting(
+        company=company["name"],
+        title=entry["title"],
+        url=entry["url"],
+        location=location,
+        work_model=work_model,
+        posted_on=posted_on,
+        posted_age_days=posted_age_days,
+        date_basis=f"candidate verified official page on {entry['verified_on']}; {date_basis}",
+        description=description,
+        source="manual-url->verified-metadata",
+        verification_status="official_live",
+        job_id=entry.get("job_id", "") or extract_requisition_hint(entry["url"]),
+        source_url=entry.get("source_url", ""),
+    )
+    score_job(job, profile, max_age_days, company=company)
+    return job
+
+
+def enrich_job_with_verified_manual_metadata(
+    job: JobPosting,
+    *,
+    entry: dict[str, str],
+    company: dict[str, Any],
+    profile: dict[str, Any],
+    today: dt.date,
+    max_age_days: int,
+) -> None:
+    metadata_job = job_from_verified_manual_metadata(
+        entry=entry,
+        company=company,
+        profile=profile,
+        today=today,
+        max_age_days=max_age_days,
+    )
+    if metadata_job is None:
+        return
+
+    if len(metadata_job.description.strip()) > len(job.description.strip()):
+        job.description = metadata_job.description
+    elif metadata_job.description.strip() not in job.description:
+        job.description = f"{job.description.strip()}\n\n{metadata_job.description.strip()}".strip()
+    job.title = metadata_job.title
+    job.location = metadata_job.location or job.location
+    job.work_model = metadata_job.work_model or job.work_model
+    job.posted_on = metadata_job.posted_on
+    job.posted_age_days = metadata_job.posted_age_days
+    job.date_basis = metadata_job.date_basis
+    job.job_id = metadata_job.job_id or job.job_id
+    job.source_url = metadata_job.source_url or job.source_url
+    job.verification_status = "official_live"
+    score_job(job, profile, max_age_days, company=company)
+
+
+def apply_job_overrides(
+    jobs: list[JobPosting],
+    overrides: list[dict[str, str]],
+    *,
+    as_of: dt.date | None = None,
+) -> None:
+    effective_date = as_of or dt.date.today()
     for job in jobs:
         for override in overrides:
+            if not override_is_active(override, as_of=effective_date):
+                continue
+            company = override.get("company", "")
+            title_contains = override.get("title_contains", "")
             url_contains = override.get("url_contains", "")
             job_id = override.get("job_id", "")
+            if company and normalize_company_key(company) != normalize_company_key(job.company):
+                continue
+            if title_contains:
+                normalized_marker = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", title_contains.casefold())).strip()
+                normalized_title = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", job.title.casefold())).strip()
+                if normalized_marker not in normalized_title:
+                    continue
             if url_contains and url_contains not in job.url:
                 continue
             if job_id and job_id != job.job_id and job_id not in job.url:
                 continue
-            if not url_contains and not job_id:
+            if not company and not title_contains and not url_contains and not job_id:
                 continue
             if decision := override.get("decision"):
                 job.decision = decision
@@ -3729,9 +4263,21 @@ def discover_manual_job_urls(
     adapter_result_cache: dict[tuple[str, str], list[JobPosting]] = {}
     for entry in load_manual_job_url_entries(manual_path):
         url = entry["url"]
-        company = match_company_for_url(url, companies)
+        entry_company_name = str(entry.get("company") or "").strip()
+        company = next(
+            (
+                candidate
+                for candidate in companies
+                if entry_company_name
+                and normalize_company_key(str(candidate.get("name") or ""))
+                == normalize_company_key(entry_company_name)
+            ),
+            None,
+        )
+        if company is None and not entry_company_name:
+            company = match_company_for_url(url, companies)
         if company is None:
-            company_name = entry.get("company") or infer_company_name_from_url(url)
+            company_name = entry_company_name or infer_company_name_from_url(url)
             company = {"name": company_name, "careers_url": ""}
         target_title = (
             entry.get("title")
@@ -3769,8 +4315,45 @@ def discover_manual_job_urls(
                 max_age_days,
                 errors,
                 adapter_result_cache=adapter_result_cache,
-        )
+            )
+        if job is None and entry.get("verification_status", "").casefold() == "official_live":
+            try:
+                status, page, _effective_url = request_text_with_status(url, timeout=15)
+            except (HTTPError, URLError, TimeoutError, ValueError) as exc:
+                errors.append(
+                    DiscoveryError(
+                        company["name"],
+                        "manual-url-live-recheck",
+                        f"{url}: live recheck unavailable; using verified metadata: {exc}",
+                    )
+                )
+            else:
+                if page_looks_unavailable(status, page):
+                    errors.append(
+                        DiscoveryError(
+                            company["name"],
+                            "manual-url-live-recheck",
+                            f"{url}: official page is unavailable",
+                        )
+                    )
+                    continue
+        if job is None:
+            job = job_from_verified_manual_metadata(
+                entry=entry,
+                company=company,
+                profile=profile,
+                today=today,
+                max_age_days=max_age_days,
+            )
         if job:
+            enrich_job_with_verified_manual_metadata(
+                job,
+                entry=entry,
+                company=company,
+                profile=profile,
+                today=today,
+                max_age_days=max_age_days,
+            )
             if job.source:
                 job.source = job.source.replace("public-board:manual-url", "manual-url")
             else:
@@ -4342,7 +4925,12 @@ def is_primary_ruby_on_rails_role(description: str) -> bool:
 
 def has_required_dotnet_stack(text: str) -> bool:
     lowered = text.lower()
-    if not re.search(r"(?:^|[^a-z0-9])(?:\.net|dotnet|asp\.net)(?:[^a-z0-9]|$)", lowered):
+    dotnet_match = re.search(
+        r"(?:^|[^a-z0-9])(?:\.net|dotnet|asp\.net)(?:[^a-z0-9]|$)",
+        lowered,
+    )
+    csharp_matches = list(re.finditer(r"(?<![a-z0-9])c\s*#(?![a-z0-9])", lowered))
+    if dotnet_match is None and not csharp_matches:
         return False
     requirement_markers = [
         "qualification",
@@ -4355,12 +4943,51 @@ def has_required_dotnet_stack(text: str) -> bool:
         "experience with",
         "proficient with",
         "proficiency with",
+        "knowledge of",
         "technologies:",
         "languages:",
         "tech stack",
         "our stack",
     ]
-    return any(marker in lowered for marker in requirement_markers)
+    has_requirement_context = any(marker in lowered for marker in requirement_markers)
+    if dotnet_match is not None and has_requirement_context:
+        return True
+    if not has_requirement_context:
+        return False
+
+    optional_markers = (
+        "preferred",
+        "preference for",
+        "nice to have",
+        "bonus",
+        "is a plus",
+        "such as",
+    )
+    for match in csharp_matches:
+        context = lowered[max(0, match.start() - 160) : match.end() + 160]
+        if not any(marker in context for marker in optional_markers):
+            return True
+    return False
+
+
+def is_clearly_junior_target_role(title: str) -> bool:
+    normalized = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", title.casefold())).strip()
+    if not normalized.startswith("associate "):
+        return False
+    if any(marker in normalized for marker in ("director", "principal", "senior", "lead")):
+        return False
+    return any(
+        marker in normalized
+        for marker in (
+            "technical consultant",
+            "software engineer",
+            "application engineer",
+            "solutions engineer",
+            "solution engineer",
+            "developer",
+            "architect",
+        )
+    )
 
 
 def clustered_hard_stack_requirement_gaps(text: str) -> list[str]:
@@ -4466,6 +5093,41 @@ def has_substantial_customer_software_ownership(title: str, description: str) ->
     )
 
 
+def is_primary_sales_engineering_role(title: str, description: str) -> bool:
+    title_text = title.casefold()
+    text = f"{title} {description}".casefold()
+    if re.search(r"\bsales engineer(?:ing)?\b", title_text) or "account solution architect" in title_text:
+        return True
+
+    explicit_role_markers = (
+        "looking for a sales engineer",
+        "join our sales team",
+        "member of the sales team",
+        "technical sales role",
+        "technology sales team",
+        "technical sales support",
+    )
+    if any(marker in text for marker in explicit_role_markers):
+        return True
+
+    sales_function_markers = (
+        "partner with account executives",
+        "partner with sales",
+        "qualify opportunities",
+        "drive technical sales",
+        "co-sell",
+        "sales engineering",
+        "sales process",
+        "sales cycle",
+        "technical sales wins",
+        "product demos",
+        "prospective customers",
+        "quota attainment",
+        "variable compensation",
+    )
+    return sum(marker in text for marker in sales_function_markers) >= 3
+
+
 def score_job(
     job: JobPosting,
     profile: dict[str, Any],
@@ -4488,7 +5150,10 @@ def score_job(
     ]
     exclusions = [str(item).lower() for item in profile.get("exclude_if_primary_focus", [])]
 
-    if any(target in title_text for target in title_targets):
+    if any(
+        target in title_text or title_similarity(target, title_text) >= 0.75
+        for target in title_targets
+    ):
         score += 35
         reasons.append("target title match")
 
@@ -4540,6 +5205,8 @@ def score_job(
         "london",
         "england",
         "united kingdom",
+        "remote uk",
+        "uk remote",
         "sumida",
         "tokyo",
         "japan",
@@ -4609,6 +5276,17 @@ def score_job(
     has_us_location = any(token in location_text for token in us_location_tokens) or has_georgia_location
     nonlocal_us = any(token in location_text for token in ["usa", "united states", "u.s."])
     is_local_or_remote = any(token in location_text for token in local_or_remote_tokens) or has_georgia_location
+
+    if hybrid_location_outside_allowed_metro(
+        location=job.location,
+        work_model=job.work_model,
+        allowed_metro_tokens=[
+            str(item) for item in profile.get("hybrid_allowed_metro_tokens", [])
+        ],
+    ):
+        score = min(score - 45, 45)
+        risks.append("hybrid location outside Atlanta metro")
+        hard_reject = True
 
     if job.work_model.lower() == "remote":
         if has_foreign_location:
@@ -4689,6 +5367,18 @@ def score_job(
         risks.append("required .NET tech stack")
         hard_reject = True
 
+    unsupported_languages = required_unsupported_spoken_languages(
+        haystack,
+        [str(item) for item in profile.get("unsupported_required_languages", [])],
+    )
+    if unsupported_languages:
+        score = min(score - 45, 45)
+        risks.extend(
+            f"required spoken language unsupported: {language}"
+            for language in unsupported_languages
+        )
+        hard_reject = True
+
     hard_stack_gaps = clustered_hard_stack_requirement_gaps(haystack)
     if (
         len(hard_stack_gaps) >= 3
@@ -4748,6 +5438,21 @@ def score_job(
     ):
         risks.append("required C++/Windows experience gap")
         score = min(score - 35, 45)
+        hard_reject = True
+
+    if is_primary_sales_engineering_role(job.title, job.description):
+        risks.append("primary pre-sales / sales engineering role")
+        score = min(score - 45, 35)
+        hard_reject = True
+
+    if re.search(r"\b(?:android|ios)\b", title_text):
+        risks.append("primary mobile application engineering role")
+        score = min(score - 45, 35)
+        hard_reject = True
+
+    if is_clearly_junior_target_role(job.title):
+        risks.append("junior associate-level role below target scope")
+        score = min(score - 45, 35)
         hard_reject = True
 
     job.fit_score = max(0, min(100, score))
@@ -5292,6 +5997,7 @@ def run(
     threads_post_total_hit_limit: int,
     threads_post_time_budget_seconds: int,
 ) -> tuple[list[JobPosting], list[DiscoveryError], Path, Path, Path, Path, Path, Path]:
+    today = dt.date.today()
     companies = normalize_company_entries(load_yaml(companies_path))
     profile = profile_doc_to_profile(load_yaml(profile_path))
     companies = [
@@ -5300,13 +6006,13 @@ def run(
     ]
     ats_registry = load_ats_registry(ats_registry_path) if ats_registry_path else {}
     job_overrides = load_job_overrides(job_overrides_path) if job_overrides_path else []
+    companies = filter_companies_by_overrides(companies, job_overrides, as_of=today)
     if company_names:
         allowed = set(company_names)
         companies = [company for company in companies if company["name"] in allowed]
     if limit_companies:
         companies = companies[:limit_companies]
 
-    today = dt.date.today()
     now = dt.datetime.now(dt.timezone.utc)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -5392,7 +6098,7 @@ def run(
 
     all_jobs = [job for job in all_jobs if not is_excluded_company(job.company, profile)]
     deduped_jobs = dedupe_jobs(all_jobs)
-    apply_job_overrides(deduped_jobs, job_overrides)
+    apply_job_overrides(deduped_jobs, job_overrides, as_of=today)
     json_path = out_dir / f"{today.isoformat()}-discovered-jobs.json"
     md_path = out_dir / f"{today.isoformat()}-ats-discovery.md"
     query_path = out_dir / f"{today.isoformat()}-public-job-board-queries.md"

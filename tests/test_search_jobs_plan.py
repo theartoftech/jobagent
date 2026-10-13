@@ -18,6 +18,28 @@ SPEC.loader.exec_module(search_jobs)
 
 
 class SearchJobsPlanTests(unittest.TestCase):
+    def test_human_search_rotation_prefers_company_specific_search_url(self) -> None:
+        lines = search_jobs.format_human_search_companies(
+            [
+                {
+                    "name": "Cognizant",
+                    "careers_url": "https://careers.cognizant.com/us-en/jobs/",
+                    "human_search_url": (
+                        "https://careers.cognizant.com/us-en/jobs/"
+                        "?keyword=Java&location=United%20States&cname=United%20States&pagesize=20#results"
+                    ),
+                }
+            ]
+        )
+
+        self.assertEqual(
+            lines,
+            [
+                "1. Cognizant - https://careers.cognizant.com/us-en/jobs/"
+                "?keyword=Java&location=United%20States&cname=United%20States&pagesize=20#results"
+            ],
+        )
+
     def test_select_human_search_companies_uses_unsearched_companies_first(self) -> None:
         companies = [
             {"name": "Company A", "careers_url": "https://a.example.com"},
@@ -49,6 +71,33 @@ class SearchJobsPlanTests(unittest.TestCase):
         selected = search_jobs.select_human_search_companies(companies, state, count=5)
 
         self.assertEqual([company["name"] for company in selected], ["Company A", "Company B"])
+
+    def test_select_human_search_companies_fills_count_across_cycle_boundary(self) -> None:
+        companies = [
+            {"name": f"Company {letter}", "careers_url": f"https://{letter.casefold()}.example.com"}
+            for letter in "ABCDEFG"
+        ]
+        state = {
+            "suggested_company_names": [
+                "Company A",
+                "Company B",
+                "Company C",
+                "Company D",
+                "Company E",
+            ]
+        }
+
+        selected = search_jobs.select_human_search_companies(companies, state, count=5)
+        updated = search_jobs.update_human_search_state(state, selected, companies)
+
+        self.assertEqual(
+            [company["name"] for company in selected],
+            ["Company F", "Company G", "Company A", "Company B", "Company C"],
+        )
+        self.assertEqual(
+            updated["suggested_company_names"],
+            ["Company A", "Company B", "Company C"],
+        )
 
     def test_write_human_search_rotation_updates_state_and_writes_dated_file(self) -> None:
         companies = [
@@ -165,6 +214,9 @@ class SearchJobsPlanTests(unittest.TestCase):
         self.assertIn("ats_registry.yml", markdown)
         self.assertIn("USAJOBS", markdown)
         self.assertIn("USAJOBS_USER_AGENT", markdown)
+        self.assertIn("AI Apply MCP", markdown)
+        self.assertIn("queue_job_for_review", markdown)
+        self.assertIn("submit_application", markdown)
         self.assertIn("Human Search Calibration", markdown)
         self.assertIn("Example Co", markdown)
 
