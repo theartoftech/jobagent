@@ -306,7 +306,7 @@ class USAJobsDiscoveryTests(unittest.TestCase):
             mock.patch.dict(
                 discover_jobs.os.environ,
                 {
-                    "USAJOBS_USER_AGENT": "candidate@example.com",
+                    "USAJOBS_USER_AGENT": "jobagent-test@example.com",
                     "USAJOBS_AUTHORIZATION_KEY": "secret",
                 },
                 clear=True,
@@ -326,11 +326,93 @@ class USAJobsDiscoveryTests(unittest.TestCase):
         self.assertEqual(jobs[0].source, "usajobs")
         self.assertEqual(jobs[0].posted_age_days, 2)
         self.assertIn(jobs[0].decision, {"Apply", "Maybe"})
-        self.assertEqual(request_mock.call_args.kwargs["headers"]["User-Agent"], "candidate@example.com")
+        self.assertEqual(request_mock.call_args.kwargs["headers"]["User-Agent"], "jobagent-test@example.com")
         self.assertIn("Authorization-Key", request_mock.call_args.kwargs["headers"])
 
 
 class WorkdayRuntimeControlsTests(unittest.TestCase):
+    def test_workday_detail_failures_cannot_keep_live_status(self) -> None:
+        url = "https://example.wd1.myworkdayjobs.com/Careers/job/Remote/Engineer_REQ-1"
+        failures = [
+            discover_jobs.HTTPError(url, code, "failed", None, None)
+            for code in (403, 404, 410)
+        ] + [discover_jobs.URLError("unreachable"), TimeoutError("timeout")]
+        for failure in failures:
+            with self.subTest(failure=failure), mock.patch.object(
+                discover_jobs, "request_json", side_effect=failure,
+            ):
+                errors: list[discover_jobs.DiscoveryError] = []
+                job = discover_jobs.WorkdayAdapter("https://example.wd1.myworkdayjobs.com/Careers").fetch_detail(discover_jobs.JobPosting(
+                    company="ExampleCo", title="Senior Software Engineer", url=url,
+                ), self.today, errors)
+                self.assertNotEqual("official_live", job.verification_status)
+                self.assertTrue(errors)
+                discover_jobs.score_job(job, self.profile, 60)
+                self.assertEqual("Skip", job.decision)
+
+    def test_workday_empty_and_error_payloads_do_not_verify_a_posting(self) -> None:
+        for payload in ({}, {"errorCode": "S22", "httpStatus": 403}, {"jobPostingInfo": None}, {"jobPostingInfo": {}}):
+            with self.subTest(payload=payload), mock.patch.object(discover_jobs, "request_json", return_value=payload):
+                errors: list[discover_jobs.DiscoveryError] = []
+                job = discover_jobs.WorkdayAdapter("https://example.wd1.myworkdayjobs.com/Careers").fetch_detail(discover_jobs.JobPosting(
+                    company="ExampleCo", title="Senior Software Engineer",
+                    url="https://example.wd1.myworkdayjobs.com/Careers/job/Remote/Engineer_REQ-1",
+                ), self.today, errors)
+                self.assertNotEqual("official_live", job.verification_status)
+                self.assertTrue(errors)
+
+    def test_workday_success_replaces_prior_failure_status(self) -> None:
+        with mock.patch.object(discover_jobs, "request_json", return_value={"jobPostingInfo": {
+            "title": "Senior Software Engineer", "jobReqId": "REQ-1",
+            "jobDescription": "Build Java APIs", "posted": True, "canApply": True,
+        }}):
+            job = discover_jobs.WorkdayAdapter("https://example.wd1.myworkdayjobs.com/Careers").fetch_detail(discover_jobs.JobPosting(
+                company="ExampleCo", title="Senior Software Engineer", verification_status="verification_failed",
+                url="https://example.wd1.myworkdayjobs.com/Careers/job/Remote/Engineer_REQ-1",
+            ), self.today, [])
+        self.assertEqual("official_live", job.verification_status)
+
+    def test_workday_detail_dates_are_read_after_successful_verification(self) -> None:
+        adapter = discover_jobs.WorkdayAdapter("https://example.wd1.myworkdayjobs.com/Careers")
+        for dates, expected, basis in (({"startDate": "2026-06-22"}, 1, "startDate"),
+                                       ({"postedOn": "Posted 2 Days Ago"}, 2, "Posted 2 Days Ago")):
+            with self.subTest(dates=dates), mock.patch.object(discover_jobs, "request_json", return_value={"jobPostingInfo": {
+                "title": "Engineer", "jobDescription": "Java APIs", **dates,
+            }}):
+                job = adapter.fetch_detail(discover_jobs.JobPosting(
+                    company="ExampleCo", title="Engineer",
+                    url="https://example.wd1.myworkdayjobs.com/Careers/job/Engineer_REQ-1",
+                ), self.today, [])
+                self.assertEqual("official_live", job.verification_status)
+                self.assertEqual(expected, job.posted_age_days)
+                self.assertIn(basis, job.date_basis)
+
+    def test_workday_invalid_path_and_closed_flags_are_not_live(self) -> None:
+        adapter = discover_jobs.WorkdayAdapter("https://example.wd1.myworkdayjobs.com/Careers")
+        invalid = adapter.fetch_detail(discover_jobs.JobPosting(
+            company="ExampleCo", title="Engineer", url="https://example.com/jobs/1",
+        ), self.today, [])
+        self.assertEqual("verification_failed", invalid.verification_status)
+        for flag in ("posted", "canApply"):
+            with self.subTest(flag=flag), mock.patch.object(discover_jobs, "request_json", return_value={"jobPostingInfo": {
+                "title": "Engineer", "jobDescription": "Java APIs", flag: False,
+            }}):
+                job = adapter.fetch_detail(discover_jobs.JobPosting(
+                    company="ExampleCo", title="Engineer",
+                    url="https://example.wd1.myworkdayjobs.com/Careers/job/Engineer_REQ-1",
+                ), self.today, [])
+                self.assertEqual("official_unavailable", job.verification_status)
+
+    def test_workday_public_url_cannot_verify_after_detail_failure(self) -> None:
+        url = "https://example.wd1.myworkdayjobs.com/Careers/job/Engineer_REQ-1"
+        with mock.patch.object(discover_jobs, "request_json", side_effect=discover_jobs.URLError("blocked")):
+            job = discover_jobs.job_from_ats_url(
+                company=self.company, official_url=url, target_title="Senior Software Engineer",
+                hit=discover_jobs.PublicBoardHit(company="ExampleCo", source="manual-url", query="", target_title="Senior Software Engineer", title="Senior Software Engineer", url=url),
+                profile=self.profile, today=self.today, max_age_days=60, errors=[],
+            )
+        self.assertIsNone(job)
+
     def setUp(self) -> None:
         self.adapter = discover_jobs.WorkdayAdapter(
             "https://example.myworkdayjobs.com/en-US/Careers"
@@ -1024,7 +1106,18 @@ jobs:
         self.assertEqual(jobs[0].source, "manual-url->verified-metadata")
         self.assertIn("manually surfaced by the candidate", jobs[0].risk_flags)
 
+    def test_live_posting_ignores_unavailable_labels_in_scripts(self) -> None:
+        page = '<script>var pageNameMap={"404":"404_page_view","expired":"job has expired"};</script><style>.error404 {color:red}</style><h1>Lead Engineer</h1><p>3+ years of cloud experience</p>'
+        self.assertFalse(discover_jobs.page_looks_unavailable(200, page))
+
+    def test_unavailable_http_and_visible_messages_still_block(self) -> None:
+        for status, page in ((404, '<h1>Lead Engineer</h1>'), (410, ''), (200, '<h1>Job has expired</h1>'), (200, '<h1>404</h1>')):
+            with self.subTest(status=status, page=page):
+                self.assertTrue(discover_jobs.page_looks_unavailable(status, page))
+        self.assertFalse(discover_jobs.page_looks_unavailable(200, '<h1>Engineer 404123</h1>'))
+
     def test_verified_manual_metadata_does_not_revive_soft_404_job_page(self) -> None:
+        self.assertTrue(discover_jobs.page_looks_unavailable(200, "The page you are looking for doesn't exist."))
         with tempfile.TemporaryDirectory() as tmp_dir:
             manual_path = Path(tmp_dir) / "manual_job_urls.yml"
             manual_path.write_text(
@@ -1071,6 +1164,29 @@ jobs:
                 )
 
         self.assertEqual([], jobs)
+
+    def test_workday_shell_cannot_revive_failed_detail_from_manual_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "manual.yml"
+            path.write_text("""jobs:
+  - company: Example Co
+    title: Senior Software Engineer
+    url: https://example.wd1.myworkdayjobs.com/Careers/job/Engineer_REQ-1
+    verification_status: official_live
+    verified_on: 2026-10-14
+    location: Remote US
+    description: Build Java Spring Boot REST API SQL backend services
+""")
+            with mock.patch.object(discover_jobs, "job_from_ats_url", return_value=None), mock.patch.object(
+                discover_jobs, "request_text_with_status", return_value=(200, "<div id='root'></div>", "https://example.wd1.myworkdayjobs.com/Careers/job/Engineer_REQ-1"),
+            ):
+                jobs = discover_jobs.discover_manual_job_urls(
+                    manual_path=path, companies=[{"name": "Example Co"}], profile=self.profile,
+                    today=discover_jobs.dt.date(2026, 10, 14), max_age_days=60, errors=[],
+                )
+        self.assertEqual(1, len(jobs))
+        self.assertEqual("verification_required", jobs[0].verification_status)
+        self.assertEqual("Skip", jobs[0].decision)
 
     def test_verified_manual_metadata_without_posted_date_uses_verification_date(self) -> None:
         entry = {
@@ -3155,14 +3271,16 @@ class XPostDiscoveryTests(unittest.TestCase):
         )
 
         self.assertEqual(len(payload["jobs"]), 2)
-        self.assertLess(len(payload["jobs"][0]["description"]), 5000)
+        self.assertEqual(apply_job.description, payload["jobs"][0]["description"])
         self.assertGreater(len(payload["jobs"][0]["description"]), len(payload["jobs"][1]["description"]))
         self.assertLess(len(payload["jobs"][1]["description"]), 5000)
 
-    def test_compact_apply_description_preserves_role_intro_and_trailing_qualifications(self) -> None:
+    def test_apply_description_preserves_middle_and_trailing_qualifications(self) -> None:
         description = (
             "Position Purpose: Lead enterprise platform architecture. "
-            + ("delivery context " * 400)
+            + ("delivery context " * 300)
+            + "What Will Our Ideal Candidate Have? 5+ years Guidewire BillingCenter experience. "
+            + ("benefits context " * 300)
             + "Minimum Qualifications: Java, Spring Boot, REST APIs, and SQL are required."
         )
         job = discover_jobs.JobPosting(
@@ -3182,10 +3300,22 @@ class XPostDiscoveryTests(unittest.TestCase):
         )
 
         compacted = payload["jobs"][0]["description"]
-        self.assertLessEqual(len(compacted), discover_jobs.MAX_COMPACT_DESCRIPTION_CHARS)
+        self.assertEqual(description, compacted)
         self.assertTrue(compacted.startswith("Position Purpose:"))
-        self.assertIn("[middle omitted]", compacted)
+        self.assertNotIn("[middle omitted]", compacted)
+        self.assertIn("5+ years Guidewire BillingCenter experience", compacted)
         self.assertIn("Minimum Qualifications: Java, Spring Boot, REST APIs, and SQL are required.", compacted)
+
+    def test_freshness_verification_preserves_complete_requirements(self) -> None:
+        description = "Java platform engineering " * 300 + "Required specialist-platform expertise."
+        job = discover_jobs.JobPosting(
+            company="ExampleCo", title="Principal Engineer", url="https://example.com/jobs/freshness",
+            description=description, decision=discover_jobs.NEEDS_FRESHNESS_VERIFICATION_DECISION,
+        )
+        payload = discover_jobs.build_discovered_jobs_payload(
+            jobs=[job], errors=[], generated_on="2026-10-14", max_age_days=60,
+        )
+        self.assertEqual(description, payload["jobs"][0]["description"])
 
     def test_write_x_post_summary_outputs_verified_and_manual_sections(self) -> None:
         manual_lead = discover_jobs.XPostLead(

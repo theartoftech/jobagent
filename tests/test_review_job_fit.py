@@ -10,6 +10,7 @@ from scripts.mark_applied_jobs import TrackerJob, write_tracker_jobs_snapshot
 from scripts.review_job_fit import (
     classify_review,
     is_excluded_company,
+    is_active_carry_forward_review,
     is_skipped_by_job_override,
     load_carry_forward_jobs,
     main,
@@ -32,6 +33,118 @@ PROFILE = {
 
 
 class ReviewJobFitTests(unittest.TestCase):
+    def test_required_named_cloud_years_are_not_met_by_training(self) -> None:
+        profile = {**PROFILE, 'do_not_claim': ['AWS', 'Azure', 'GCP'],
+                   'candidate_gap_resolutions': {'AWS': 'limited_exposure: training only', 'Azure': 'do_not_claim', 'GCP': 'limited_exposure: training only'}}
+        job = {'company': 'Fiserv', 'title': 'Lead Engineer', 'url': 'https://careers.fiserv.com/us/en/job/R-10404240/Lead-Engineer',
+               'description': "Experience you'll need to have:\n3+ years of experience in AWS, Azure, or GCP services\nJava and SQL engineering.",
+               'decision': 'Apply', 'fit_score': 100}
+        review = classify_review(job=job, workflow_profile=profile)
+        self.assertFalse(review.should_generate_resume)
+        self.assertEqual('SKIP', review.workflow_decision)
+        self.assertTrue({'AWS', 'Azure', 'GCP'}.issubset(review.required_gaps))
+
+    def test_annual_salary_range_is_not_truncated_by_mixed_hourly_boilerplate(self) -> None:
+        review = classify_review(job={'company': 'ReadyCo', 'title': 'Principal Java Engineer',
+                                     'description': 'Build Java Spring Boot REST APIs. Pay Range: $106,605.00 - $260,590.00. This pay range represents the base hourly rate or base annual full-time salary for all positions in the job grade.',
+                                     'decision': 'Apply', 'fit_score': 100, 'url': 'https://example.com/annual-range'}, workflow_profile=PROFILE)
+        self.assertNotEqual('SKIP', review.workflow_decision)
+
+    def test_cloud_qualifications_cannot_be_cleared_by_unrelated_java(self) -> None:
+        description = "Requirements & Qualifications\nBachelor's degree; Master's degree preferred\n" + 'Enterprise architecture experience.\n' * 15 + 'Experience designing enterprise multi-cloud architectures (SAP Cloud, Microsoft Azure, or Google Cloud Platform).\nReporting relationship\nSkills: Java, Kotlin'
+        profile = {**PROFILE, 'do_not_claim': [*PROFILE['do_not_claim'], 'Azure', 'GCP'],
+                   'required_capability_evidence': [{'label': 'Enterprise multi-cloud architecture', 'terms': ['multi-cloud'], 'title_pattern': r'cloud.*architect', 'evidence_status': 'unconfirmed'}]}
+        review = classify_review(job={'company': 'Coke', 'title': 'Cloud Architect', 'description': description,
+                                     'decision': 'Apply', 'fit_score': 100, 'url': 'https://example.com/R-144531'}, workflow_profile=profile)
+        self.assertEqual('SKIP', review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+        self.assertTrue({'Azure', 'GCP', 'Enterprise multi-cloud architecture'}.issubset(review.required_gaps))
+
+    def test_missing_middle_qualifications_require_official_refresh(self) -> None:
+        review = classify_review(job={'company': 'ReadyCo', 'title': 'Principal Java Engineer',
+                                     'description': 'Build Java Spring Boot REST APIs [middle omitted] SQL.',
+                                     'decision': 'Apply', 'fit_score': 100, 'url': 'https://example.com/incomplete'}, workflow_profile=PROFILE)
+        self.assertFalse(review.should_generate_resume)
+        self.assertIn('incomplete qualification evidence; refresh official posting', review.hard_blockers)
+    def test_pending_availability_remains_a_verification_item(self) -> None:
+        pending = {
+            "workflow_decision": "SKIP", "should_generate_resume": False, "already_applied": False,
+            "hard_blockers": ["official posting availability not verified: verification_required"],
+        }
+        self.assertTrue(is_active_carry_forward_review(pending))
+        self.assertFalse(is_active_carry_forward_review({**pending, "already_applied": True}))
+
+    def test_nonlive_posting_is_blocked_even_with_high_score(self) -> None:
+        for status in ("official_unavailable", "verification_failed", "verification_required"):
+            with self.subTest(status=status):
+                review = classify_review(job={
+                    "company": "ReadyCo", "title": "Principal Java Engineer",
+                    "description": "Own Java Spring Boot REST APIs and SQL architecture.",
+                    "url": "https://example.com/jobs/closed", "decision": "Apply",
+                    "fit_score": 100, "verification_status": status,
+                }, workflow_profile=PROFILE)
+                self.assertEqual("SKIP", review.workflow_decision)
+                self.assertFalse(review.should_generate_resume)
+                self.assertTrue(any("availability" in blocker for blocker in review.hard_blockers))
+
+    def test_expired_cached_posting_cannot_authorize_documents(self) -> None:
+        review = classify_review(job={
+            "company": "ReadyCo", "title": "Principal Java Engineer",
+            "description": "Anticipated End Date: 2020-09-29 Own Java Spring Boot REST APIs and SQL architecture.",
+            "url": "https://example.com/jobs/expired", "decision": "Apply", "fit_score": 100,
+        }, workflow_profile=PROFILE)
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+
+    def test_primary_guidewire_role_cannot_reach_resume_queue(self) -> None:
+        job = {
+            "company": "Travelers", "title": "Senior Software Engineer, Guidewire BillingCenter",
+            "description": "Configure Guidewire BillingCenter using Java, Spring Boot, REST APIs and SQL. What Will Our Ideal Candidate Have? 5+ years of Guidewire BillingCenter configuration and integration experience.",
+            "location": "Remote US", "work_model": "Remote", "decision": "Apply", "fit_score": 100,
+            "risk_flags": [], "url": "https://example.com/jobs/R-53073",
+        }
+        review = classify_review(job=job, workflow_profile={**PROFILE, "unsupported_primary_platforms": ["Guidewire"]})
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+        self.assertIn("unsupported primary platform: Guidewire", review.hard_blockers)
+        self.assertIn("Guidewire", review.required_gaps)
+
+    def test_java_or_gosu_is_not_an_alternative_to_guidewire_platform_expertise(self) -> None:
+        job = {
+            "company": "ExampleCo", "title": "Guidewire BillingCenter Engineer",
+            "description": "Required: experience with Java or Gosu for Guidewire BillingCenter development.",
+            "location": "Remote US", "work_model": "Remote", "decision": "Apply", "fit_score": 100,
+            "risk_flags": [], "url": "https://example.com/jobs/language-alternative",
+        }
+        review = classify_review(job=job, workflow_profile={
+            **PROFILE, "unsupported_primary_platforms": ["Guidewire"],
+            "do_not_claim": [*PROFILE["do_not_claim"], "Guidewire"],
+        })
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertIn("Guidewire", review.required_gaps)
+
+    def test_optional_guidewire_mention_does_not_reject_java_architecture(self) -> None:
+        job = {
+            "company": "ExampleCo", "title": "Principal Java Engineer",
+            "description": "Own Java Spring Boot REST APIs and SQL architecture. Familiarity with Guidewire for an optional integration is a plus.",
+            "location": "Remote US", "work_model": "Remote", "decision": "Apply", "fit_score": 100,
+            "risk_flags": [], "url": "https://example.com/jobs/optional-platform",
+        }
+        review = classify_review(job=job, workflow_profile={**PROFILE, "unsupported_primary_platforms": ["Guidewire"]})
+        self.assertEqual("STRONG APPLY", review.workflow_decision)
+        self.assertNotIn("unsupported primary platform: Guidewire", review.hard_blockers)
+
+    def test_primary_platform_delivery_in_body_is_blocked_without_title_keyword(self) -> None:
+        job = {
+            "company": "ExampleCo", "title": "Principal Engineer",
+            "description": "Configure Guidewire BillingCenter integrations using Java and SQL.",
+            "location": "Remote US", "work_model": "Remote", "decision": "Apply", "fit_score": 100,
+            "risk_flags": [], "url": "https://example.com/jobs/platform-delivery",
+        }
+        review = classify_review(job=job, workflow_profile={**PROFILE, "unsupported_primary_platforms": ["Guidewire"]})
+        self.assertEqual("SKIP", review.workflow_decision)
+        self.assertFalse(review.should_generate_resume)
+
     def test_published_compensation_maximum_below_floor_is_a_hard_blocker(self) -> None:
         job = {
             "company": "ExampleCo",
@@ -297,6 +410,8 @@ class ReviewJobFitTests(unittest.TestCase):
             ["https://example.com/ready", "https://example.com/questions"],
             [str(job["url"]) for job in carried],
         )
+        self.assertTrue(all(job["verification_status"] == "verification_required" for job in carried))
+        self.assertTrue(all(not classify_review(job=job, workflow_profile=PROFILE).should_generate_resume for job in carried))
 
     def test_load_carry_forward_matches_review_url_when_source_has_job_id(self) -> None:
         source_jobs = [
@@ -989,6 +1104,15 @@ class ReviewJobFitTests(unittest.TestCase):
             profile_path = root / "candidate_workflow_profile.yml"
             applied_jobs_path = root / "2026-07-22-applied-jobs.json"
             out_dir = root / "outputs"
+            out_dir.mkdir()
+            # A current Skip must suppress the previous positive record.
+            stale_source = {**jobs["jobs"][2], "decision": "Apply"}
+            (out_dir / "2026-07-21-workflow-review.json").write_text(json.dumps({
+                "source_jobs": [stale_source], "reviews": [{
+                    **stale_source, "workflow_decision": "STRONG APPLY", "should_generate_resume": True,
+                    "already_applied": False,
+                }],
+            }), encoding="utf-8")
             discovered_path.write_text(json.dumps(jobs), encoding="utf-8")
             profile_path.write_text(json.dumps(PROFILE), encoding="utf-8")
             write_tracker_jobs_snapshot(applied_jobs_path, jobs=[], ssh_host="test-host")

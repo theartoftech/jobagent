@@ -14,6 +14,16 @@ from run_benchmark import parse_args, resolve_bonsai_key, resolve_openai_key  # 
 
 
 class ArgumentTests(unittest.TestCase):
+    def test_default_bonsai_endpoint_uses_current_port(self) -> None:
+        args = parse_args(["--provider", "bonsai"])
+
+        self.assertEqual("https://llmserver:8444/v1", args.bonsai_base_url)
+
+    def test_bonsai_endpoint_can_be_overridden(self) -> None:
+        args = parse_args(["--provider", "bonsai", "--bonsai-base-url", "https://other-host:9444/v1"])
+
+        self.assertEqual("https://other-host:9444/v1", args.bonsai_base_url)
+
     def test_default_certificate_path_uses_current_user_home(self) -> None:
         with patch("run_benchmark.Path.home", return_value=Path("/example-home")):
             args = parse_args([])

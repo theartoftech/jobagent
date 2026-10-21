@@ -261,7 +261,7 @@ class BonsaiClientTests(unittest.TestCase):
         client = BonsaiChatClient(
             api_key="bonsai-secret",
             model="Bonsai-27B-Q1_0",
-            base_url="https://llmserver:8443/v1",
+            base_url="https://llmserver:8444/v1",
             ca_file=Path("/tmp/ca.pem"),
             transport=transport,
         )
@@ -271,7 +271,7 @@ class BonsaiClientTests(unittest.TestCase):
         self.assertEqual(result.provider, "bonsai")
         self.assertEqual(result.usage.total_tokens, 120)
         url, headers, payload = transport.requests[0]
-        self.assertEqual(url, "https://llmserver:8443/v1/chat/completions")
+        self.assertEqual(url, "https://llmserver:8444/v1/chat/completions")
         self.assertEqual(headers["Authorization"], "Bearer bonsai-secret")
         self.assertEqual(payload["max_tokens"], 500)
 

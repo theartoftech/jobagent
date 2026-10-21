@@ -30,6 +30,11 @@ To diagnose one provider explicitly without treating it as a comparison:
 ../../.venv/bin/python run_benchmark.py --provider bonsai
 ```
 
+Bonsai defaults to `https://llmserver:8444/v1` and sends requests to
+`https://llmserver:8444/v1/chat/completions`. Use `--bonsai-base-url` to override
+the base URL. The daily deterministic job-search controller does not call this
+benchmark or Bonsai; its separate verifier uses `gpt-6-luna` by default.
+
 ## Test
 
 ```bash

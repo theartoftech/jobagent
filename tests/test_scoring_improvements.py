@@ -26,6 +26,53 @@ BASE_PROFILE = {
 
 
 class ScoringImprovementTests(unittest.TestCase):
+    def test_remote_austria_is_outside_us_target_geography(self) -> None:
+        job = self.make_job(title='Senior Solution Architect Austria', description='Java Spring Boot REST API SQL architecture and technical leadership')
+        job.location = 'Vienna - MSO; Remote Austria'
+        discover_jobs.score_job(job, {**BASE_PROFILE, 'title_targets': ['Senior Solution Architect']}, 60)
+        self.assertEqual('Skip', job.decision)
+
+    def test_specialist_cloud_qualifications_override_generic_java_boosts(self) -> None:
+        job = self.make_job(title='Cloud Architect', description='Requirements & Qualifications\nExperience designing enterprise multi-cloud architectures.\nSkills: Java, Spring Boot, REST API, SQL, cloud architecture, technical consulting.')
+        profile = {**BASE_PROFILE, 'required_capability_evidence': [{'label': 'Enterprise multi-cloud architecture', 'terms': ['multi-cloud'], 'title_pattern': r'cloud.*architect', 'evidence_status': 'unconfirmed'}]}
+        discover_jobs.score_job(job, profile, 60)
+        self.assertEqual('Skip', job.decision)
+        self.assertLessEqual(job.fit_score, 45)
+
+    def test_general_cloud_experience_is_not_a_specialist_blocker(self) -> None:
+        job = self.make_job(title='Cloud Architect', description='Requirements & Qualifications\nExperience designing solutions on a public cloud such as OCI.\nSkills: Java, Spring Boot, REST API, SQL, architecture.')
+        profile = {**BASE_PROFILE, 'required_capability_evidence': [{'label': 'Enterprise multi-cloud architecture', 'terms': ['multi-cloud'], 'title_pattern': r'cloud.*architect', 'evidence_status': 'unconfirmed'}]}
+        discover_jobs.score_job(job, profile, 60)
+        self.assertNotEqual('Skip', job.decision)
+    def test_unavailable_posting_cannot_be_boosted_back_to_apply(self) -> None:
+        job = self.make_job(
+            title="Senior Software Engineer",
+            description="Build Java Spring Boot REST API SQL backend services with architecture, technical consulting and professional services leadership.",
+        )
+        job.verification_status = "official_unavailable"
+        discover_jobs.score_job(job, BASE_PROFILE, 60)
+        self.assertEqual("Skip", job.decision)
+        self.assertLessEqual(job.fit_score, 45)
+
+    def test_unsupported_guidewire_role_is_skipped_despite_java_matches(self) -> None:
+        job = self.make_job(
+            title="Senior Software Engineer, Guidewire BillingCenter",
+            description="Configure and extend Guidewire BillingCenter using Java, REST APIs and SQL. What Will Our Ideal Candidate Have? 5+ years of Guidewire BillingCenter configuration and integration experience. Technical consulting, professional services, technical advisory, client delivery leadership and architecture.",
+        )
+        discover_jobs.score_job(job, {**BASE_PROFILE, "unsupported_primary_platforms": ["Guidewire"]}, 60)
+        self.assertEqual("Skip", job.decision)
+        self.assertLessEqual(job.fit_score, 45)
+        self.assertIn("unsupported primary platform: Guidewire", job.risk_flags)
+
+    def test_optional_guidewire_integration_does_not_block_java_role(self) -> None:
+        job = self.make_job(
+            title="Senior Software Engineer",
+            description="Build Java Spring Boot REST API SQL backend services with architecture and technical leadership. Familiarity with Guidewire for an optional integration is a plus.",
+        )
+        discover_jobs.score_job(job, {**BASE_PROFILE, "unsupported_primary_platforms": ["Guidewire"]}, 60)
+        self.assertNotEqual("Skip", job.decision)
+        self.assertNotIn("unsupported primary platform: Guidewire", job.risk_flags)
+
     def make_job(self, *, title: str, description: str) -> discover_jobs.JobPosting:
         return discover_jobs.JobPosting(
             company="Example Co",
@@ -37,6 +84,42 @@ class ScoringImprovementTests(unittest.TestCase):
             verification_status="official_live",
             description=description,
         )
+
+    def test_positive_override_cannot_revive_unavailable_posting(self) -> None:
+        job = self.make_job(title="Senior Software Engineer", description="Build Java APIs")
+        job.verification_status = "official_unavailable"
+        discover_jobs.score_job(job, BASE_PROFILE, 60)
+        discover_jobs.apply_job_overrides([job], [{"company": "Example Co", "decision": "Apply", "fit_score": "100"}])
+        self.assertEqual("Skip", job.decision)
+        self.assertLessEqual(job.fit_score, 45)
+
+    def test_old_manual_verification_is_not_current_live_evidence(self) -> None:
+        job = discover_jobs.job_from_verified_manual_metadata(
+            entry={"url": "https://example.com/jobs/1", "title": "Senior Software Engineer",
+                   "description": "Build Java Spring Boot REST API SQL backend services", "verified_on": "2026-10-13",
+                   "verification_status": "official_live", "location": "Remote US"},
+            company={"name": "Example Co"}, profile=BASE_PROFILE,
+            today=discover_jobs.dt.date(2026, 10, 14), max_age_days=60,
+        )
+        self.assertIsNotNone(job)
+        assert job is not None
+        self.assertEqual("verification_required", job.verification_status)
+        self.assertEqual("Skip", job.decision)
+        discover_jobs.enrich_job_with_verified_manual_metadata(
+            job, entry={"verification_status": "official_live", "verified_on": "2026-10-14"},
+            company={"name": "Example Co"}, profile=BASE_PROFILE,
+            today=discover_jobs.dt.date(2026, 10, 14), max_age_days=60,
+        )
+        self.assertEqual("verification_required", job.verification_status)
+
+    def test_expiration_uses_run_date_instead_of_wall_clock(self) -> None:
+        job = self.make_job(title="Senior Software Engineer", description="End Date: 2026-10-01 Build Java Spring Boot REST API SQL backend services")
+        discover_jobs.score_job(job, BASE_PROFILE, 60, as_of=discover_jobs.dt.date(2026, 9, 30))
+        self.assertNotEqual("Skip", job.decision)
+        discover_jobs.score_job(job, BASE_PROFILE, 60, as_of=discover_jobs.dt.date(2026, 10, 14))
+        self.assertEqual("Skip", job.decision)
+        discover_jobs.apply_job_overrides([job], [{"company": "Example Co", "decision": "Apply", "fit_score": "100"}], as_of=discover_jobs.dt.date(2026, 10, 14))
+        self.assertEqual("Skip", job.decision)
 
     def test_company_title_alias_counts_as_target_title_match(self) -> None:
         job = self.make_job(

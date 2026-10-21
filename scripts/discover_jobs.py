@@ -38,6 +38,21 @@ except ModuleNotFoundError:
     from language_requirements import required_unsupported_spoken_languages
 
 try:
+    from scripts.platform_requirements import unsupported_primary_platforms
+except ModuleNotFoundError:
+    from platform_requirements import unsupported_primary_platforms
+
+try:
+    from scripts.qualification_requirements import qualification_text, unconfirmed_required_capabilities
+except ModuleNotFoundError:
+    from qualification_requirements import qualification_text, unconfirmed_required_capabilities
+
+try:
+    from scripts.posting_availability import posting_availability_blockers
+except ModuleNotFoundError:
+    from posting_availability import posting_availability_blockers
+
+try:
     from scripts.location_requirements import hybrid_location_outside_allowed_metro
 except ModuleNotFoundError:
     from location_requirements import hybrid_location_outside_allowed_metro
@@ -95,7 +110,6 @@ MAX_X_POST_JOB_URLS_PER_POST = 3
 MAX_SOCIAL_POST_FETCHES_PER_RUN = 12
 MAX_SOCIAL_CONSECUTIVE_QUERY_FAILURES = 5
 MAX_SOCIAL_TOTAL_QUERY_FAILURES = 15
-MAX_COMPACT_DESCRIPTION_CHARS = 4000
 MAX_SKIP_DESCRIPTION_CHARS = 240
 MAX_PUBLIC_BOARD_QUERY_FILE_COMPANIES = 12
 MAX_PUBLIC_BOARD_QUERY_FILE_TITLES = 3
@@ -313,7 +327,7 @@ UNAVAILABLE_TEXT_MARKERS = [
     "no longer accepting applications",
     "this job is no longer accepting applications",
     "this position is no longer available",
-    "404",
+    "the page you are looking for doesn't exist",
 ]
 
 
@@ -420,19 +434,6 @@ def truncate_text(value: str, max_chars: int) -> str:
     return text[: max_chars - 3].rstrip() + "..."
 
 
-def compact_text_preserving_ends(value: str, max_chars: int) -> str:
-    text = value or ""
-    if len(text) <= max_chars:
-        return text
-    marker = "\n\n[middle omitted]\n\n"
-    if max_chars <= len(marker):
-        return truncate_text(text, max_chars)
-    content_chars = max_chars - len(marker)
-    head_chars = (content_chars * 3) // 5
-    tail_chars = content_chars - head_chars
-    return text[:head_chars].rstrip() + marker + text[-tail_chars:].lstrip()
-
-
 def build_discovered_jobs_payload(
     *,
     jobs: list[JobPosting],
@@ -444,11 +445,10 @@ def build_discovered_jobs_payload(
     for job in jobs:
         job_dict = asdict(job)
         description = str(job_dict.get("description") or "")
-        if job.decision in {"Apply", "Maybe"}:
-            job_dict["description"] = compact_text_preserving_ends(
-                description,
-                MAX_COMPACT_DESCRIPTION_CHARS,
-            )
+        if job.decision in {"Apply", "Maybe", NEEDS_FRESHNESS_VERIFICATION_DECISION}:
+            # Strict review needs the complete qualification evidence, including
+            # requirements in the middle of long employer descriptions.
+            job_dict["description"] = description
         else:
             job_dict["description"] = truncate_text(description, MAX_SKIP_DESCRIPTION_CHARS)
         serialized_jobs.append(job_dict)
@@ -952,7 +952,7 @@ def job_from_usajobs_descriptor(
     clearance = usajobs_security_clearance(descriptor).casefold()
     if clearance and clearance not in {"not required", "none"}:
         job.risk_flags.append(f"security clearance required: {clearance}")
-    score_job(job, profile, max_age_days, company={"name": company})
+    score_job(job, profile, max_age_days, company={"name": company}, as_of=today)
     if any("security clearance required:" in risk for risk in job.risk_flags):
         job.decision = "Skip"
         job.fit_score = min(job.fit_score, 45)
@@ -1622,7 +1622,7 @@ class WorkdayAdapter(Adapter):
                             source=self.name,
                             job_id=job_id,
                         )
-                        score_job(jobs[key], profile, max_age_days, company=company)
+                        score_job(jobs[key], profile, max_age_days, company=company, as_of=today)
                         term_added_jobs += 1
                         if is_viable_discovery_candidate(jobs[key], max_age_days):
                             term_viable_jobs += 1
@@ -1677,9 +1677,11 @@ class WorkdayAdapter(Adapter):
         for job in jobs.values():
             if job.url in detail_urls:
                 detail = self.fetch_detail(job, today, errors)
-                score_job(detail, profile, max_age_days, company=company)
+                score_job(detail, profile, max_age_days, company=company, as_of=today)
                 detailed.append(detail)
             else:
+                job.verification_status = "verification_required"
+                score_job(job, profile, max_age_days, company=company, as_of=today)
                 detailed.append(job)
         return detailed
 
@@ -1688,20 +1690,30 @@ class WorkdayAdapter(Adapter):
         # Convert public URL back to CXS detail path.
         marker = f"/{self.site}/"
         if marker not in parsed.path:
+            job.verification_status = "verification_failed"
+            errors.append(DiscoveryError(job.company, self.name, f"detail path invalid: {job.url}"))
             return job
         cxs_path = parsed.path.split(marker, 1)[1]
         detail_url = f"{self.base}/wday/cxs/{self.tenant}/{self.site}/{cxs_path}"
         try:
             response = request_json(detail_url)
         except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+            job.verification_status = (
+                "official_unavailable" if isinstance(exc, HTTPError) and exc.code in {404, 410}
+                else "verification_failed"
+            )
             errors.append(DiscoveryError(job.company, self.name, f"detail failed {job.title}: {exc}"))
             return job
 
         info = response.get("jobPostingInfo", {}) if isinstance(response, dict) else {}
-        if not isinstance(info, dict):
+        if not isinstance(info, dict) or not info.get("title") or not info.get("jobDescription"):
+            job.verification_status = "verification_failed"
+            errors.append(DiscoveryError(job.company, self.name, f"detail missing posting data: {job.url}"))
             return job
 
-        job.description = html_to_text(str(info.get("jobDescription", "")))
+        job.verification_status = "official_live"
+
+        job.description = qualification_text(str(info.get("jobDescription", "")))
         job.title = str(info.get("title") or job.title).strip()
         job.location = workday_detail_locations(info, job.location)
         job.work_model = str(info.get("remoteType") or infer_work_model(job.location, job.description))
@@ -1772,7 +1784,7 @@ class GreenhouseAdapter(Adapter):
                 source=self.name,
                 job_id=str(item.get("id", "")),
             )
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
         return jobs
 
@@ -1839,7 +1851,7 @@ class LeverAdapter(Adapter):
                 source=self.name,
                 job_id=str(item.get("id", "")),
             )
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
         return jobs
 
@@ -1894,7 +1906,7 @@ class SmartRecruitersAdapter(Adapter):
                 source=self.name,
                 job_id=str(item.get("id", "")),
             )
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
         return jobs
 
@@ -2000,7 +2012,7 @@ class AshbyAdapter(Adapter):
                 source=self.name,
                 job_id=posting_id,
             )
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
         return jobs
 
@@ -2127,7 +2139,7 @@ class ADPAdapter(Adapter):
             )
             if age is None:
                 job.risk_flags.append("official posting is live but posting date is unavailable; needs freshness verification")
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
         return jobs
 
@@ -2278,7 +2290,7 @@ class FirstPartyListingAdapter(Adapter):
                     source=self.name,
                     job_id=job_id,
                 )
-                score_job(job, profile, max_age_days, company=company)
+                score_job(job, profile, max_age_days, company=company, as_of=today)
                 jobs.append(job)
         return dedupe_postings(jobs)
 
@@ -2423,7 +2435,7 @@ class FirstPartyListingAdapter(Adapter):
                 source=self.name,
                 job_id=job_id,
             )
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
         return jobs
 
@@ -2690,11 +2702,11 @@ def extract_json_ld_jobs(
                 posted_on=posted_on,
                 posted_age_days=age,
                 date_basis=date_basis,
-                description=html_to_text(str(item.get("description", ""))),
+                description=qualification_text(str(item.get("description", ""))),
                 source="json-ld",
                 job_id=str(item.get("identifier", "")),
             )
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
     return jobs
 
@@ -2738,7 +2750,7 @@ def fetch_job_page_jobs(
         source=source,
         job_id=extract_requisition_hint(url),
     )
-    score_job(job, profile, max_age_days, company=company)
+    score_job(job, profile, max_age_days, company=company, as_of=today)
     return [job]
 
 
@@ -2790,7 +2802,7 @@ def parse_insight_global_job_page(
         job_id=extract_insight_global_job_id(url, page),
         verification_status="official_live",
     )
-    score_job(job, profile, max_age_days, company=company)
+    score_job(job, profile, max_age_days, company=company, as_of=today)
     return job
 
 
@@ -2827,7 +2839,7 @@ def parse_atlassian_job_page(
         job_id=extract_atlassian_job_id(canonical_url, page),
         verification_status="official_live",
     )
-    score_job(job, profile, max_age_days, company=company)
+    score_job(job, profile, max_age_days, company=company, as_of=today)
     return job
 
 
@@ -3670,8 +3682,11 @@ def strip_tracking_fragment(url: str) -> str:
 def page_looks_unavailable(status: int, page: str) -> bool:
     if status >= 400:
         return True
-    lowered = html_to_text(page[:20000]).lower()
-    return any(marker in lowered for marker in UNAVAILABLE_TEXT_MARKERS)
+    visible_page = re.sub(r'<(script|style)\b[^>]*>.*?</\1\s*>', '', page, flags=re.IGNORECASE | re.DOTALL)
+    lowered = html_to_text(visible_page[:20000]).lower()
+    return bool(re.fullmatch(r'(?:error\s+)?404(?:\s*[-:]?\s*not found)?', lowered)) or any(
+        marker in lowered for marker in UNAVAILABLE_TEXT_MARKERS
+    )
 
 
 def page_looks_like_access_challenge(page: str) -> bool:
@@ -3743,7 +3758,7 @@ def job_from_official_page(
             return None
         best.source = f"public-board:{hit.source}->json-ld"
         best.risk_flags.append(f"discovered via {hit.source}; verified on official page")
-        score_job(best, profile, max_age_days, company=company)
+        score_job(best, profile, max_age_days, company=company, as_of=today)
         enforce_public_board_freshness(best, max_age_days)
         return best
 
@@ -3767,7 +3782,7 @@ def job_from_official_page(
         verification_status="official_live",
         risk_flags=[f"discovered via {hit.source}; verified on official page"],
     )
-    score_job(job, profile, max_age_days, company=company)
+    score_job(job, profile, max_age_days, company=company, as_of=today)
     enforce_public_board_freshness(job, max_age_days)
     return job
 
@@ -3857,7 +3872,7 @@ def job_from_ats_url(
             return None
         if title_similarity(target_title, detail.title) < 0.4:
             return None
-        score_job(detail, profile, max_age_days, company=company)
+        score_job(detail, profile, max_age_days, company=company, as_of=today)
         enforce_public_board_freshness(detail, max_age_days)
         return detail
 
@@ -3900,7 +3915,7 @@ def job_from_ats_url(
         return None
     best.source = f"public-board:{hit.source}->{adapter.name}"
     best.risk_flags.append(f"discovered via {hit.source}; verified on {adapter.name}")
-    score_job(best, profile, max_age_days, company=company)
+    score_job(best, profile, max_age_days, company=company, as_of=today)
     enforce_public_board_freshness(best, max_age_days)
     return best
 
@@ -4167,11 +4182,13 @@ def job_from_verified_manual_metadata(
         date_basis=f"candidate verified official page on {entry['verified_on']}; {date_basis}",
         description=description,
         source="manual-url->verified-metadata",
-        verification_status="official_live",
+        verification_status=(
+            "official_live" if entry["verified_on"] == today.isoformat() else "verification_required"
+        ),
         job_id=entry.get("job_id", "") or extract_requisition_hint(entry["url"]),
         source_url=entry.get("source_url", ""),
     )
-    score_job(job, profile, max_age_days, company=company)
+    score_job(job, profile, max_age_days, company=company, as_of=today)
     return job
 
 
@@ -4184,6 +4201,8 @@ def enrich_job_with_verified_manual_metadata(
     today: dt.date,
     max_age_days: int,
 ) -> None:
+    if job.verification_status != "official_live":
+        return
     metadata_job = job_from_verified_manual_metadata(
         entry=entry,
         company=company,
@@ -4207,7 +4226,7 @@ def enrich_job_with_verified_manual_metadata(
     job.job_id = metadata_job.job_id or job.job_id
     job.source_url = metadata_job.source_url or job.source_url
     job.verification_status = "official_live"
-    score_job(job, profile, max_age_days, company=company)
+    score_job(job, profile, max_age_days, company=company, as_of=today)
 
 
 def apply_job_overrides(
@@ -4237,6 +4256,11 @@ def apply_job_overrides(
             if job_id and job_id != job.job_id and job_id not in job.url:
                 continue
             if not company and not title_contains and not url_contains and not job_id:
+                continue
+            if posting_availability_blockers(
+                verification_status=job.verification_status, description=job.description, as_of=effective_date,
+            ) and override.get("decision", "") != "Skip":
+                job.risk_flags = dedupe([*job.risk_flags, "availability gate prevents positive job override"])
                 continue
             if decision := override.get("decision"):
                 job.decision = decision
@@ -4345,6 +4369,10 @@ def discover_manual_job_urls(
                 today=today,
                 max_age_days=max_age_days,
             )
+            if job is not None and extract_workday_config(url):
+                # A Workday HTML shell cannot replace a failed CXS detail check.
+                job.verification_status = "verification_required"
+                score_job(job, profile, max_age_days, company=company, as_of=today)
         if job:
             enrich_job_with_verified_manual_metadata(
                 job,
@@ -5134,6 +5162,7 @@ def score_job(
     max_age_days: int,
     *,
     company: dict[str, Any] | None = None,
+    as_of: dt.date | None = None,
 ) -> None:
     haystack = f"{job.title} {job.description} {job.location} {job.work_model}".lower()
     title_text = job.title.lower()
@@ -5226,6 +5255,7 @@ def score_job(
         "courbevoie",
         "france",
         "sweden",
+        "austria",
         "stockholm",
         "poland",
         "warsaw",
@@ -5367,6 +5397,23 @@ def score_job(
         risks.append("required .NET tech stack")
         hard_reject = True
 
+    platform_gaps = unsupported_primary_platforms(
+        title=job.title,
+        description=job.description,
+        unsupported_platforms=profile.get("unsupported_primary_platforms", []) or [],
+    )
+    if platform_gaps:
+        score = min(score - 45, 45)
+        risks.extend(f"unsupported primary platform: {platform}" for platform in platform_gaps)
+        hard_reject = True
+
+    capability_gaps = unconfirmed_required_capabilities(
+        title=job.title, description=job.description, rules=profile.get('required_capability_evidence', []) or [],
+    )
+    if capability_gaps:
+        risks.extend(f'unconfirmed required specialist capability: {gap}' for gap in capability_gaps)
+        hard_reject = True
+
     unsupported_languages = required_unsupported_spoken_languages(
         haystack,
         [str(item) for item in profile.get("unsupported_required_languages", [])],
@@ -5418,9 +5465,12 @@ def score_job(
         score += 3
         reasons.append(f"posted within {max_age_days} days")
 
-    if job.verification_status != "official_live":
-        score -= 25
-        risks.append(job.verification_status)
+    availability_blockers = posting_availability_blockers(
+        verification_status=job.verification_status, description=job.description, as_of=as_of or dt.date.today(),
+    )
+    if availability_blockers:
+        hard_reject = True
+        risks.extend(availability_blockers)
 
     required_gap_hits = explicit_required_experience_gaps(haystack)
     if required_gap_hits:
@@ -5455,6 +5505,12 @@ def score_job(
         score = min(score - 45, 35)
         hard_reject = True
 
+    if platform_gaps:
+        score = min(score, 45)
+    if capability_gaps:
+        score = min(score, 45)
+    if availability_blockers:
+        score = min(score, 45)
     job.fit_score = max(0, min(100, score))
     job.fit_reasons = dedupe(reasons)
     job.risk_flags = dedupe(risks)
@@ -5564,7 +5620,7 @@ def discover_ats_sentinel(
                 source=f"{adapter.name}-sentinel",
                 job_id=identifier_match.group(1) if identifier_match else url.rstrip("/").rsplit("/", 1)[-1],
             )
-            score_job(job, profile, max_age_days, company=company)
+            score_job(job, profile, max_age_days, company=company, as_of=today)
             jobs.append(job)
         return jobs
     if not isinstance(adapter, WorkdayAdapter):
@@ -5601,7 +5657,7 @@ def discover_ats_sentinel(
             source="workday-sentinel",
             job_id=str((item.get("bulletFields") or [""])[0] or external_path),
         )
-        score_job(job, profile, max_age_days, company=company)
+        score_job(job, profile, max_age_days, company=company, as_of=today)
         jobs.append(job)
     return jobs
 
@@ -5619,7 +5675,7 @@ def hydrate_ats_sentinel_job(
     adapter = adapter_for_url(board_url)
     if isinstance(adapter, WorkdayAdapter):
         job = adapter.fetch_detail(job, today, errors)
-        score_job(job, profile, max_age_days, company=company)
+        score_job(job, profile, max_age_days, company=company, as_of=today)
     elif isinstance(adapter, (ICIMSAdapter, WorkableAdapter)):
         detailed = fetch_job_page_jobs(
             company,

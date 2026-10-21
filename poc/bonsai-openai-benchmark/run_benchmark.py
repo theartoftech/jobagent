@@ -59,7 +59,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     )
     parser.add_argument("--openai-env-file", type=Path)
     parser.add_argument("--bonsai-model", default="Bonsai-27B-Q1_0")
-    parser.add_argument("--bonsai-base-url", default="https://llmserver:8443/v1")
+    parser.add_argument("--bonsai-base-url", default="https://llmserver:8444/v1")
     parser.add_argument(
         "--bonsai-ca-file",
         type=Path,

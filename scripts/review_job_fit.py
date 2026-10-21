@@ -31,6 +31,9 @@ except ModuleNotFoundError:
     yaml = None
 
 if __package__:
+    from scripts.qualification_requirements import REQUIRED_HEADING, contains_required_qualification, has_confirmed_alternative, qualification_text, unconfirmed_required_capabilities
+    from scripts.posting_availability import posting_availability_blockers
+    from scripts.platform_requirements import unsupported_primary_platforms
     from scripts.job_override_dates import override_is_active
     from scripts.language_requirements import required_unsupported_spoken_languages
     from scripts.location_requirements import (
@@ -40,6 +43,18 @@ if __package__:
     from scripts.mark_applied_jobs import ReportJob, TrackerJob, load_tracker_jobs_snapshot, match_tracker_job
     from scripts.render_workflow_review_html import write_workflow_review_html
 else:
+    try:
+        from scripts.qualification_requirements import REQUIRED_HEADING, contains_required_qualification, has_confirmed_alternative, qualification_text, unconfirmed_required_capabilities
+    except ModuleNotFoundError:
+        from qualification_requirements import REQUIRED_HEADING, contains_required_qualification, has_confirmed_alternative, qualification_text, unconfirmed_required_capabilities
+    try:
+        from scripts.posting_availability import posting_availability_blockers
+    except ModuleNotFoundError:
+        from posting_availability import posting_availability_blockers
+    try:
+        from scripts.platform_requirements import unsupported_primary_platforms
+    except ModuleNotFoundError:
+        from platform_requirements import unsupported_primary_platforms
     try:
         from scripts.job_override_dates import override_is_active
     except ModuleNotFoundError:
@@ -268,6 +283,10 @@ def is_active_carry_forward_review(item: dict[str, Any]) -> bool:
         return False
     if bool(item.get("should_generate_resume", False)):
         return True
+    if "official posting availability not verified: verification_required" in (item.get("hard_blockers") or []):
+        return True
+    if 'incomplete qualification evidence; refresh official posting' in (item.get('hard_blockers') or []):
+        return True
     decision = normalize(item.get("workflow_decision", ""))
     return bool(item.get("gap_questions_needed", False)) and decision in {
         "strong apply",
@@ -325,7 +344,7 @@ def load_carry_forward_jobs(*, out_dir: Path, run_date: str) -> list[dict[str, A
         source_jobs = [item for item in raw_source_jobs if isinstance(item, dict)]
 
     return [
-        job
+        {**job, "verification_status": "verification_required"}
         for job in source_jobs
         if job_identity(job) in active_identities
         or (
@@ -473,6 +492,9 @@ def text_for_job(job: dict[str, Any]) -> str:
 
 
 def contains_required_context(text: str, token: str) -> bool:
+    if REQUIRED_HEADING.search(qualification_text(text)):
+        return contains_required_qualification(text, token)
+    text = normalize(text)
     token = normalize(token)
     if not token:
         return False
@@ -537,17 +559,7 @@ def required_skill_has_confirmed_disjunctive_alternative(
     required_skill: str,
     confirmed_strengths: list[str],
 ) -> bool:
-    normalized_text = normalize(text)
-    for clause in re.split(r"(?<=[.;])\s+", normalized_text):
-        if not contains_term(clause, required_skill) or not contains_term(clause, "or"):
-            continue
-        for strength in confirmed_strengths:
-            for variant in skill_variants(strength):
-                if normalize(variant) == normalize(required_skill):
-                    continue
-                if contains_term(clause, variant):
-                    return True
-    return False
+    return has_confirmed_alternative(text, required_skill, [variant for strength in confirmed_strengths for variant in skill_variants(strength)])
 
 
 def detect_required_gaps(
@@ -555,10 +567,11 @@ def detect_required_gaps(
     do_not_claim: list[str],
     confirmed_strengths: list[str] | None = None,
 ) -> list[str]:
-    required_text = re.split(
+    required_text = text if REQUIRED_HEADING.search(qualification_text(text)) else re.split(
         r"\b(?:preferred qualifications|preferred experience|nice to have|bonus qualifications)\b",
         text,
         maxsplit=1,
+        flags=re.IGNORECASE,
     )[0]
     confirmed = confirmed_strengths or []
     gaps: list[str] = []
@@ -686,7 +699,8 @@ def published_annual_compensation_maximum(text: str) -> float | None:
                 nearby_start = max(0, amount_match.start() - 50)
                 nearby_end = min(len(window), amount_match.end() + 50)
                 nearby = window[nearby_start:nearby_end]
-                if "per hour" in nearby or "hourly" in nearby:
+                mixed_annual_disclosure = 'annual' in window and 'hourly' in window
+                if "per hour" in nearby or ("hourly" in nearby and not mixed_annual_disclosure):
                     continue
                 token = amount_match.group("amount").replace(",", "").replace(" ", "")
                 multiplier = 1000.0 if token.casefold().endswith("k") else 1.0
@@ -703,11 +717,26 @@ def detect_hard_blockers(
     workflow_profile: dict[str, Any],
     required_gaps: list[str],
     confirmed_strengths: list[str] | None = None,
+    *, as_of: dt.date | None = None,
 ) -> list[str]:
     blockers: list[str] = []
+    if '[middle omitted]' in str(job.get('description', '')):
+        blockers.append('incomplete qualification evidence; refresh official posting')
+    blockers.extend(posting_availability_blockers(
+        verification_status=str(job.get("verification_status", "")),
+        description=str(job.get("description", "")), as_of=as_of or dt.date.today(),
+    ))
     risk_flags = [normalize(flag) for flag in job.get("risk_flags", []) or []]
 
     salary_floor = configured_salary_floor(workflow_profile)
+    blockers.extend(
+        f"unsupported primary platform: {platform}"
+        for platform in unsupported_primary_platforms(
+            title=str(job.get("title", "")),
+            description=str(job.get("description", "")),
+            unsupported_platforms=workflow_profile.get("unsupported_primary_platforms", []) or [],
+        )
+    )
     published_maximum = published_annual_compensation_maximum(text)
     if (
         salary_floor is not None
@@ -899,12 +928,24 @@ def classify_review(
     job: dict[str, Any],
     workflow_profile: dict[str, Any],
     tracker_jobs: list[TrackerJob] | None = None,
+    as_of: dt.date | None = None,
 ) -> WorkflowReview:
     text = text_for_job(job)
     do_not_claim = [str(item) for item in workflow_profile.get("do_not_claim", []) or []]
     confirmed = [str(item) for item in workflow_profile.get("confirmed_strengths", []) or []]
 
-    required_gaps = detect_required_gaps(text, do_not_claim, confirmed)
+    platform_gaps = unsupported_primary_platforms(
+        title=str(job.get("title", "")),
+        description=str(job.get("description", "")),
+        unsupported_platforms=workflow_profile.get("unsupported_primary_platforms", []) or [],
+    )
+    # General-language alternatives do not substitute for expertise in a
+    # platform that defines the job's implementation work.
+    capability_gaps = unconfirmed_required_capabilities(
+        title=str(job.get('title', '')), description=str(job.get('description', '')),
+        rules=workflow_profile.get('required_capability_evidence', []) or [],
+    )
+    required_gaps = dedupe([*detect_required_gaps(str(job.get('description', '')), do_not_claim, confirmed), *platform_gaps, *capability_gaps])
     preferred_gaps = detect_preferred_gaps(text, do_not_claim, required_gaps, confirmed)
     resolved_gaps = resolve_gap_answers(
         job=job,
@@ -923,7 +964,9 @@ def classify_review(
         workflow_profile,
         effective_required_gaps,
         confirmed,
+        as_of=as_of,
     )
+    blockers.extend(f'unconfirmed required specialist capability: {gap}' for gap in capability_gaps if gap in effective_required_gaps)
     overqualified_risk, resume_positioning, seniority_scope_risks, interview_positioning_note = (
         classify_seniority_fit(job=job, text=text, workflow_profile=workflow_profile)
     )
@@ -1014,6 +1057,10 @@ def classify_review(
         "EXTREME STRETCH": "Skip unless the candidate explicitly overrides.",
         "SKIP": "Skip.",
     }[workflow_decision]
+    if job.get("verification_status") in {"verification_required", "verification_failed"}:
+        final_action = "Verify the live official posting before the resume workflow."
+    if 'incomplete qualification evidence; refresh official posting' in blockers:
+        final_action = 'Refresh the full official qualifications before the resume workflow.'
     if already_applied:
         final_action = "Already applied — do not generate another resume."
     elif overqualified_risk == "high" and not seniority_allows_resume and workflow_decision in {
@@ -1232,17 +1279,22 @@ def main() -> None:
         and not is_excluded_role_title(job, workflow_profile)
         and not is_skipped_by_job_override(job, job_overrides, as_of=run_date)
     ]
-    reviewed_jobs = dedupe_equivalent_postings(
-        merge_current_and_carry_forward_jobs(current_reviewed_jobs, carry_forward_jobs)
-    )
+    # Current negative evidence must supersede a prior positive review too.
+    reviewed_jobs = dedupe_equivalent_postings([
+        job for job in merge_current_and_carry_forward_jobs(jobs, carry_forward_jobs)
+        if normalize(job.get("decision", "")) in allowed_source_decisions
+        and not is_excluded_company(job, workflow_profile)
+        and not is_excluded_role_title(job, workflow_profile)
+        and not is_skipped_by_job_override(job, job_overrides, as_of=run_date)
+    ])
     reviews = [
-        classify_review(job=job, workflow_profile=workflow_profile, tracker_jobs=tracker_jobs)
+        classify_review(job=job, workflow_profile=workflow_profile, tracker_jobs=tracker_jobs, as_of=run_date)
         for job in reviewed_jobs
     ]
 
     current_identities = {job_identity(job) for job in current_reviewed_jobs}
     new_carry_forward_count = sum(
-        1 for job in carry_forward_jobs if job_identity(job) not in current_identities
+        1 for job in reviewed_jobs if job_identity(job) not in current_identities
     )
     json_path = write_json(
         reviews,
