@@ -1,0 +1,33 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+outputs/
+outputs-contacts/
+.coverage
+htmlcov/
+Source Docs/
+resume_templates.json
+/*_profile.yml
+linkedin-export*.zip
+linkedin-live-verifications*.json
+
+# Interview answers and every generated candidate input stay local.
+setup.answers.json
+candidate_profile.yaml
+candidate_profile.yml
+candidate_workflow_profile.yml
+companies.yml
+ats_registry.yml
+startup_watchlist.yml
+manual_job_urls.yml
+job_overrides.yml
+job_sources.yml
+search_rules.md
+applied_jobs.json
+run_preferences.json
+candidate_evidence.json
+coverage.json

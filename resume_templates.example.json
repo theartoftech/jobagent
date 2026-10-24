@@ -1,0 +1,8 @@
+{
+  "general": {
+    "filename": "Candidate_SOURCE_Resume.docx",
+    "sha256": "replace-with-sha256-of-source-document",
+    "source_title": "Exact existing resume headline",
+    "summary_prefix": "Exact opening words of the existing summary"
+  }
+}
